@@ -29,6 +29,7 @@ import app.meuorcamento.data.ApiException
 import app.meuorcamento.domain.formatCentavos
 import app.meuorcamento.ui.CompetenciaPicker
 import app.meuorcamento.ui.OfflineBanner
+import app.meuorcamento.ui.copy.Strings
 import kotlinx.serialization.Serializable
 import java.io.IOException
 import java.util.Calendar
@@ -148,14 +149,14 @@ fun ResumoScreen(
             OfflineBanner(offline || error != null, error)
             when {
                 loading && totais == null -> CircularProgressIndicator(Modifier.padding(24.dp))
-                totais == null -> Text("Não foi possível carregar o orçamento.")
+                totais == null -> Text(Strings.erroCarregarOrcamento)
                 else -> {
                     val ainda = totais.aindaPodeGastarCentavos
                     val orcado = totais.totalOrcadoDespesasCentavos
                     val gasto = totais.totalGastoDespesasCentavos
                     val dias = diasRestantesNoMes(competencia)
                     val estourou = ainda < 0
-                    Text(if (estourou) "Passou do orçado" else "Ainda pode gastar")
+                    Text(if (estourou) Strings.passouDoOrcado else Strings.aindaPodeGastar)
                     Text(
                         formatCentavos(ainda),
                         style = ValorDisplay,
@@ -163,8 +164,8 @@ fun ResumoScreen(
                     )
                     if (orcado > 0) {
                         val frase = buildString {
-                            append("Gastou ${formatCentavos(gasto)} de ${formatCentavos(orcado)}")
-                            if (dias != null) append(". Faltam $dias dias neste mês, incluindo hoje")
+                            append("${Strings.gastou} ${formatCentavos(gasto)} de ${formatCentavos(orcado)}")
+                            if (dias != null) append(". ${Strings.faltam} $dias ${Strings.diasNesteMes}")
                         }
                         Text(
                             frase,
@@ -180,7 +181,7 @@ fun ResumoScreen(
                         )
                     } else if (dias != null) {
                         Text(
-                            "Faltam $dias dias neste mês, incluindo hoje",
+                            "${Strings.faltam} $dias ${Strings.diasNesteMes}",
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
@@ -211,7 +212,7 @@ private fun LinhaTipo(tipo: TotalTipoDto, onClick: () -> Unit) {
             Text(formatCentavos(tipo.realizadoCentavos), maxLines = 1, softWrap = false)
         }
         Text(
-            "planejado ${formatCentavos(tipo.planoCentavos)}",
+            "${Strings.plano} ${formatCentavos(tipo.planoCentavos)}",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -219,17 +220,17 @@ private fun LinhaTipo(tipo: TotalTipoDto, onClick: () -> Unit) {
 }
 
 fun labelChip(tipo: String): String = when (tipo) {
-    "R" -> "Receitas"
-    "F" -> "Fixas"
-    "V" -> "Variáveis"
-    "E" -> "Anuais"
+    "R" -> Strings.receitas
+    "F" -> Strings.fixas
+    "V" -> Strings.variaveis
+    "E" -> Strings.anuais
     else -> tipo
 }
 
 fun labelTipo(tipo: String): String = when (tipo) {
-    "R" -> "Receitas"
-    "F" -> "Despesas fixas"
-    "V" -> "Despesas variáveis"
-    "E" -> "Anuais / eventuais"
+    "R" -> Strings.receitas
+    "F" -> Strings.despesasFixas
+    "V" -> Strings.despesasVariaveis
+    "E" -> Strings.anuaisEventuais
     else -> tipo
 }
