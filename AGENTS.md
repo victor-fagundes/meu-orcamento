@@ -37,5 +37,6 @@ Cada história/card (MO-xxx) entrega **back + front juntos** na mesma entrega.
 ## Ordem de trabalho atual
 
 Release A e Release B `verified` (PM 2026-11-16). Specs 001–022 `verified`.  
-GAP-001, GAP-002, GAP-004 e GAP-005 fechados.  
-Próximo em aberto, sem fatia confirmada: GAP-006 (Resumo) ou GAP-007 (sheet). GAP-003 segue no parking lot.
+Spec 025 `implemented` (chegar no mês: card Total gasto e destino do import de lançamentos). Falta o PM marcar `verified`.  
+GAP-001, GAP-002, GAP-003, GAP-004, GAP-005 e GAP-006 fechados.  
+Próximo em aberto: GAP-007 (foco do sheet e nome acessível de Arquivar).

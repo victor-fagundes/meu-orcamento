@@ -36,7 +36,7 @@ O Resumo lê a mesma competência do Orçamento. O filtro é o mês, mais pagame
 | Barras | Sem dados | Eixos vazios |
 | Média | Mês corrente, dia D, gasto G | round(G / D) centavos e dias restantes = último dia do mês − D |
 | Outro mês | Competência diferente do mês civil atual | Média diária e dias restantes não aparecem |
-| Card | Toque no total gasto | Abre Lançamentos dessa competência |
+| Card | Toque no total gasto | Abre Lançamentos dessa competência. O href leva `mes` (spec 025; antes o link ia para Lançamentos sem mês) |
 | Card | Toque no orçado ou no tipo | Abre Orçamento dessa competência |
 
 ## Acceptance criteria

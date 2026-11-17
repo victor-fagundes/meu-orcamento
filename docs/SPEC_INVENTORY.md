@@ -75,4 +75,4 @@ Release A is inventoried with default fit rules (FR-010): `implemented` / `verif
 
 ## Self-reference
 
-All 22 specs (001–022) are `verified` after the PM marked verify on 2026-11-16. GAP-004 and GAP-005 are closed. GAP-003, GAP-006 and GAP-007 stay open and unconfirmed.
+All 22 specs (001–022) are `verified` after the PM marked verify on 2026-11-16. Em 2026-11-17 a spec 025 (`implemented`) fecha o card Total gasto e o destino do import de lançamentos. GAP-007 continua aberto. O PM ainda não marcou a 025 como `verified`.

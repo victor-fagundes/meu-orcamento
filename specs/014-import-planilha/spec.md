@@ -60,6 +60,11 @@ Unit: `src/domain/import-planilha.test.ts`, inclusive “Açúcar” = “acucar
 - A confirmação reconstrói a prévia no servidor (linhas + mapa + meio). Não grava meio, valor, aceite ou duplicata vindos da prévia do cliente.
 - [x] AC-020-014 Seção auxilia o ano da data; competência via regra do cartão na confirmação
 
+## Amend (025)
+
+- Depois de gravar lançamentos, a tela abre o mês civil se ele está no conjunto; senão a competência mais recente. O relatório nomeia esse mês.
+- [x] AC-025 na spec `025-chegar-no-mes`
+
 ## Open questions
 
 Nenhuma. D-05.

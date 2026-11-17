@@ -20,6 +20,7 @@ import {
   type PreviewRow,
 } from "@/domain/import-planilha";
 import { formatBRL } from "@/domain/money";
+import { competenciaDestinoImport, textoDestinoImport } from "@/domain/navegacao-mes";
 import { FileField } from "@/components/file-field";
 import { MdFilledButton, MdOption, MdOutlinedButton, MdSelect } from "@/components/material/ui";
 
@@ -572,10 +573,12 @@ export function ImportPlanilhaPanel({ cartoes = [] }: { cartoes?: CartaoOpt[] })
                 }
                 rememberHash(meta.fileHash);
                 setSeenBefore(true);
-                const mes = res.competencias[0];
+                const hoje = new Date();
+                const mesCivil = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, "0")}`;
+                const mes = competenciaDestinoImport(res.competencias, mesCivil);
                 setReport(
                   `Importados: ${res.imported} · Ignorados: ${res.skipped} · Rejeitados: ${res.rejected} · Itens criados: ${res.itemsCreated}` +
-                    (mes ? ` · ver Lançamentos em ${mes}` : ""),
+                    (mes ? ` · ${textoDestinoImport(mes, res.competencias.length)}` : ""),
                 );
                 setPreview(null);
                 if (mes) router.push(`/app/lancamentos?mes=${mes}`);

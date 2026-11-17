@@ -370,6 +370,7 @@ Cards clicáveis com filtros visíveis e “Limpar filtros”.
 **Critérios de aceite**
 - [x] Filtro cartão: total gasto filtrado; orçado/saldo “—” com texto explicativo (6).
 - [x] Cards levam a Orçamento ou Lançamentos conforme contexto.
+- [x] Total gasto abre Lançamentos na competência do Resumo (spec 025).
 - [x] Filtros não alteram dados, só visualização.
 
 **Dependências:** MO-401, MO-304
@@ -513,6 +514,7 @@ Importar com relatório e regra de duplicidade.
 - [ ] Competência cartão aplicada em linhas de crédito.
 - [ ] Reimportação pede confirmação; duplicatas sinalizadas na prévia.
 - [ ] Dados existentes não sobrescritos sem confirmação.
+- [x] Depois de importar lançamentos, abre o mês civil se ele foi gravado; senão a competência mais recente (spec 025).
 
 **Dependências:** MO-802, MO-302
 

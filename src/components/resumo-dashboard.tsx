@@ -4,6 +4,7 @@ import Link from "next/link";
 import { track } from "@/lib/telemetry";
 import { useMemo, useState } from "react";
 import { TIPOS_LABEL, type TipoOrcamento } from "@/domain/catalog";
+import { hrefLancamentosMes } from "@/domain/navegacao-mes";
 import { formatBRL } from "@/domain/money";
 import { MdFilledButton, MdOption, MdSelect } from "@/components/material/ui";
 import { collapseDonutGroups } from "@/components/resumo-donut";
@@ -208,7 +209,7 @@ export function ResumoDashboard({
           <div className="am">{pgAll ? formatBRL(planoDespesas) : "—"}</div>
           <div className="sp">{pgAll ? "despesas previstas no mês" : "não se aplica ao filtro de pagamento"}</div>
         </Link>
-        <Link href="/app/lancamentos" className="resumo-kb">
+        <Link href={hrefLancamentosMes(competencia)} className="resumo-kb">
           <div className="sp">Total gasto</div>
           <div className={`am${pgAll && gasto > planoDespesas ? " er" : ""}`}>{formatBRL(gasto)}</div>
           <div className="sp">
