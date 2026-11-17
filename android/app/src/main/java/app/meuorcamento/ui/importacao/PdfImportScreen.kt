@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -17,7 +16,6 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,6 +30,9 @@ import app.meuorcamento.data.ApiException
 import app.meuorcamento.ui.BarraTitulo
 import app.meuorcamento.domain.formatCentavos
 import app.meuorcamento.ui.OfflineBanner
+import app.meuorcamento.ui.components.BotaoPrimario
+import app.meuorcamento.ui.components.BotaoTexto
+import app.meuorcamento.ui.copy.Strings
 import app.meuorcamento.ui.lancamentos.CartaoDto
 import app.meuorcamento.ui.lancamentos.CartoesResponse
 import kotlinx.coroutines.launch
@@ -98,14 +99,14 @@ fun PdfImportScreen(api: ApiClient, onUnauthorized: () -> Unit) {
                 .verticalScroll(rememberScrollState()),
         ) {
         OfflineBanner(offline, status)
-        Button(onClick = { picker.launch("application/pdf") }) { Text("Escolher PDF") }
-        val apelido = cartoes.find { it.id == cartaoId }?.apelido ?: "Cartão destino"
+        BotaoPrimario(text = Strings.escolherPdf, onClick = { picker.launch("application/pdf") })
+        val apelido = cartoes.find { it.id == cartaoId }?.apelido ?: Strings.cartaoDestino
         ExposedDropdownMenuBox(expanded = cartaoAberto, onExpandedChange = { cartaoAberto = it }) {
             OutlinedTextField(
                 value = apelido,
                 onValueChange = {},
                 readOnly = true,
-                label = { Text("Cartão destino") },
+                label = { Text(Strings.cartaoDestino) },
                 modifier = Modifier.menuAnchor().fillMaxWidth().padding(vertical = 8.dp),
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(cartaoAberto) },
             )
@@ -126,9 +127,10 @@ fun PdfImportScreen(api: ApiClient, onUnauthorized: () -> Unit) {
             Text("$desc · ${formatCentavos(cents)}", modifier = Modifier.padding(top = 4.dp))
         }
         if (preview != null) {
-            TextButton(onClick = { preview = null; status = "Prévia descartada" }) { Text("Cancelar") }
+            BotaoTexto(text = Strings.cancelar, onClick = { preview = null; status = "Prévia descartada" })
         }
-        Button(
+        BotaoPrimario(
+            text = Strings.confirmarPdf,
             enabled = preview != null && cartaoId.isNotBlank(),
             onClick = {
                 scope.launch {
@@ -150,7 +152,7 @@ fun PdfImportScreen(api: ApiClient, onUnauthorized: () -> Unit) {
                     }
                 }
             },
-        ) { Text("Confirmar PDF") }
+        )
         }
     }
 }
