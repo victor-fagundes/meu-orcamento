@@ -1240,11 +1240,45 @@ body {
   border-collapse: collapse;
 }
 
+.imp-tbl-pdf {
+  table-layout: fixed;
+}
+
+.imp-tbl-pdf th:nth-child(1),
+.imp-tbl-pdf td:nth-child(1) {
+  width: 36px;
+}
+
+.imp-tbl-pdf th:nth-child(2),
+.imp-tbl-pdf td:nth-child(2) {
+  width: 9.5rem;
+}
+
+.imp-tbl-pdf th:nth-child(4),
+.imp-tbl-pdf td:nth-child(4) {
+  width: 6.5rem;
+}
+
+.imp-tbl-pdf th:nth-child(5),
+.imp-tbl-pdf td:nth-child(5) {
+  width: 4.25rem;
+}
+
+.imp-tbl-pdf th:nth-child(6),
+.imp-tbl-pdf td:nth-child(6) {
+  width: 6.5rem;
+}
+
 .imp-tbl th,
 .imp-tbl td {
   padding: 6px 8px;
   border-top: 1px solid var(--olv);
   text-align: left;
+  vertical-align: top;
+}
+
+.imp-tbl-pdf td {
+  overflow: hidden;
 }
 
 .imp-tbl tr.ok td {
@@ -1256,13 +1290,27 @@ body {
 }
 
 .imp-inline {
+  display: block;
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
   font: inherit;
-  font-size: 12px;
-  border: 1px solid var(--olv);
-  border-radius: 4px;
-  padding: 2px 4px;
-  background: var(--bg, #fff);
+  font-size: 13px;
+  line-height: 20px;
+  border: 1px solid var(--md-sys-color-outline);
+  border-radius: 8px;
+  padding: 6px 8px;
+  background: var(--md-sys-color-surface-container-lowest);
+  color: var(--md-sys-color-on-surface);
+}
+
+.imp-tbl .aj-help {
+  display: block;
+  margin-top: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .imp-sheet-chips {

@@ -97,7 +97,7 @@ export function ImportPdfPanel({ cartoes }: { cartoes: CartaoOpt[] }) {
           </MdSelect>
 
           <div className="ano-scroll">
-            <table className="imp-tbl">
+            <table className="imp-tbl imp-tbl-pdf">
               <thead>
                 <tr>
                   <th></th>
@@ -137,6 +137,7 @@ export function ImportPdfPanel({ cartoes }: { cartoes: CartaoOpt[] }) {
                       <input
                         className="imp-inline"
                         value={r.desc}
+                        title={r.desc}
                         onChange={(e) => updateRow(r.n, { desc: e.target.value })}
                       />
                       <span className="aj-help">{r.itemHint}</span>
@@ -144,7 +145,6 @@ export function ImportPdfPanel({ cartoes }: { cartoes: CartaoOpt[] }) {
                     <td>
                       <input
                         className="imp-inline"
-                        style={{ width: 88 }}
                         value={(r.valCents / 100).toFixed(2)}
                         onChange={(e) => {
                           const n = Number(e.target.value.replace(",", "."));
