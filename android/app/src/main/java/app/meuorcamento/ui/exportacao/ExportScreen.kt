@@ -4,7 +4,6 @@ import android.content.Intent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,6 +19,8 @@ import app.meuorcamento.data.ApiClient
 import app.meuorcamento.data.ApiException
 import app.meuorcamento.ui.BarraTitulo
 import app.meuorcamento.ui.OfflineBanner
+import app.meuorcamento.ui.components.BotaoPrimario
+import app.meuorcamento.ui.copy.Strings
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import java.io.IOException
@@ -83,12 +84,16 @@ fun ExportScreen(api: ApiClient, onUnauthorized: () -> Unit) {
         BarraTitulo("Exportar")
         Column(Modifier.padding(horizontal = 16.dp)) {
         OfflineBanner(offline, status)
-        Button(onClick = { share("/api/v1/export/csv", "text/csv", "meu-orcamento.csv") }, modifier = Modifier.padding(top = 12.dp)) {
-            Text("Exportar CSV")
-        }
-        Button(onClick = { share("/api/v1/export/json", "application/json", "meu-orcamento.json") }, modifier = Modifier.padding(top = 8.dp)) {
-            Text("Exportar JSON")
-        }
+        BotaoPrimario(
+            text = Strings.exportarCsv,
+            onClick = { share("/api/v1/export/csv", "text/csv", "meu-orcamento.csv") },
+            modifier = Modifier.padding(top = 12.dp),
+        )
+        BotaoPrimario(
+            text = Strings.exportarJson,
+            onClick = { share("/api/v1/export/json", "application/json", "meu-orcamento.json") },
+            modifier = Modifier.padding(top = 8.dp),
+        )
         status?.let { Text(it, modifier = Modifier.padding(top = 12.dp)) }
         }
     }
