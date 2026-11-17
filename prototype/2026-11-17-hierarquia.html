@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Meu Orçamento — computador como está, Android nativo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --sf: #f8f9ff;
+      --ink: #191c20;
+      --soft: #43474e;
+      --pr: #0058be;
+      --on-pr: #fff;
+      --pc: #d7e3ff;
+      --on-pc: #001b3f;
+      --low: #f2f3fb;
+      --lowest: #fff;
+      --line: #c3c6d0;
+      --container: #eceef6;
+      --warn: #6d5e00;
+      --danger: #ba1a1a;
+      --mark: #ffe600;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--sf);
+      color: var(--ink);
+      font-family: Roboto, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.45;
+    }
+    button, select { font: inherit; color: inherit; }
+    :focus-visible { outline: 2px solid var(--pr); outline-offset: 3px; }
+
+    .proposal {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      padding: 8px 16px;
+      background: var(--ink);
+      color: #f0f0f7;
+      font-size: 13px;
+    }
+    .proposal button {
+      background: transparent;
+      color: inherit;
+      border: 0;
+      min-height: 36px;
+      padding: 0 12px;
+      cursor: pointer;
+      border-radius: 8px;
+    }
+    .proposal button[aria-pressed="true"] { background: var(--pc); color: var(--on-pc); }
+
+    .desk { display: block; }
+    .droid { display: none; }
+    body.android .desk { display: none; }
+    body.android .droid { display: block; }
+
+    .top-inner, .desk-nav, .content { max-width: 1120px; margin: 0 auto; }
+    .top-inner {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 16px;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; font-size: 22px; font-weight: 500; }
+    .mark {
+      width: 32px; height: 32px; border-radius: 10px;
+      background: var(--mark); color: #221b00;
+      display: grid; place-items: center; font-weight: 700; font-size: 16px;
+    }
+    .top-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+    .filled {
+      background: var(--pr); color: var(--on-pr); border: 0; border-radius: 20px;
+      min-height: 40px; padding: 0 16px; font-weight: 500; cursor: pointer;
+    }
+    .avatar {
+      width: 32px; height: 32px; border-radius: 16px;
+      background: var(--pc); color: var(--on-pc);
+      display: grid; place-items: center; font-weight: 500;
+    }
+    .desk-nav { display: flex; border-bottom: 1px solid var(--line); padding: 0 12px; }
+    .desk-nav button {
+      position: relative; height: 48px; padding: 0 16px; border: 0; background: none;
+      color: var(--soft); font-size: 14px; font-weight: 500; cursor: pointer;
+    }
+    .desk-nav button[aria-current="page"] { color: var(--pr); }
+    .desk-nav button[aria-current="page"]::after {
+      content: ""; position: absolute; left: 12px; right: 12px; bottom: 0; height: 3px;
+      border-radius: 3px 3px 0 0; background: var(--pr);
+    }
+    .content { padding: 8px 24px 48px; }
+    .screen { display: none; }
+    .screen.on { display: block; }
+
+    .mes { display: flex; align-items: center; gap: 4px; margin: 8px 0 12px; }
+    .mes p { margin: 0; min-width: 168px; text-align: center; font-weight: 500; }
+    .mes button {
+      width: 40px; height: 40px; border: 0; border-radius: 20px; background: transparent;
+      color: var(--soft); font-size: 22px; cursor: pointer;
+    }
+
+    .g3 {
+      display: grid;
+      grid-template-columns: 1.4fr 0.8fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .hero {
+      grid-row: span 2;
+      background: var(--pc); color: var(--on-pc);
+      border-radius: 28px; padding: 20px 24px; text-decoration: none;
+    }
+    .eye { font-size: 12px; font-weight: 500; letter-spacing: 0.4px; text-transform: uppercase; opacity: 0.75; }
+    .hero .amt { margin: 6px 0 12px; font-size: 40px; font-weight: 400; line-height: 48px; }
+    .hero .sub, .side .sub { font-size: 12px; }
+    .hero .sub { opacity: 0.9; }
+    .track { height: 8px; border-radius: 4px; margin-top: 12px; background: rgba(0, 27, 63, 0.18); overflow: hidden; }
+    .track i { display: block; height: 100%; background: var(--on-pc); }
+    .side {
+      background: var(--low); border-radius: 16px; padding: 16px; color: inherit; text-decoration: none;
+    }
+    .side strong { display: block; margin-top: 6px; font-size: 22px; }
+    .tipos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 12px; }
+    .tipo {
+      background: var(--lowest); border-radius: 16px; padding: 16px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+    .tipo strong { display: block; margin-top: 6px; font-size: 22px; }
+    .tipo a { display: inline-block; margin-top: 8px; color: var(--pr); font-size: 13px; font-weight: 500; text-decoration: none; }
+    .tipo span, .side span { font-size: 12px; color: var(--soft); }
+    .ritmo { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; color: var(--soft); margin: 4px 0 12px; }
+    .filters { display: flex; gap: 12px; align-items: end; margin-bottom: 16px; }
+    .filters label { display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 500; }
+    select { min-height: 44px; padding: 8px 10px; border: 1px solid var(--soft); border-radius: 8px; background: var(--lowest); }
+    .charts { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .panel { background: var(--low); border-radius: 16px; padding: 16px; }
+    .panel h2 { margin: 0 0 12px; font-size: 16px; font-weight: 500; }
+    .donut { display: grid; grid-template-columns: 120px 1fr; gap: 12px; align-items: center; }
+    .ring {
+      width: 120px; height: 120px; border-radius: 50%;
+      background: conic-gradient(#0058be 0 59.5%, #565e71 59.5% 75.3%, #6d5e00 75.3% 86.7%, #001b3f 86.7% 92.7%, #73777f 92.7% 100%);
+      -webkit-mask: radial-gradient(circle, transparent 38px, #000 39px);
+      mask: radial-gradient(circle, transparent 38px, #000 39px);
+    }
+    .legend { display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
+    .legend div { display: flex; justify-content: space-between; }
+    .legend i { display: inline-block; width: 10px; height: 10px; margin-right: 6px; }
+    .bars { display: flex; flex-direction: column; gap: 8px; font-size: 13px; }
+    .bars b { font-weight: 500; }
+
+    .chips { display: flex; gap: 8px; margin-bottom: 12px; }
+    .chips button {
+      height: 36px; padding: 0 14px; border-radius: 8px; border: 1px solid var(--line);
+      background: transparent; color: var(--soft); cursor: pointer; font-weight: 500;
+    }
+    .chips button[aria-checked="true"] { background: var(--pc); color: var(--on-pc); border-color: transparent; }
+    .total {
+      display: flex; justify-content: space-between; align-items: center;
+      background: var(--low); border-radius: 16px; padding: 14px 16px; margin-bottom: 8px; font-weight: 500;
+    }
+    .muted { color: var(--soft); font-weight: 400; }
+    .cat { background: var(--lowest); border-radius: 16px; padding: 4px 0 8px; margin-bottom: 8px; }
+    .cat-head {
+      width: 100%; display: flex; justify-content: space-between; gap: 12px;
+      border: 0; background: none; padding: 12px 16px; cursor: pointer; font-weight: 500; text-align: left;
+    }
+    .hint { margin: 0 16px 8px; font-size: 12px; color: var(--soft); }
+    .hint.warn { color: var(--warn); }
+    .hint.over { color: var(--danger); }
+    .bar { height: 6px; margin: 0 16px 8px; background: var(--line); border-radius: 3px; overflow: hidden; }
+    .bar i { display: block; height: 100%; background: var(--pr); }
+    .bar.warn i { background: var(--warn); }
+    .bar.over i { background: var(--danger); }
+    .ghost { border: 0; background: none; color: var(--soft); min-height: 44px; cursor: pointer; padding: 0 16px; }
+    .add { border: 1px solid var(--pr); background: transparent; color: var(--pr); border-radius: 20px; min-height: 40px; padding: 0 16px; margin-top: 8px; cursor: pointer; }
+
+    .phone {
+      width: min(412px, 100%);
+      min-height: 100dvh;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      background: var(--sf);
+    }
+    .appbar {
+      display: flex; align-items: center; gap: 4px;
+      min-height: 64px; padding: 8px 4px 8px 16px;
+    }
+    .appbar h1 { margin: 0; flex: 1; font-size: 22px; font-weight: 400; }
+    .iconbtn {
+      width: 48px; height: 48px; border: 0; border-radius: 24px; background: transparent;
+      color: var(--ink); font-size: 22px; cursor: pointer;
+    }
+    .phone main { flex: 1; padding: 0 16px 16px; }
+    .display { margin: 4px 0 0; font-size: 45px; font-weight: 400; line-height: 52px; letter-spacing: -0.02em; }
+    .display.over { color: var(--danger); }
+    .phone .note { margin: 4px 0 12px; color: var(--soft); max-width: 34ch; }
+    .m3bar { height: 4px; border-radius: 2px; background: var(--line); overflow: hidden; margin-bottom: 16px; }
+    .m3bar i { display: block; height: 100%; background: var(--pr); }
+    .m3bar.over i { background: var(--danger); }
+    .m3bar.warn i { background: var(--warn); }
+    .scrollchips { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 8px; }
+    .scrollchips button {
+      flex: none; min-height: 32px; padding: 0 16px; border-radius: 8px;
+      border: 1px solid var(--line); background: var(--lowest); cursor: pointer;
+    }
+    .scrollchips button[aria-checked="true"] { background: var(--container); border-color: transparent; font-weight: 500; }
+    .rowbtn, .plain {
+      width: 100%; text-align: left; border: 0; background: none; cursor: pointer;
+      padding: 12px 0; border-bottom: 1px solid var(--line);
+      display: grid; grid-template-columns: 1fr auto; gap: 2px 12px;
+    }
+    .plain { cursor: default; }
+    .rowbtn small, .plain small { grid-column: 1 / -1; color: var(--soft); font-size: 14px; }
+    .rowbtn .meter, .plain .meter { grid-column: 1 / -1; height: 4px; border-radius: 2px; background: var(--line); overflow: hidden; margin-top: 6px; }
+    .meter i { display: block; height: 100%; }
+    .navb {
+      display: flex; position: sticky; bottom: 0;
+      border-top: 1px solid var(--line); background: var(--container); padding: 8px 0 10px;
+    }
+    .navb button {
+      flex: 1; border: 0; background: none; color: var(--soft); font-size: 12px; cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; gap: 4px; min-height: 56px;
+    }
+    .navb button[aria-current="page"] { color: var(--ink); }
+    .pill { width: 56px; height: 32px; border-radius: 16px; display: grid; place-items: center; }
+    .navb button[aria-current="page"] .pill { background: var(--pc); }
+    .sheet {
+      position: fixed; left: 50%; bottom: 0; transform: translateX(-50%);
+      width: min(412px, 100%); background: var(--lowest);
+      border-radius: 28px 28px 0 0; padding: 16px 16px 24px;
+      box-shadow: 0 -8px 24px rgba(25, 28, 32, 0.18);
+    }
+    .sheet h2 { margin: 8px 0 16px; font-size: 22px; font-weight: 400; }
+    .sheet label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+    .sheet input { min-height: 56px; border: 1px solid var(--soft); border-radius: 4px; padding: 8px 12px; font: inherit; }
+    .sheet-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+    .textbtn { border: 0; background: none; color: var(--pr); min-height: 40px; padding: 0 12px; font-weight: 500; cursor: pointer; }
+    .scrim { position: fixed; inset: 0; background: rgba(25, 28, 32, 0.45); }
+    @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+  </style>
+</head>
+<body>
+  <div class="proposal">
+    <span>Proposta</span>
+    <button type="button" id="show-desk" aria-pressed="true">Computador</button>
+    <button type="button" id="show-droid" aria-pressed="false">Android</button>
+  </div>
+
+  <div class="desk">
+    <header>
+      <div class="top-inner">
+        <div class="brand"><span class="mark" aria-hidden="true">M</span> Meu Orçamento</div>
+        <div class="top-right">
+          <button class="filled" type="button">Novo lançamento</button>
+          <span class="avatar" aria-hidden="true">V</span>
+        </div>
+      </div>
+      <nav class="desk-nav" aria-label="Principal">
+        <button type="button" data-desk="resumo" aria-current="page">Resumo</button>
+        <button type="button" data-desk="orcamento">Orçamento</button>
+        <button type="button" data-desk="igual">Lançamentos</button>
+        <button type="button" data-desk="igual">Ano</button>
+        <button type="button" data-desk="igual">Ajustes</button>
+      </nav>
+    </header>
+    <div class="content">
+      <section class="screen on" id="desk-resumo">
+        <div class="mes">
+          <button type="button" aria-label="Mês anterior">‹</button>
+          <p>Novembro 2026</p>
+          <button type="button" aria-label="Próximo mês">›</button>
+        </div>
+        <div class="g3">
+          <a class="hero" href="#desk-orcamento">
+            <div class="eye">Ainda pode gastar</div>
+            <div class="amt" id="hero-amt">R$ 1.024,00</div>
+            <div class="sub" id="hero-sub">74% do orçado de despesas neste mês</div>
+            <div class="track"><i style="width:74%"></i></div>
+          </a>
+          <a class="side" href="#desk-orcamento"><span>Total orçado</span><strong>R$ 3.880,00</strong><span class="sub">despesas previstas no mês</span></a>
+          <a class="side" href="#desk-orcamento"><span>Total gasto</span><strong>R$ 2.856,00</strong><span class="sub">74% do orçado</span></a>
+        </div>
+        <div class="tipos">
+          <article class="tipo"><span>Receitas</span><strong>R$ 5.400,00</strong><span>planejado R$ 5.400,00</span><br><a href="#desk-orcamento">Ver receitas</a></article>
+          <article class="tipo"><span>Despesas fixas</span><strong>R$ 1.960,00</strong><span>planejado R$ 2.080,00</span><br><a href="#desk-orcamento">Ver despesas fixas</a></article>
+          <article class="tipo"><span>Despesas variáveis</span><strong>R$ 570,00</strong><span>planejado R$ 1.200,00</span><br><a href="#desk-orcamento">Ver despesas variáveis</a></article>
+          <article class="tipo"><span>Anuais / eventuais</span><strong>R$ 326,00</strong><span>planejado R$ 600,00</span><br><a href="#desk-orcamento">Ver anuais</a></article>
+        </div>
+        <div class="ritmo"><span>Média diária: <b>R$ 168,00</b></span><span>Restam <b>13</b> dias no mês</span></div>
+        <div class="filters">
+          <label>Pagamento
+            <select id="pay">
+              <option value="todos">Todos</option>
+              <option value="pix">PIX</option>
+              <option value="deb">Débito</option>
+            </select>
+          </label>
+          <label>Categoria
+            <select><option>Todas</option><option>Moradia</option><option>Mercado</option></select>
+          </label>
+        </div>
+        <div class="charts">
+          <section class="panel">
+            <h2>Gastos por categoria</h2>
+            <div class="donut">
+              <div class="ring" role="img" aria-label="Moradia 60%, Mercado 16%, Impostos 11%, Transporte 6%, demais 7%"></div>
+              <div class="legend">
+                <div><span><i style="background:#0058be"></i>Moradia</span><b>60%</b></div>
+                <div><span><i style="background:#565e71"></i>Mercado</span><b>16%</b></div>
+                <div><span><i style="background:#6d5e00"></i>Impostos</span><b>11%</b></div>
+                <div><span><i style="background:#001b3f"></i>Transporte</span><b>6%</b></div>
+                <div><span><i style="background:#73777f"></i>Habitação e lazer</span><b>7%</b></div>
+              </div>
+            </div>
+          </section>
+          <section class="panel">
+            <h2>Planejado × realizado</h2>
+            <div class="bars">
+              <div><b>Receitas</b> R$ 5.400 de R$ 5.400</div>
+              <div><b>Fixas</b> R$ 1.960 de R$ 2.080</div>
+              <div><b>Variáveis</b> R$ 570 de R$ 1.200</div>
+              <div><b>Anuais</b> R$ 326 de R$ 600</div>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section class="screen" id="desk-orcamento">
+        <div class="mes">
+          <button type="button" aria-label="Mês anterior">‹</button>
+          <p>Novembro 2026</p>
+          <button type="button" aria-label="Próximo mês">›</button>
+        </div>
+        <div class="chips" role="radiogroup" aria-label="Tipo">
+          <button type="button" role="radio">Receitas</button>
+          <button type="button" role="radio" aria-checked="true">Fixas</button>
+          <button type="button" role="radio">Variáveis</button>
+          <button type="button" role="radio">Anuais</button>
+        </div>
+        <div class="total">
+          <span>Despesas fixas</span>
+          <strong>R$ 120,00 <span class="muted">ainda cabem · R$ 1.960 / R$ 2.080</span></strong>
+        </div>
+        <article class="cat">
+          <button class="cat-head" type="button"><span>Moradia</span><span>R$ 1.700,00 <span class="muted">/ R$ 1.700,00</span></span></button>
+          <p class="hint warn">Chegou no planejado</p>
+          <div class="bar warn"><i style="width:100%"></i></div>
+        </article>
+        <article class="cat">
+          <button class="cat-head" type="button"><span>Habitação</span><span>R$ 90,00 <span class="muted">/ R$ 180,00</span></span></button>
+          <p class="hint">Dentro do planejado</p>
+          <div class="bar"><i style="width:50%"></i></div>
+        </article>
+        <article class="cat">
+          <button class="cat-head" type="button"><span>Transporte</span><span>R$ 170,00 <span class="muted">/ R$ 200,00</span></span></button>
+          <p class="hint warn">Perto do limite</p>
+          <div class="bar warn"><i style="width:85%"></i></div>
+        </article>
+        <button class="ghost" type="button" id="zeros" aria-expanded="false">Sem movimento neste mês, 3 grupos</button>
+        <ul id="zero-list" hidden>
+          <li>Educação</li><li>Saúde</li><li>Outros</li>
+        </ul>
+        <button class="add" type="button">Novo item em despesas fixas</button>
+      </section>
+      <section class="screen" id="desk-igual">
+        <h1>Esta parte do computador fica como está.</h1>
+        <p>A revisão desta proposta é o Resumo e o Orçamento.</p>
+      </section>
+    </div>
+  </div>
+
+  <div class="droid">
+    <div class="phone">
+      <header class="appbar">
+        <button class="iconbtn" type="button" aria-label="Mês anterior">‹</button>
+        <h1>Novembro</h1>
+        <button class="iconbtn" type="button" aria-label="Próximo mês">›</button>
+      </header>
+      <main>
+        <section id="and-resumo">
+          <p style="margin:0">Ainda pode gastar</p>
+          <p class="display">R$ 1.024,00</p>
+          <p class="note">74% das despesas do mês já foram gastas. Restam 13 dias.</p>
+          <div class="m3bar" aria-hidden="true"><i style="width:74%"></i></div>
+          <button class="rowbtn" type="button" data-and="orcamento"><span>Receitas</span><b>R$ 5.400,00</b><small>planejado R$ 5.400,00</small></button>
+          <button class="rowbtn" type="button" data-and="orcamento"><span>Despesas fixas</span><b>R$ 1.960,00</b><small>planejado R$ 2.080,00</small></button>
+          <button class="rowbtn" type="button" data-and="orcamento"><span>Despesas variáveis</span><b>R$ 570,00</b><small>planejado R$ 1.200,00</small></button>
+          <button class="rowbtn" type="button" data-and="orcamento"><span>Anuais</span><b>R$ 326,00</b><small>planejado R$ 600,00</small></button>
+        </section>
+        <section id="and-orcamento" hidden>
+          <div class="scrollchips" role="radiogroup" aria-label="Tipo">
+            <button type="button" role="radio">Receitas</button>
+            <button type="button" role="radio" aria-checked="true">Fixas</button>
+            <button type="button" role="radio">Variáveis</button>
+            <button type="button" role="radio">Anuais</button>
+          </div>
+          <p style="margin:8px 0 0">Ainda cabe em despesas fixas</p>
+          <p class="display">R$ 120,00</p>
+          <p class="note">R$ 1.960 gastos de R$ 2.080 planejados.</p>
+          <button class="rowbtn" type="button" id="open-mora"><span>Moradia</span><b>R$ 0,00</b><small class="hint warn">Chegou no planejado</small><span class="meter"><i style="width:100%;background:#6d5e00"></i></span></button>
+          <div id="mora-item" hidden>
+            <button class="textbtn" type="button" id="open-plano">Aluguel, planejado R$ 1.700,00</button>
+            <button class="textbtn" type="button">Arquivar Aluguel</button>
+          </div>
+          <div class="plain"><span>Habitação</span><b>R$ 90,00</b><small>Dentro do planejado</small><span class="meter"><i style="width:50%;background:#0058be"></i></span></div>
+          <div class="plain"><span>Transporte</span><b>R$ 30,00</b><small class="hint warn">Perto do limite</small><span class="meter"><i style="width:85%;background:#6d5e00"></i></span></div>
+          <button class="textbtn" type="button">Sem movimento neste mês, 3 grupos</button>
+        </section>
+      </main>
+      <nav class="navb" aria-label="Principal">
+        <button type="button" data-and="resumo" aria-current="page"><span class="pill">⌂</span>Resumo</button>
+        <button type="button" data-and="orcamento"><span class="pill">▣</span>Orçamento</button>
+        <button type="button"><span class="pill">≡</span>Lançamentos</button>
+        <button type="button"><span class="pill">▦</span>Ano</button>
+        <button type="button"><span class="pill">⚙</span>Ajustes</button>
+      </nav>
+    </div>
+  </div>
+
+  <div id="scrim" class="scrim" hidden></div>
+  <div id="plano" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="plano-title">
+    <h2 id="plano-title">Plano de Aluguel</h2>
+    <label>Planejado em novembro
+      <input id="plano-input" value="1.700,00" inputmode="decimal" />
+    </label>
+    <div class="sheet-actions">
+      <button class="textbtn" type="button" id="plano-cancel">Cancelar</button>
+      <button class="filled" type="button" id="plano-save">Salvar plano</button>
+    </div>
+  </div>
+
+  <script>
+    const body = document.body;
+    document.getElementById("show-desk").onclick = () => setMode(false);
+    document.getElementById("show-droid").onclick = () => setMode(true);
+    function setMode(android) {
+      body.classList.toggle("android", android);
+      document.getElementById("show-desk").setAttribute("aria-pressed", String(!android));
+      document.getElementById("show-droid").setAttribute("aria-pressed", String(android));
+    }
+    document.querySelectorAll("[data-desk]").forEach((b) => {
+      b.onclick = () => {
+        document.querySelectorAll(".desk .screen").forEach((s) => s.classList.remove("on"));
+        document.getElementById("desk-" + b.dataset.desk).classList.add("on");
+        document.querySelectorAll("[data-desk]").forEach((n) => n.removeAttribute("aria-current"));
+        b.setAttribute("aria-current", "page");
+      };
+    });
+    document.querySelectorAll('a[href="#desk-orcamento"]').forEach((a) => {
+      a.addEventListener("click", (e) => {
+        e.preventDefault();
+        document.querySelector('[data-desk="orcamento"]').click();
+      });
+    });
+    document.getElementById("pay").onchange = (e) => {
+      const pix = e.target.value === "pix";
+      document.getElementById("hero-amt").textContent = "R$ 1.024,00";
+      document.getElementById("hero-sub").textContent = pix
+        ? "No PIX foram R$ 640,00. O mês inteiro ainda pode gastar R$ 1.024,00."
+        : "74% do orçado de despesas neste mês";
+    };
+    document.getElementById("zeros").onclick = (e) => {
+      const open = e.currentTarget.getAttribute("aria-expanded") === "true";
+      e.currentTarget.setAttribute("aria-expanded", String(!open));
+      document.getElementById("zero-list").hidden = open;
+    };
+    document.querySelectorAll("[data-and]").forEach((b) => {
+      b.onclick = () => showAnd(b.dataset.and);
+    });
+    function showAnd(name) {
+      document.getElementById("and-resumo").hidden = name !== "resumo";
+      document.getElementById("and-orcamento").hidden = name !== "orcamento";
+      document.querySelectorAll(".navb button[data-and]").forEach((n) => {
+        if (n.dataset.and === name) n.setAttribute("aria-current", "page");
+        else n.removeAttribute("aria-current");
+      });
+    }
+    document.getElementById("open-mora").onclick = () => {
+      const el = document.getElementById("mora-item");
+      el.hidden = !el.hidden;
+    };
+    const scrim = document.getElementById("scrim");
+    const plano = document.getElementById("plano");
+    const input = document.getElementById("plano-input");
+    document.getElementById("open-plano").onclick = () => {
+      scrim.hidden = false;
+      plano.hidden = false;
+      input.focus();
+      input.select();
+    };
+    function closePlano() { scrim.hidden = true; plano.hidden = true; }
+    document.getElementById("plano-cancel").onclick = closePlano;
+    document.getElementById("plano-save").onclick = closePlano;
+    scrim.onclick = closePlano;
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closePlano(); });
+  </script>
+</body>
+</html>

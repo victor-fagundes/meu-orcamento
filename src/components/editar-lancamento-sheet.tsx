@@ -89,7 +89,7 @@ export function EditarLancamentoSheet({
         <MdTextField label="Descrição" value={descricao} onChange={setDescricao} />
 
         <div className="r2">
-          <MdTextField label="Valor (R$ por parcela)" value={valor} onChange={setValor} inputMode="decimal" />
+          <MdTextField label="Valor (R$ por parcela)" value={valor} onChange={setValor} inputMode="decimal" sheetFocus />
           <MdTextField label="Data" type="date" value={data} onChange={setData} />
         </div>
 

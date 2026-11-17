@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 import { salvarPlanoAction } from "@/app/actions/plano";
 import { TIPOS_LABEL, type TipoOrcamento } from "@/domain/catalog";
 import { fromCents, toCents } from "@/domain/money";
@@ -11,6 +11,7 @@ import {
   copiarMesAnterior,
   parsePlanoFromJson,
 } from "@/domain/plano";
+import { indiceMesAberto } from "@/components/arquivar-rotulo";
 import { MaterialSheet } from "@/components/material/sheet";
 import { MdFilledButton, MdOutlinedButton, MdTextButton, MdTextField } from "@/components/material/ui";
 
@@ -29,6 +30,7 @@ export function PlanoSheet({
   item,
   open,
   onClose,
+  competencia,
 }: {
   item: {
     id: string;
@@ -39,24 +41,29 @@ export function PlanoSheet({
   } | null;
   open: boolean;
   onClose: () => void;
+  competencia: string;
 }) {
   const [valores, setValores] = useState<string[]>(Array(12).fill("0,00"));
   const [bulk, setBulk] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, start] = useTransition();
-
-  useEffect(() => {
-    if (!item || !open) return;
-    setValores(parsePlanoFromJson(item.planoJson).map(centsToInput));
-    setBulk("");
-    setMsg(null);
-    setError(null);
-  }, [item, open]);
+  const [aberto, setAberto] = useState<string | null>(null);
+  const chave = item && open ? item.id : null;
+  if (chave !== aberto) {
+    setAberto(chave);
+    if (item && open) {
+      setValores(parsePlanoFromJson(item.planoJson).map(centsToInput));
+      setBulk("");
+      setMsg(null);
+      setError(null);
+    }
+  }
 
   if (!open || !item) return null;
 
   const mesCorrente = new Date().getMonth();
+  const mesAberto = indiceMesAberto(competencia);
 
   return (
     <MaterialSheet open={open} onClose={onClose} title={item.nome}>
@@ -84,6 +91,7 @@ export function PlanoSheet({
               label={m}
               value={valores[n] ?? ""}
               inputMode="decimal"
+              sheetFocus={n === mesAberto}
               onChange={(v) => {
                 const next = [...valores];
                 next[n] = v;

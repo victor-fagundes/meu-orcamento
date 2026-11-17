@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Meu Orçamento</string>
+    <string name="offline_message">Sem conexão. Conecte-se à internet para usar seus dados.</string>
+    <string name="sign_in">Entrar</string>
+    <string name="sign_out">Sair</string>
+    <string name="email">E-mail</string>
+    <string name="password">Senha</string>
+    <string name="nav_resumo">Resumo</string>
+    <string name="nav_orcamento">Orçamento</string>
+    <string name="nav_lancamentos">Lançamentos</string>
+    <string name="nav_ano">Ano</string>
+    <string name="nav_ajustes">Ajustes</string>
+</resources>

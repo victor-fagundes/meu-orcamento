@@ -58,5 +58,9 @@ export default async function AnoPage({
     return { planejado, realizado };
   });
 
-  return <AnoView ano={ano} planejado={planejado} realizado={realizado} />;
+  return (
+    <main id="conteudo">
+      <AnoView ano={ano} planejado={planejado} realizado={realizado} />
+    </main>
+  );
 }

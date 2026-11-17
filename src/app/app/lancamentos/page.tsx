@@ -38,6 +38,7 @@ export default async function LancamentosPage({
   const cartoes = await listCartoesAtivos(db, orcamento.id);
 
   return (
+    <main id="conteudo">
     <LancamentosView
       competencia={competencia}
       mesLabel={labelCompetencia(competencia)}
@@ -71,5 +72,6 @@ export default async function LancamentosPage({
         diaFechamento: c.diaFechamento,
       }))}
     />
+    </main>
   );
 }

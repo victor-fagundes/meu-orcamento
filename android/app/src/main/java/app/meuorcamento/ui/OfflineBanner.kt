@@ -1,0 +1,26 @@
+package app.meuorcamento.ui
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import app.meuorcamento.R
+
+@Composable
+fun OfflineBanner(visible: Boolean, message: String? = null) {
+    if (!visible) return
+    Text(
+        text = message ?: stringResource(R.string.offline_message),
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.errorContainer)
+            .padding(12.dp),
+        color = MaterialTheme.colorScheme.onErrorContainer,
+        style = MaterialTheme.typography.bodyMedium,
+    )
+}

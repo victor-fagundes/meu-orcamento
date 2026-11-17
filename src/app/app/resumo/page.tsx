@@ -68,7 +68,7 @@ export default async function ResumoPage({
   });
 
   return (
-    <>
+    <main id="conteudo">
       <AlertBanner alertas={alertas} />
       <ResumoDashboard
         competencia={competencia}
@@ -76,6 +76,6 @@ export default async function ResumoPage({
         lancamentos={lancView}
         cartoes={cartoesView}
       />
-    </>
+    </main>
   );
 }

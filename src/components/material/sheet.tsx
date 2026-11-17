@@ -22,6 +22,7 @@ export function MaterialSheet({
   children: ReactNode;
 }) {
   const titleId = useId();
+  const dialogRef = useRef<HTMLDivElement>(null);
   const [wide, setWide] = useState(false);
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
@@ -37,6 +38,14 @@ export function MaterialSheet({
   useEffect(() => {
     if (!open) return;
     const prevFocus = document.activeElement as HTMLElement | null;
+    const root = dialogRef.current;
+    const target = root?.querySelector<HTMLElement>("[data-sheet-focus]");
+    const place = target ?? root;
+    place?.focus();
+    if (place instanceof HTMLInputElement || place instanceof HTMLTextAreaElement) {
+      const end = place.value.length;
+      place.setSelectionRange(end, end);
+    }
     function onKey(e: globalThis.KeyboardEvent) {
       if (e.key === "Escape") onCloseRef.current();
     }
@@ -72,10 +81,12 @@ export function MaterialSheet({
   return (
     <div className={wide ? "scrim desk" : "scrim"} role="presentation" onClick={onClose}>
       <div
+        ref={dialogRef}
         className="sheet"
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
+        tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
         onKeyDown={trapTab}
       >

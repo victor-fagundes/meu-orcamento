@@ -9,9 +9,10 @@ type Btn = {
   type?: "button" | "submit" | "reset";
   href?: string;
   style?: CSSProperties;
+  sheetFocus?: boolean;
 };
 
-export function MdFilledButton({ children, onClick, disabled, type = "button", href, style }: Btn) {
+export function MdFilledButton({ children, onClick, disabled, type = "button", href, style, sheetFocus }: Btn) {
   if (href) {
     return (
       <a className="btn" href={href} style={style}>
@@ -20,7 +21,7 @@ export function MdFilledButton({ children, onClick, disabled, type = "button", h
     );
   }
   return (
-    <button className="btn" type={type} disabled={disabled} onClick={onClick} style={style}>
+    <button className="btn" type={type} disabled={disabled} onClick={onClick} style={style} {...(sheetFocus ? { "data-sheet-focus": "" } : {})}>
       {children}
     </button>
   );
@@ -68,6 +69,7 @@ type FieldProps = {
   autoComplete?: string;
   minLength?: number;
   inputMode?: "decimal" | "text" | "numeric";
+  sheetFocus?: boolean;
 };
 
 export function MdTextField({
@@ -82,6 +84,7 @@ export function MdTextField({
   autoComplete,
   minLength,
   inputMode,
+  sheetFocus,
 }: FieldProps) {
   const filled = type === "date" || type === "time" || type === "month";
   return (
@@ -95,6 +98,7 @@ export function MdTextField({
         autoComplete={autoComplete}
         minLength={minLength}
         inputMode={inputMode}
+        {...(sheetFocus ? { "data-sheet-focus": "" } : {})}
         {...(value !== undefined ? { value } : { defaultValue })}
         onChange={onChange ? (e) => onChange(e.target.value) : undefined}
       />

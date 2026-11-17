@@ -121,7 +121,7 @@ export function NovoLancamentoSheet({
         <MdTextField label="Descrição (opcional)" value={descricao} onChange={setDescricao} />
 
         <div className="r2">
-          <MdTextField label="Valor total (R$)" value={valor} onChange={setValor} inputMode="decimal" />
+          <MdTextField label="Valor total (R$)" value={valor} onChange={setValor} inputMode="decimal" sheetFocus />
           <MdTextField label="Data" type="date" value={data} onChange={setData} />
         </div>
 

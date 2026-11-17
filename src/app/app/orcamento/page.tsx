@@ -54,6 +54,7 @@ export default async function OrcamentoPage({
   });
 
   return (
+    <main id="conteudo">
     <OrcamentoView
       itens={view}
       mesLabel={labelCompetencia(competencia)}
@@ -62,5 +63,6 @@ export default async function OrcamentoPage({
       alertas={alertas}
       initialTipo={(["R", "F", "V", "E"] as const).includes(sp.tipo as TipoOrcamento) ? (sp.tipo as TipoOrcamento) : "F"}
     />
+    </main>
   );
 }

@@ -19,7 +19,7 @@ Deep write-ups focus on **Release B / import** smoke. Release A gaps appear only
 | GAP-004 | Release B verify (`implemented` sem `verified`) | P2 | **Fechado** — PM marcou 001–022 como `verified` em 2026-11-16, inclusive import, PDF, export e telemetria. | verify_only | 014, 015, 016, 017, 018, 021 | PM verify 2026-11-16 |
 | GAP-005 | Um item só: plano da seção não vira grupo com o nome da aba | P1 | **Fechado** — 022 `verified`. Plano da seção fica no item do catálogo. | amend_spec | 015-import-planejamento, 011-orcamento-mensal, 007-lancamentos, 022-item-unico | PM verify 2026-11-16 |
 | GAP-006 | Resumo legível (eixo, legenda, Ver detalhes) | P2 | **Fechado** — legenda e “Ver detalhes” já estavam no código (023). O card Total gasto omitia `mes`; spec 025 `implemented` corrige. | amend_spec | 012-resumo, 025-chegar-no-mes | Código 2026-11-17 |
-| GAP-007 | Sheet no teclado e nome de Arquivar | P2 | Diálogo sem Escape e sem foco preso; Arquivar não anuncia o item; telas sem área principal | amend_spec | 007-lancamentos, 003-itens, 011-orcamento-mensal | Crítica UI 2026-11-16, árvore da página e código dos sheets |
+| GAP-007 | Sheet no teclado e nome de Arquivar | P2 | **Decidido, ainda aberto** — spec 037 `draft`. No computador o foco entra no campo certo sem selecionar o texto; o primeiro Arquivar continua curto e anuncia o item; a confirmação diz "Arquivar {nome}?"; Resumo, Orçamento, Lançamentos e Ano ganham região principal. Escape e a permanência do Tab dentro do diálogo já existem. | amend_spec | 007-lancamentos, 003-itens, 011-orcamento-mensal, 037-foco-arquivar | Crítica UI 2026-11-16; decisão 2026-11-17 |
 
 ## Next slice
 
@@ -27,8 +27,8 @@ Deep write-ups focus on **Release B / import** smoke. Release A gaps appear only
 
 **Closed**: GAP-004 e GAP-005. Todas as specs 001–022 estão `verified` (PM, 2026-11-16).
 
-**Open, not confirmed**:
-- GAP-007 — teclado do sheet e nome acessível de Arquivar
+**Decidido na spec 037 `draft`, ainda não construído**:
+- GAP-007 — foco ao abrir o diálogo, confirmação "Arquivar {nome}?" e região principal no computador
 
 **Closed 2026-11-17**: GAP-003 (lançamentos; planejamento permanece non-goal) e GAP-006, via spec 025. Status da 025 é `implemented` até o PM marcar `verified`.
 
@@ -36,7 +36,7 @@ Deep write-ups focus on **Release B / import** smoke. Release A gaps appear only
 
 | id | title | priority | note |
 |----|-------|----------|------|
-| GAP-007 | Sheet no teclado | P2 | Fatia de UI; sem regra nova de domínio. Escape e trap de Tab já existem; o foco não entra no diálogo ao abrir, e Arquivar só tem o nome do item no tooltip. |
+| GAP-007 | Sheet no teclado | P2 | Saiu do estacionamento. A decisão está na spec 037 `draft`. |
 
 ## Compliance note
 

@@ -3,6 +3,8 @@ node_modules/
 dist/
 coverage/
 data/
+!android/app/src/main/java/app/meuorcamento/data/
+!android/app/src/main/java/app/meuorcamento/data/**
 .env
 .env.local
 .env*
@@ -14,3 +16,15 @@ build/
 .DS_Store
 playwright-report/
 test-results/
+
+# Android (027)
+android/.gradle/
+android/**/build/
+android/local.properties
+android/*.iml
+android/**/*.iml
+android/.idea/
+*.jks
+*.keystore
+!android/app/debug.keystore
+.vercel

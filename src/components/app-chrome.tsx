@@ -34,6 +34,9 @@ function ChromeBody({
 
   return (
     <>
+      <a className="skip-link" href="#conteudo">
+        Ir para o conteúdo
+      </a>
       <header className="app-top">
         <div className="app-top-inner">
           <Link href="/app/resumo" className="app-brand-link">

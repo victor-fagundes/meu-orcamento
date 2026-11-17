@@ -45,7 +45,7 @@ export default async function AjustesPage() {
     : "Nenhum cartão ativo";
 
   return (
-    <main className="aj-page">
+    <main id="conteudo" className="aj-page">
       <h1 className="orc-title">Ajustes</h1>
       <AjustesCards
         cards={[

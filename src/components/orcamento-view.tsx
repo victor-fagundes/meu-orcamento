@@ -16,6 +16,7 @@ import {
 import { formatBRL } from "@/lib/money-format";
 import { shiftCompetencia } from "@/lib/competencia-nav";
 import { MdFilterChip, MdOutlinedButton, MdProgress } from "@/components/material/ui";
+import { hrefOrcamentoMes } from "@/components/resumo-filtro";
 import { AlertBanner } from "./alert-banner";
 import { ArquivarItemButton } from "./arquivar-item-button";
 import { NovoItemSheet } from "./novo-item-sheet";
@@ -63,6 +64,8 @@ export function OrcamentoView({
   const [open, setOpen] = useState<Record<string, boolean>>({});
   const [sheetOpen, setSheetOpen] = useState(false);
   const [planoItem, setPlanoItem] = useState<OrcamentoItemView | null>(null);
+  const [semAberto, setSemAberto] = useState(false);
+  const [armedId, setArmedId] = useState<string | null>(null);
 
   const prev = shiftCompetencia(competencia, -1);
   const next = shiftCompetencia(competencia, 1);
@@ -95,13 +98,13 @@ export function OrcamentoView({
     <div className="orc-page">
       <h1 className="orc-title">Orçamento</h1>
       <div className="orc-mes-nav">
-        <Link href={`/app/orcamento?mes=${prev}`} className="orc-mes-btn" aria-label="Mês anterior" onClick={() => track("navegacao_mes", { destino: prev })}>
+        <Link href={hrefOrcamentoMes(prev, tipo)} className="orc-mes-btn" aria-label="Mês anterior" onClick={() => track("navegacao_mes", { destino: prev })}>
           ‹
         </Link>
         <p className="orc-month" style={{ margin: 0 }}>
           {mesLabel}
         </p>
-        <Link href={`/app/orcamento?mes=${next}`} className="orc-mes-btn" aria-label="Próximo mês" onClick={() => track("navegacao_mes", { destino: next })}>
+        <Link href={hrefOrcamentoMes(next, tipo)} className="orc-mes-btn" aria-label="Próximo mês" onClick={() => track("navegacao_mes", { destino: next })}>
           ›
         </Link>
       </div>
@@ -115,9 +118,12 @@ export function OrcamentoView({
       </div>
 
       <div className="orc-total">
-        <span>{TIPOS_LABEL[tipo]}</span>
+        <span>Ainda cabe em {TIPOS_LABEL[tipo].toLowerCase()}</span>
         <strong>
-          {formatBRL(totalR)} <span className="muted">/ {formatBRL(totalP)}</span>
+          {formatBRL(totalP - totalR)}{" "}
+          <span className="muted">
+            {formatBRL(totalR)} / {formatBRL(totalP)}
+          </span>
         </strong>
       </div>
 
@@ -126,6 +132,7 @@ export function OrcamentoView({
           const li = filtered.filter((i) => i.grupo === g);
           const p = li.reduce((s, i) => s + i.planoMes, 0);
           const r = li.reduce((s, i) => s + i.realizadoMes, 0);
+          if (p === 0 && r === 0) return null;
           const isOpen = !!open[g];
           const lim = tipo === "R" ? 80 : limiteDaCategoria(limites, g);
           const pct = barraPctVisual(r, p);
@@ -178,7 +185,7 @@ export function OrcamentoView({
                         </button>
                         <div className="orc-item-right">
                           <strong>{formatBRL(i.realizadoMes)}</strong>
-                          <ArquivarItemButton itemId={i.id} nome={i.nome} />
+                          <ArquivarItemButton itemId={i.id} nome={i.nome} armed={armedId === i.id} onArm={() => setArmedId(i.id)} />
                         </div>
                       </div>
                     );
@@ -187,6 +194,49 @@ export function OrcamentoView({
             </div>
           );
         })}
+        {grupos.some((g) => {
+          const li = filtered.filter((i) => i.grupo === g);
+          const p = li.reduce((s, i) => s + i.planoMes, 0);
+          const r = li.reduce((s, i) => s + i.realizadoMes, 0);
+          return p === 0 && r === 0;
+        }) ? (
+          <button type="button" className="orc-cat-head" onClick={() => setSemAberto((v) => !v)}>
+            Sem movimento neste mês
+            {semAberto ? " ▴" : " ▾"}
+          </button>
+        ) : null}
+        {semAberto
+          ? grupos.map((g) => {
+              const li = filtered.filter((i) => i.grupo === g);
+              const p = li.reduce((s, i) => s + i.planoMes, 0);
+              const r = li.reduce((s, i) => s + i.realizadoMes, 0);
+              if (p !== 0 || r !== 0) return null;
+              return (
+                <div key={g} className="orc-cat">
+                  <button
+                    type="button"
+                    className="orc-cat-head"
+                    onClick={() => setOpen((o) => ({ ...o, [g]: !o[g] }))}
+                  >
+                    <span>{g}</span>
+                    <span>
+                      {formatBRL(0)} <span className="muted">/ {formatBRL(0)}</span>
+                    </span>
+                  </button>
+                  {open[g]
+                    ? li.map((i) => (
+                        <div key={i.id} className="orc-item">
+                          <button type="button" className="orc-item-main" onClick={() => setPlanoItem(i)}>
+                            <div className="orc-item-name">{i.nome}</div>
+                          </button>
+                          <ArquivarItemButton itemId={i.id} nome={i.nome} armed={armedId === i.id} onArm={() => setArmedId(i.id)} />
+                        </div>
+                      ))
+                    : null}
+                </div>
+              );
+            })
+          : null}
       </div>
 
       <MdOutlinedButton onClick={() => setSheetOpen(true)}>Novo item em {TIPOS_LABEL[tipo]}</MdOutlinedButton>
@@ -212,6 +262,7 @@ export function OrcamentoView({
         }
         open={!!planoItem}
         onClose={() => setPlanoItem(null)}
+        competencia={competencia}
       />
     </div>
   );

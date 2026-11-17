@@ -435,6 +435,21 @@ body {
   padding-bottom: 88px;
 }
 
+.skip-link {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  z-index: 20;
+  transform: translateY(-120%);
+  background: var(--sf, #fff);
+  color: var(--pr, #0058be);
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+.skip-link:focus {
+  transform: none;
+}
+
 .app-top {
   background: var(--sf);
   color: var(--on-sf);
@@ -1863,7 +1878,7 @@ body {
 
 @media (prefers-color-scheme: dark) {
   .track i.warn {
-    background: var(--tc);
+    background: #d7b07a;
   }
 }
 

@@ -1,0 +1,19 @@
+import { exportOrcamentoCsv } from "@/application/export-orcamento";
+import { isApiError, requireApiSession } from "@/lib/api-session";
+
+export const dynamic = "force-dynamic";
+
+export async function GET(request: Request) {
+  const ctx = await requireApiSession(request);
+  if (isApiError(ctx)) return ctx;
+
+  const content = await exportOrcamentoCsv(ctx.db, ctx.orcamento.id);
+  const day = new Date().toISOString().slice(0, 10);
+  return new Response(content, {
+    status: 200,
+    headers: {
+      "Content-Type": "text/csv; charset=utf-8",
+      "Content-Disposition": `attachment; filename="meu-orcamento-${day}.csv"`,
+    },
+  });
+}

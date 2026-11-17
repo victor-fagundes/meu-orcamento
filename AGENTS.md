@@ -37,6 +37,6 @@ Cada história/card (MO-xxx) entrega **back + front juntos** na mesma entrega.
 ## Ordem de trabalho atual
 
 Release A e Release B `verified` (PM 2026-11-16). Specs 001–022 `verified`.  
-Spec 025 `implemented` (chegar no mês: card Total gasto e destino do import de lançamentos). Falta o PM marcar `verified`.  
-GAP-001, GAP-002, GAP-003, GAP-004, GAP-005 e GAP-006 fechados.  
-Próximo em aberto: GAP-007 (foco do sheet e nome acessível de Arquivar).
+Spec 025 `implemented` (chegar no mês). Spec 027 Android `implemented` (casca). Spec **028** `implemented`: Resumo e Orçamento no Android exibem os totais do mês calculados em `totaisDoMes`.  
+Specs **029–037** `implemented` (17 nov 2026). 029 revisa o computador. 030–036 são a casca e as telas Android. 037 fecha o GAP-007 no computador: foco ao abrir o diálogo, Arquivar nomeia o item na confirmação e região principal. O roteiro no aparelho das specs 030–036 continua em aberto. Não existe spec 038. Falta o PM marcar `verified` (025, 027, 028 e 029–037).  
+GAP-001…006 fechados. GAP-007 no computador está implementado na spec 037 e segue aberto até o PM marcar `verified`. No Android, o foco do sheet e o nome de Arquivar estão na spec 032.

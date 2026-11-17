@@ -49,7 +49,7 @@ export function AlertBanner({ alertas }: { alertas: AlertaMes[] }) {
             ))}
           </ul>
         )}
-        <MdFilledButton onClick={() => setOpen(false)}>Fechar</MdFilledButton>
+        <MdFilledButton onClick={() => setOpen(false)} sheetFocus>Fechar</MdFilledButton>
       </MaterialSheet>
     </>
   );

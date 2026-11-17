@@ -8,6 +8,7 @@ import { hrefLancamentosMes } from "@/domain/navegacao-mes";
 import { formatBRL } from "@/domain/money";
 import { MdFilledButton, MdOption, MdSelect } from "@/components/material/ui";
 import { collapseDonutGroups } from "@/components/resumo-donut";
+import { hrefOrcamentoMes, textoFiltroResumo } from "@/components/resumo-filtro";
 import { labelCompetencia, shiftCompetencia } from "@/lib/competencia-nav";
 
 export type ResumoItem = {
@@ -37,6 +38,12 @@ const CHIP: Record<TipoOrcamento, string> = {
   F: "Fixas",
   V: "Variáveis",
   E: "Anuais",
+};
+const VER: Record<TipoOrcamento, string> = {
+  R: "Ver receitas",
+  F: "Ver despesas fixas",
+  V: "Ver despesas variáveis",
+  E: "Ver anuais",
 };
 const COLORS = [
   "var(--mo-chart-1)",
@@ -75,17 +82,34 @@ export function ResumoDashboard({
   }, [lancamentos, pg, cg]);
 
   const pgAll = pg === "*";
+  const filtrado = pg !== "*" || cg !== "*";
 
   const planoDespesas = itens
     .filter((i) => i.tipo !== "R")
     .reduce((s, i) => s + i.planoMes, 0);
 
+  const gastoMes = lancamentos
+    .filter((l) => l.itemTipo !== "R")
+    .reduce((s, l) => s + l.valorCentavos, 0);
+
   const gasto = filteredLanc
     .filter((l) => l.itemTipo !== "R")
     .reduce((s, l) => s + l.valorCentavos, 0);
 
-  const saldo = planoDespesas - gasto;
-  const pctOrcado = planoDespesas > 0 ? Math.round((gasto / planoDespesas) * 100) : null;
+  const saldo = planoDespesas - gastoMes;
+  const pctOrcado = planoDespesas > 0 ? Math.round((gastoMes / planoDespesas) * 100) : null;
+  const rotuloFiltro = [
+    pg === "deb" ? "débito" : pg === "pix" ? "PIX" : pg === "din" ? "dinheiro" : pg !== "*" ? (cartoes.find((c) => c.id === pg)?.apelido ?? "pagamento") : "",
+    cg !== "*" ? cg : "",
+  ]
+    .filter(Boolean)
+    .join(" · ");
+  const fraseFiltro = textoFiltroResumo({
+    ativo: filtrado,
+    saldoMesCentavos: saldo,
+    gastoRecorteCentavos: gasto,
+    rotuloFiltro,
+  });
 
   const porTipo = TIPOS.map((t) => {
     const plano = itens.filter((i) => i.tipo === t).reduce((s, i) => s + i.planoMes, 0);
@@ -153,6 +177,50 @@ export function ResumoDashboard({
         </Link>
       </div>
 
+      <div className="resumo-g3">
+        <Link href={`/app/orcamento?mes=${competencia}`} className="resumo-kb resumo-hero">
+          <div className="sp resumo-eye">Ainda pode gastar</div>
+          <div className={`am${saldo < 0 ? " er" : ""}`}>{formatBRL(saldo)}</div>
+          <div className="sp">
+            {fraseFiltro
+              ? fraseFiltro
+              : saldo >= 0
+                ? `${pctOrcado ?? 0}% do orçado de despesas neste mês`
+                : "orçado menos gasto · passou do orçado"}
+          </div>
+          {pctOrcado != null ? (
+            <div className="resumo-track">
+              <i style={{ width: `${Math.min(100, pctOrcado)}%` }} />
+            </div>
+          ) : null}
+        </Link>
+        <Link href={`/app/orcamento?mes=${competencia}`} className="resumo-kb">
+          <div className="sp">Total orçado</div>
+          <div className="am">{formatBRL(planoDespesas)}</div>
+          <div className="sp">despesas previstas no mês</div>
+        </Link>
+        <Link href={hrefLancamentosMes(competencia)} className="resumo-kb">
+          <div className="sp">Total gasto</div>
+          <div className={`am${pgAll && gasto > planoDespesas ? " er" : ""}`}>{formatBRL(gasto)}</div>
+          <div className="sp">
+            {pgAll && pctOrcado != null
+              ? `${pctOrcado}% do orçado`
+              : `${filteredLanc.filter((l) => l.itemTipo !== "R").length} lançamentos`}
+          </div>
+        </Link>
+      </div>
+
+      {isMesCorrente ? (
+        <div className="resumo-ritmo">
+          <span>
+            Média diária: <b>{formatBRL(media ?? 0)}</b>
+          </span>
+          <span>
+            Restam <b>{restam}</b> dias no mês
+          </span>
+        </div>
+      ) : null}
+
       <div className="resumo-filters">
         <MdSelect label="Pagamento" value={pg} onChange={setPg}>
           <MdOption value="*">Todas</MdOption>
@@ -173,51 +241,7 @@ export function ResumoDashboard({
             </MdOption>
           ))}
         </MdSelect>
-        {pg !== "*" || cg !== "*" ? <MdFilledButton onClick={limpar}>Limpar filtros</MdFilledButton> : null}
-      </div>
-
-      {isMesCorrente ? (
-        <div className="resumo-ritmo">
-          <span>
-            Média diária: <b>{formatBRL(media ?? 0)}</b>
-          </span>
-          <span>
-            Restam <b>{restam}</b> dias no mês
-          </span>
-        </div>
-      ) : null}
-
-      <div className="resumo-g3">
-        <Link href={`/app/orcamento?mes=${competencia}`} className="resumo-kb resumo-hero">
-          <div className="sp resumo-eye">Ainda pode gastar</div>
-          <div className={`am${pgAll && saldo < 0 ? " er" : ""}`}>{pgAll ? formatBRL(saldo) : "—"}</div>
-          <div className="sp">
-            {pgAll
-              ? saldo >= 0
-                ? `${pctOrcado ?? 0}% do orçado de despesas neste mês`
-                : "orçado menos gasto · passou do orçado"
-              : "não se aplica ao filtro de pagamento"}
-          </div>
-          {pgAll && pctOrcado != null ? (
-            <div className="resumo-track">
-              <i style={{ width: `${Math.min(100, pctOrcado)}%` }} />
-            </div>
-          ) : null}
-        </Link>
-        <Link href={`/app/orcamento?mes=${competencia}`} className="resumo-kb">
-          <div className="sp">Total orçado</div>
-          <div className="am">{pgAll ? formatBRL(planoDespesas) : "—"}</div>
-          <div className="sp">{pgAll ? "despesas previstas no mês" : "não se aplica ao filtro de pagamento"}</div>
-        </Link>
-        <Link href={hrefLancamentosMes(competencia)} className="resumo-kb">
-          <div className="sp">Total gasto</div>
-          <div className={`am${pgAll && gasto > planoDespesas ? " er" : ""}`}>{formatBRL(gasto)}</div>
-          <div className="sp">
-            {pgAll && pctOrcado != null
-              ? `${pctOrcado}% do orçado`
-              : `${filteredLanc.filter((l) => l.itemTipo !== "R").length} lançamentos`}
-          </div>
-        </Link>
+        {filtrado ? <MdFilledButton onClick={limpar}>Limpar filtros</MdFilledButton> : null}
       </div>
 
       <div className="resumo-tipos">
@@ -226,8 +250,8 @@ export function ResumoDashboard({
             <div className="sp">{TIPOS_LABEL[t]}</div>
             <div className="am">{formatBRL(real)}</div>
             <div className="sp">{pgAll ? `planejado ${formatBRL(plano)}` : "—"}</div>
-            <Link href={`/app/orcamento?mes=${competencia}&tipo=${t}`} className="resumo-det">
-              Ver detalhes
+            <Link href={hrefOrcamentoMes(competencia, t)} className="resumo-det">
+              {VER[t]}
             </Link>
           </div>
         ))}

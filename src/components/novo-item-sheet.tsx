@@ -39,7 +39,7 @@ export function NovoItemSheet({
 
         <MdTextField label="Categoria" value={grupo} onChange={setGrupo} />
         {grupos.length ? <p className="sheet-sub">Existentes: {grupos.join(", ")}</p> : null}
-        <MdTextField label="Nome do item" value={nome} onChange={setNome} />
+        <MdTextField label="Nome do item" value={nome} onChange={setNome} sheetFocus />
         <MdTextField
           label="Valor planejado por mês (R$)"
           type="number"
