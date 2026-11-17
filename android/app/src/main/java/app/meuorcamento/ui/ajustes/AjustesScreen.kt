@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -28,6 +27,10 @@ import app.meuorcamento.data.ApiException
 import app.meuorcamento.data.AuthRepository
 import app.meuorcamento.ui.BarraTitulo
 import app.meuorcamento.ui.OfflineBanner
+import app.meuorcamento.ui.components.BotaoPerigo
+import app.meuorcamento.ui.components.BotaoPrimario
+import app.meuorcamento.ui.components.BotaoTexto
+import app.meuorcamento.ui.copy.Strings
 import app.meuorcamento.ui.lancamentos.CartaoDto
 import app.meuorcamento.ui.lancamentos.CartoesResponse
 import kotlinx.coroutines.launch
@@ -122,61 +125,69 @@ fun AjustesScreen(
             enabled = !resetUrl.isNullOrBlank(),
             onClick = { resetUrl?.let { uriHandler.openUri(it) } },
         )
-        LinhaAjuste("Sair", onClick = { confirmarSaida = true })
+        LinhaAjuste(Strings.sair, onClick = { confirmarSaida = true })
 
-        Text("Alertas", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 16.dp))
+        Text(Strings.limitesAlerta, style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 16.dp))
         OutlinedTextField(
             value = globalPct,
             onValueChange = { globalPct = it.filter(Char::isDigit) },
-            label = { Text("Limite global, de 1 a 100") },
+            label = { Text(Strings.limiteGlobal) },
             modifier = Modifier.fillMaxWidth(),
         )
-        Button(onClick = {
-            val pct = globalPct.toIntOrNull()
-            if (pct == null || pct !in 1..100) {
-                error = "Informe um inteiro de 1 a 100."
-                globalPct = salvoPct
-                return@Button
-            }
-            scope.launch {
-                try {
-                    api.putJson("/api/v1/limites", api.json.encodeToString(SaveLimitesBody(pct)))
-                    salvoPct = pct.toString()
-                    reload()
-                } catch (e: Exception) {
-                    error = e.message
+        BotaoPrimario(
+            text = Strings.salvarLimites,
+            onClick = {
+                val pct = globalPct.toIntOrNull()
+                if (pct == null || pct !in 1..100) {
+                    error = Strings.informeInteiro1a100
+                    globalPct = salvoPct
+                    return@BotaoPrimario
                 }
-            }
-        }, modifier = Modifier.padding(top = 8.dp)) { Text("Salvar limites") }
+                scope.launch {
+                    try {
+                        api.putJson("/api/v1/limites", api.json.encodeToString(SaveLimitesBody(pct)))
+                        salvoPct = pct.toString()
+                        reload()
+                    } catch (e: Exception) {
+                        error = e.message
+                    }
+                }
+            },
+            modifier = Modifier.padding(top = 8.dp),
+        )
 
-        Text("Cartões", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 16.dp))
-        if (cartoes.isEmpty()) Text("Nenhum cartão ativo")
+        Text(Strings.cartoes, style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 16.dp))
+        if (cartoes.isEmpty()) Text(Strings.nenhumCartao)
         cartoes.forEach { c ->
-            LinhaAjuste(c.apelido, "Desativar", onClick = { cartaoSair = c })
+            LinhaAjuste(c.apelido, Strings.desativar, onClick = { cartaoSair = c })
         }
-        OutlinedTextField(value = apelido, onValueChange = { apelido = it }, label = { Text("Novo apelido") }, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(value = diaFecha, onValueChange = { diaFecha = it }, label = { Text("Dia fechamento") }, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(value = diaVenc, onValueChange = { diaVenc = it }, label = { Text("Dia vencimento") }, modifier = Modifier.fillMaxWidth())
-        Button(onClick = {
-            if (apelido.isBlank()) {
-                error = "Informe o apelido do cartão."
-                return@Button
-            }
-            scope.launch {
-                try {
-                    api.postJson(
-                        "/api/v1/cartoes",
-                        api.json.encodeToString(
-                            NewCartaoBody(apelido.trim(), diaFecha.toIntOrNull() ?: 10, diaVenc.toIntOrNull() ?: 17),
-                        ),
-                    )
-                    apelido = ""
-                    reload()
-                } catch (e: Exception) {
-                    error = e.message
+        OutlinedTextField(value = apelido, onValueChange = { apelido = it }, label = { Text(Strings.novoApelido) }, modifier = Modifier.fillMaxWidth())
+        OutlinedTextField(value = diaFecha, onValueChange = { diaFecha = it }, label = { Text(Strings.diaFechamento) }, modifier = Modifier.fillMaxWidth())
+        OutlinedTextField(value = diaVenc, onValueChange = { diaVenc = it }, label = { Text(Strings.diaVencimento) }, modifier = Modifier.fillMaxWidth())
+        BotaoPrimario(
+            text = Strings.adicionarCartao,
+            onClick = {
+                if (apelido.isBlank()) {
+                    error = Strings.informeApelido
+                    return@BotaoPrimario
                 }
-            }
-        }, modifier = Modifier.padding(top = 8.dp)) { Text("Adicionar cartão") }
+                scope.launch {
+                    try {
+                        api.postJson(
+                            "/api/v1/cartoes",
+                            api.json.encodeToString(
+                                NewCartaoBody(apelido.trim(), diaFecha.toIntOrNull() ?: 10, diaVenc.toIntOrNull() ?: 17),
+                            ),
+                        )
+                        apelido = ""
+                        reload()
+                    } catch (e: Exception) {
+                        error = e.message
+                    }
+                }
+            },
+            modifier = Modifier.padding(top = 8.dp),
+        )
 
         Text("Dados", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 24.dp))
         LinhaAjuste("Importar planilha", onClick = onImportPlanilha)
@@ -188,43 +199,49 @@ fun AjustesScreen(
     if (confirmarSaida) {
         AlertDialog(
             onDismissRequest = { confirmarSaida = false },
-            title = { Text("Sair da conta") },
-            text = { Text("A sessão desta conta será encerrada neste aparelho.") },
+            title = { Text(Strings.sairDaConta) },
+            text = { Text(Strings.sessaoEncerrada) },
             confirmButton = {
-                TextButton(onClick = {
-                    confirmarSaida = false
-                    scope.launch {
-                        auth.signOut()
-                        onSignedOut()
-                    }
-                }) { Text("Sair") }
+                BotaoPerigo(
+                    text = Strings.sair,
+                    onClick = {
+                        confirmarSaida = false
+                        scope.launch {
+                            auth.signOut()
+                            onSignedOut()
+                        }
+                    },
+                )
             },
-            dismissButton = { TextButton(onClick = { confirmarSaida = false }) { Text("Cancelar") } },
+            dismissButton = { TextButton(onClick = { confirmarSaida = false }) { Text(Strings.cancelar) } },
         )
     }
 
     cartaoSair?.let { cartao ->
         AlertDialog(
             onDismissRequest = { cartaoSair = null },
-            title = { Text("Desativar ${cartao.apelido}") },
-            text = { Text("O cartão sai dos pagamentos novos. Lançamentos antigos permanecem.") },
+            title = { Text("${Strings.desativar} ${cartao.apelido}") },
+            text = { Text(Strings.mensagemDesativar) },
             confirmButton = {
-                TextButton(onClick = {
-                    cartaoSair = null
-                    scope.launch {
-                        try {
-                            api.patchJson(
-                                "/api/v1/cartoes",
-                                api.json.encodeToString(InativarCartaoBody(cartao.id)),
-                            )
-                            reload()
-                        } catch (e: Exception) {
-                            error = e.message
+                BotaoPerigo(
+                    text = Strings.desativar,
+                    onClick = {
+                        cartaoSair = null
+                        scope.launch {
+                            try {
+                                api.patchJson(
+                                    "/api/v1/cartoes",
+                                    api.json.encodeToString(InativarCartaoBody(cartao.id)),
+                                )
+                                reload()
+                            } catch (e: Exception) {
+                                error = e.message
+                            }
                         }
-                    }
-                }) { Text("Desativar") }
+                    },
+                )
             },
-            dismissButton = { TextButton(onClick = { cartaoSair = null }) { Text("Cancelar") } },
+            dismissButton = { TextButton(onClick = { cartaoSair = null }) { Text(Strings.cancelar) } },
         )
     }
 }
