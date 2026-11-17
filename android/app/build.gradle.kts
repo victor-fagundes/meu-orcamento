@@ -74,6 +74,14 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
+    applicationVariants.configureEach {
+        val variant = this
+        outputs.configureEach {
+            (this as com.android.build.gradle.internal.api.BaseVariantOutputImpl).outputFileName =
+                "MeuOrcamento-${variant.versionName}-${variant.versionCode}-${variant.name}.apk"
+        }
+    }
 }
 
 dependencies {

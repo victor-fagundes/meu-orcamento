@@ -18,6 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import app.meuorcamento.data.ApiClient
 import app.meuorcamento.data.ApiException
+import app.meuorcamento.ui.BarraTitulo
 import app.meuorcamento.ui.OfflineBanner
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -78,8 +79,9 @@ fun ExportScreen(api: ApiClient, onUnauthorized: () -> Unit) {
         }
     }
 
-    Column(Modifier.fillMaxSize().padding(16.dp)) {
-        Text("Exportar", style = MaterialTheme.typography.headlineSmall)
+    Column(Modifier.fillMaxSize()) {
+        BarraTitulo("Exportar")
+        Column(Modifier.padding(horizontal = 16.dp)) {
         OfflineBanner(offline, status)
         Button(onClick = { share("/api/v1/export/csv", "text/csv", "meu-orcamento.csv") }, modifier = Modifier.padding(top = 12.dp)) {
             Text("Exportar CSV")
@@ -88,5 +90,6 @@ fun ExportScreen(api: ApiClient, onUnauthorized: () -> Unit) {
             Text("Exportar JSON")
         }
         status?.let { Text(it, modifier = Modifier.padding(top = 12.dp)) }
+        }
     }
 }

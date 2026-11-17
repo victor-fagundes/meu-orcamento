@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import app.meuorcamento.data.ApiClient
 import app.meuorcamento.data.ApiException
 import app.meuorcamento.domain.formatCentavos
+import app.meuorcamento.ui.BarraTitulo
 import app.meuorcamento.ui.OfflineBanner
 import kotlinx.serialization.Serializable
 import java.io.IOException
@@ -74,17 +75,20 @@ fun AnoScreen(api: ApiClient, onUnauthorized: () -> Unit) {
         grade.planejado.none { it.valoresCentavos.any { v -> v > 0 } } &&
         grade.realizado.none { it.valoresCentavos.any { v -> v > 0 } }
 
-    Column(
-        Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-            .verticalScroll(rememberScrollState()),
-    ) {
-        Text("Ano $confirmado", style = MaterialTheme.typography.headlineSmall)
-        Row {
-            TextButton(onClick = { pedido = confirmado - 1 }) { Text("Ano anterior") }
-            TextButton(onClick = { pedido = confirmado + 1 }) { Text("Próximo ano") }
-        }
+    Column(Modifier.fillMaxSize()) {
+        BarraTitulo(
+            titulo = confirmado.toString(),
+            onAnterior = { pedido = confirmado - 1 },
+            onProximo = { pedido = confirmado + 1 },
+            rotuloAnterior = "Ano anterior",
+            rotuloProximo = "Próximo ano",
+        )
+        Column(
+            Modifier
+                .weight(1f)
+                .padding(horizontal = 16.dp)
+                .verticalScroll(rememberScrollState()),
+        ) {
         OfflineBanner(offline || error != null, error)
         when {
             grade == null -> Text("Não foi possível carregar o ano.")
@@ -99,7 +103,7 @@ fun AnoScreen(api: ApiClient, onUnauthorized: () -> Unit) {
                         )
                         Row(Modifier.horizontalScroll(rememberScrollState())) {
                             MESES.forEachIndexed { index, nome ->
-                                Column(Modifier.width(88.dp).padding(end = 8.dp)) {
+                                Column(Modifier.width(120.dp).padding(end = 8.dp)) {
                                     Text(nome, style = MaterialTheme.typography.labelSmall)
                                     Text(
                                         formatCentavos(cell.valoresCentavos.getOrElse(index) { 0L }),
@@ -118,6 +122,7 @@ fun AnoScreen(api: ApiClient, onUnauthorized: () -> Unit) {
                     }
                 }
             }
+        }
         }
     }
 }

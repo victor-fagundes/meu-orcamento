@@ -29,6 +29,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import app.meuorcamento.data.ApiClient
 import app.meuorcamento.data.ApiException
+import app.meuorcamento.ui.BarraTitulo
 import app.meuorcamento.domain.formatCentavos
 import app.meuorcamento.ui.OfflineBanner
 import kotlinx.coroutines.launch
@@ -169,13 +170,14 @@ fun PlanilhaImportScreen(
     val linhasPlano = preview?.lines.orEmpty()
     val faltaEscolha = linhasPlano.any { it.ok && it.alvo == "escolher" && escolhas[it.n].isNullOrBlank() }
 
-    Column(
-        Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-            .verticalScroll(rememberScrollState()),
-    ) {
-        Text("Importar planilha", style = MaterialTheme.typography.headlineSmall)
+    Column(Modifier.fillMaxSize()) {
+        BarraTitulo("Importar planilha")
+        Column(
+            Modifier
+                .weight(1f)
+                .padding(horizontal = 16.dp)
+                .verticalScroll(rememberScrollState()),
+        ) {
         OfflineBanner(offline, status)
         Button(onClick = { picker.launch("*/*") }) { Text("Escolher arquivo") }
         status?.let { Text(it, modifier = Modifier.padding(top = 8.dp)) }
@@ -239,6 +241,7 @@ fun PlanilhaImportScreen(
             },
             modifier = Modifier.padding(top = 8.dp),
         ) { Text("Confirmar importação") }
+        }
     }
 }
 

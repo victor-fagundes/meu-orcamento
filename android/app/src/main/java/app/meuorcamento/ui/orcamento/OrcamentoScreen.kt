@@ -13,10 +13,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -30,11 +32,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.isSystemInDarkTheme
 import app.meuorcamento.data.ApiClient
 import app.meuorcamento.data.ApiException
 import app.meuorcamento.domain.formatCentavos
@@ -44,16 +49,29 @@ import app.meuorcamento.ui.reaisParaCentavos
 import app.meuorcamento.ui.resumo.ResumoItemDto
 import app.meuorcamento.ui.resumo.ResumoResponse
 import app.meuorcamento.ui.resumo.TotalGrupoDto
+import app.meuorcamento.ui.resumo.labelChip
 import app.meuorcamento.ui.resumo.labelTipo
+import app.meuorcamento.ui.theme.AzulAcao
+import app.meuorcamento.ui.theme.ValorDisplay
+import app.meuorcamento.ui.theme.aviso
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import java.io.IOException
 
 private val TIPOS = listOf("R", "F", "V", "E")
-private val PERTO = Color(0xFF8A7000)
-private val PRIMARIA = Color(0xFF0057B8)
 private val ERRO = Color(0xFFBA1A1A)
+private val CantoPainel = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)
+
+private fun corBarra(plano: Long, realizado: Long, escuro: Boolean): Color {
+    if (plano <= 0) return aviso(escuro)
+    val pct = realizado.toDouble() / plano.toDouble()
+    return when {
+        pct > 1.0 -> ERRO
+        pct >= 0.8 -> aviso(escuro)
+        else -> AzulAcao
+    }
+}
 
 @Serializable
 private data class PlanoItemDto(
@@ -73,16 +91,6 @@ private data class NovoItemBody(val tipo: String, val grupo: String, val nome: S
 private fun indiceMes(competencia: String): Int {
     val month = competencia.substringAfter("-", "").toIntOrNull() ?: return 0
     return if (month in 1..12) month - 1 else 0
-}
-
-private fun corBarra(plano: Long, realizado: Long): Color {
-    if (plano <= 0) return PERTO
-    val pct = realizado.toDouble() / plano.toDouble()
-    return when {
-        pct > 1.0 -> ERRO
-        pct >= 0.8 -> PERTO
-        else -> PRIMARIA
-    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -141,31 +149,41 @@ fun OrcamentoScreen(
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
-            ) { armedId = null }
-            .padding(16.dp),
+            ) { armedId = null },
     ) {
-        Text("Orçamento", style = MaterialTheme.typography.headlineSmall)
         CompetenciaPicker(competencia, onCompetencia)
-        OfflineBanner(offline || error != null, error)
-        Row(Modifier.horizontalScroll(rememberScrollState())) {
-            TIPOS.forEach { code ->
-                FilterChip(
-                    selected = tipo == code,
-                    onClick = { onTipo(code) },
-                    label = { Text(labelTipo(code)) },
-                    modifier = Modifier.padding(end = 8.dp),
-                )
+        Column(Modifier.padding(horizontal = 16.dp)) {
+            OfflineBanner(offline || error != null, error)
+            Row(Modifier.horizontalScroll(rememberScrollState())) {
+                TIPOS.forEach { code ->
+                    FilterChip(
+                        selected = tipo == code,
+                        onClick = { onTipo(code) },
+                        label = { Text(labelChip(code)) },
+                        modifier = Modifier.padding(end = 8.dp),
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                            selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        ),
+                    )
+                }
             }
         }
         when {
             loading && totais == null -> CircularProgressIndicator(Modifier.padding(24.dp))
-            totais == null -> Text("Não foi possível carregar o orçamento.")
+            totais == null -> Text("Não foi possível carregar o orçamento.", modifier = Modifier.padding(horizontal = 16.dp))
             else -> {
                 val cabe = (linha?.planoCentavos ?: 0) - (linha?.realizadoCentavos ?: 0)
-                Text("Ainda cabe em ${labelTipo(tipo).lowercase()}", modifier = Modifier.padding(top = 12.dp))
-                Text(formatCentavos(cabe), style = MaterialTheme.typography.headlineMedium)
-                TextButton(onClick = { novoAberto = true }) { Text("Novo item") }
-                LazyColumn(Modifier.weight(1f)) {
+                Column(Modifier.padding(horizontal = 16.dp)) {
+                    Text("Ainda cabe em ${labelTipo(tipo).lowercase()}", modifier = Modifier.padding(top = 12.dp))
+                    Text(
+                        formatCentavos(cabe),
+                        style = ValorDisplay,
+                        color = if (cabe < 0) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
+                    )
+                    TextButton(onClick = { novoAberto = true }) { Text("Novo item") }
+                }
+                LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp)) {
                     items(comMovimento, key = { "${it.tipo}-${it.grupo}" }) { grupo ->
                         GrupoBloco(
                             grupo = grupo,
@@ -273,27 +291,52 @@ private fun GrupoBloco(
     onArchive: (String) -> Unit,
 ) {
     val doGrupo = itens.filter { it.tipo == grupo.tipo && it.grupo == grupo.grupo }
+    val escuro = isSystemInDarkTheme()
+    val cor = corBarra(grupo.planoCentavos, grupo.realizadoCentavos, escuro)
     Column(Modifier.padding(vertical = 8.dp)) {
-        Text(grupo.grupo, style = MaterialTheme.typography.titleMedium)
-        Text(grupo.frase.ifBlank { "planejado ${formatCentavos(grupo.planoCentavos)} · realizado ${formatCentavos(grupo.realizadoCentavos)}" })
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                grupo.grupo,
+                modifier = Modifier.weight(1f),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.titleMedium,
+            )
+            Text(
+                formatCentavos(grupo.aindaCabeCentavos),
+                maxLines = 1,
+                softWrap = false,
+                color = if (grupo.aindaCabeCentavos < 0) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
+            )
+        }
+        val fraseCor = when {
+            grupo.planoCentavos > 0 && grupo.realizadoCentavos > grupo.planoCentavos -> MaterialTheme.colorScheme.error
+            grupo.planoCentavos > 0 && grupo.realizadoCentavos * 5 >= grupo.planoCentavos * 4 -> cor
+            else -> MaterialTheme.colorScheme.onSurfaceVariant
+        }
+        Text(
+            grupo.frase.ifBlank { "planejado ${formatCentavos(grupo.planoCentavos)} · realizado ${formatCentavos(grupo.realizadoCentavos)}" },
+            color = fraseCor,
+        )
         if (grupo.planoCentavos > 0 || grupo.realizadoCentavos > 0) {
             val frac = if (grupo.planoCentavos <= 0) 1f
             else (grupo.realizadoCentavos.toFloat() / grupo.planoCentavos.toFloat()).coerceIn(0f, 1f)
             LinearProgressIndicator(
                 progress = { frac },
                 modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp).height(4.dp),
-                color = corBarra(grupo.planoCentavos, grupo.realizadoCentavos),
-                trackColor = Color(0xFFE6E8F0),
+                color = cor,
+                trackColor = MaterialTheme.colorScheme.surfaceVariant,
             )
         }
         doGrupo.forEach { item ->
             val realizado = lancamentos.filter { it.itemId == item.id }.sumOf { it.valorCentavos }
-            Row(Modifier.fillMaxWidth().padding(top = 4.dp)) {
+            Row(Modifier.fillMaxWidth().padding(top = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f).clickable { onEdit(item) }) {
-                    Text(item.nome)
+                    Text(item.nome, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     Text(
                         "realizado ${formatCentavos(realizado)} · plano ${formatCentavos(item.planoMesCentavos)}",
                         style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
                 val armed = armedId == item.id
@@ -342,7 +385,7 @@ private fun PlanoMesSheet(
         focus.requestFocus()
     }
 
-    ModalBottomSheet(onDismissRequest = onClose) {
+    ModalBottomSheet(onDismissRequest = onClose, shape = CantoPainel) {
         Column(Modifier.padding(16.dp)) {
             Text(item.nome, style = MaterialTheme.typography.titleLarge)
             OutlinedTextField(
@@ -395,7 +438,7 @@ private fun NovoItemSheet(
     var aviso by remember { mutableStateOf<String?>(null) }
     val focus = remember { FocusRequester() }
     LaunchedEffect(Unit) { focus.requestFocus() }
-    ModalBottomSheet(onDismissRequest = onClose) {
+    ModalBottomSheet(onDismissRequest = onClose, shape = CantoPainel) {
         Column(Modifier.padding(16.dp)) {
             Text("Novo item · ${labelTipo(tipo)}", style = MaterialTheme.typography.titleLarge)
             OutlinedTextField(

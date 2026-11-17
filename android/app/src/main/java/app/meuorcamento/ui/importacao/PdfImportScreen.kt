@@ -29,6 +29,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import app.meuorcamento.data.ApiClient
 import app.meuorcamento.data.ApiException
+import app.meuorcamento.ui.BarraTitulo
 import app.meuorcamento.domain.formatCentavos
 import app.meuorcamento.ui.OfflineBanner
 import app.meuorcamento.ui.lancamentos.CartaoDto
@@ -88,13 +89,14 @@ fun PdfImportScreen(api: ApiClient, onUnauthorized: () -> Unit) {
         }
     }
 
-    Column(
-        Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-            .verticalScroll(rememberScrollState()),
-    ) {
-        Text("Importar PDF", style = MaterialTheme.typography.headlineSmall)
+    Column(Modifier.fillMaxSize()) {
+        BarraTitulo("Importar fatura")
+        Column(
+            Modifier
+                .weight(1f)
+                .padding(horizontal = 16.dp)
+                .verticalScroll(rememberScrollState()),
+        ) {
         OfflineBanner(offline, status)
         Button(onClick = { picker.launch("application/pdf") }) { Text("Escolher PDF") }
         val apelido = cartoes.find { it.id == cartaoId }?.apelido ?: "Cartão destino"
@@ -149,5 +151,6 @@ fun PdfImportScreen(api: ApiClient, onUnauthorized: () -> Unit) {
                 }
             },
         ) { Text("Confirmar PDF") }
+        }
     }
 }

@@ -1,5 +1,6 @@
 package app.meuorcamento.ui.ajustes
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import app.meuorcamento.data.ApiClient
 import app.meuorcamento.data.ApiException
 import app.meuorcamento.data.AuthRepository
+import app.meuorcamento.ui.BarraTitulo
 import app.meuorcamento.ui.OfflineBanner
 import app.meuorcamento.ui.lancamentos.CartaoDto
 import app.meuorcamento.ui.lancamentos.CartoesResponse
@@ -105,22 +107,30 @@ fun AjustesScreen(
 
     LaunchedEffect(Unit) { reload() }
 
-    Column(
-        Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-            .verticalScroll(rememberScrollState()),
-    ) {
-        Text("Ajustes", style = MaterialTheme.typography.headlineSmall)
+    Column(Modifier.fillMaxSize()) {
+        BarraTitulo("Ajustes")
+        Column(
+            Modifier
+                .weight(1f)
+                .padding(horizontal = 16.dp)
+                .verticalScroll(rememberScrollState()),
+        ) {
         OfflineBanner(offline || error != null, error)
-        Text("Conta: ${email ?: "—"}", modifier = Modifier.padding(vertical = 8.dp))
-        Button(onClick = { resetUrl?.let { uriHandler.openUri(it) } }, enabled = !resetUrl.isNullOrBlank()) {
-            Text("Esqueci a senha (web)")
-        }
-        Button(onClick = { confirmarSaida = true }, modifier = Modifier.padding(top = 8.dp)) { Text("Sair") }
+        Text(email ?: "Conta", modifier = Modifier.padding(vertical = 8.dp))
+        LinhaAjuste(
+            "Esqueci a senha",
+            enabled = !resetUrl.isNullOrBlank(),
+            onClick = { resetUrl?.let { uriHandler.openUri(it) } },
+        )
+        LinhaAjuste("Sair", onClick = { confirmarSaida = true })
 
-        Text("Alertas — % global", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 16.dp))
-        OutlinedTextField(value = globalPct, onValueChange = { globalPct = it.filter(Char::isDigit) }, modifier = Modifier.fillMaxWidth())
+        Text("Alertas", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 16.dp))
+        OutlinedTextField(
+            value = globalPct,
+            onValueChange = { globalPct = it.filter(Char::isDigit) },
+            label = { Text("Limite global, de 1 a 100") },
+            modifier = Modifier.fillMaxWidth(),
+        )
         Button(onClick = {
             val pct = globalPct.toIntOrNull()
             if (pct == null || pct !in 1..100) {
@@ -137,13 +147,12 @@ fun AjustesScreen(
                     error = e.message
                 }
             }
-        }) { Text("Salvar limites") }
+        }, modifier = Modifier.padding(top = 8.dp)) { Text("Salvar limites") }
 
         Text("Cartões", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 16.dp))
         if (cartoes.isEmpty()) Text("Nenhum cartão ativo")
         cartoes.forEach { c ->
-            Text("${c.apelido}")
-            TextButton(onClick = { cartaoSair = c }) { Text("Desativar ${c.apelido}") }
+            LinhaAjuste(c.apelido, "Desativar", onClick = { cartaoSair = c })
         }
         OutlinedTextField(value = apelido, onValueChange = { apelido = it }, label = { Text("Novo apelido") }, modifier = Modifier.fillMaxWidth())
         OutlinedTextField(value = diaFecha, onValueChange = { diaFecha = it }, label = { Text("Dia fechamento") }, modifier = Modifier.fillMaxWidth())
@@ -167,12 +176,13 @@ fun AjustesScreen(
                     error = e.message
                 }
             }
-        }) { Text("Adicionar cartão") }
+        }, modifier = Modifier.padding(top = 8.dp)) { Text("Adicionar cartão") }
 
         Text("Dados", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 24.dp))
-        TextButton(onClick = onImportPlanilha) { Text("Importar planilha") }
-        TextButton(onClick = onImportPdf) { Text("Importar PDF") }
-        TextButton(onClick = onExport) { Text("Exportar") }
+        LinhaAjuste("Importar planilha", onClick = onImportPlanilha)
+        LinhaAjuste("Importar fatura", onClick = onImportPdf)
+        LinhaAjuste("Exportar", onClick = onExport)
+        }
     }
 
     if (confirmarSaida) {
@@ -216,5 +226,28 @@ fun AjustesScreen(
             },
             dismissButton = { TextButton(onClick = { cartaoSair = null }) { Text("Cancelar") } },
         )
+    }
+}
+
+@Composable
+private fun LinhaAjuste(
+    titulo: String,
+    detalhe: String? = null,
+    enabled: Boolean = true,
+    onClick: () -> Unit,
+) {
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .clickable(enabled = enabled, onClick = onClick)
+            .padding(vertical = 12.dp),
+    ) {
+        Text(
+            titulo,
+            color = if (enabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        if (detalhe != null) {
+            Text(detalhe, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
     }
 }

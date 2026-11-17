@@ -13,7 +13,10 @@ data/
 tsconfig.tsbuildinfo
 build/
 *.log
+*.class
+out/
 .DS_Store
+Thumbs.db
 playwright-report/
 test-results/
 

@@ -1,6 +1,7 @@
 package app.meuorcamento.ui.lancamentos
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -26,9 +27,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import app.meuorcamento.data.ApiClient
 import app.meuorcamento.data.ApiException
@@ -155,16 +158,20 @@ fun LancamentosScreen(
 
     LaunchedEffect(competencia) { reload() }
 
-    Column(Modifier.fillMaxSize().padding(16.dp)) {
-        Text("Lançamentos", style = MaterialTheme.typography.headlineSmall)
+    Column(Modifier.fillMaxSize()) {
         CompetenciaPicker(competencia, onCompetencia)
-        OfflineBanner(offline || error != null, error)
-        Button(onClick = {
-            editing = null
-            showForm = true
-        }) { Text(if (showForm && editing == null) "Novo" else "Registrar") }
+        Column(Modifier.padding(horizontal = 16.dp)) {
+            OfflineBanner(offline || error != null, error)
+            if (loaded && rows.isNotEmpty()) {
+                Button(onClick = {
+                    editing = null
+                    showForm = true
+                }) { Text("Registrar") }
+            }
+        }
 
         if (showForm) {
+            Column(Modifier.padding(horizontal = 16.dp)) {
             LancamentoForm(
                 itens = itens,
                 cartoes = cartoes,
@@ -221,20 +228,33 @@ fun LancamentosScreen(
                     }
                 },
             )
+            }
         }
 
-        if (loaded && rows.isEmpty() && error == null) {
-            Text("Não há lançamentos neste mês.", modifier = Modifier.padding(top = 16.dp))
-            TextButton(onClick = { editing = null; showForm = true }) { Text("Registrar") }
+        if (loaded && rows.isEmpty() && error == null && !showForm) {
+            Column(Modifier.padding(horizontal = 16.dp)) {
+                Text("Não há lançamentos neste mês.", modifier = Modifier.padding(top = 16.dp))
+                Button(onClick = { editing = null; showForm = true }) { Text("Registrar") }
+            }
         }
 
-        LazyColumn {
+        LazyColumn(Modifier.weight(1f)) {
             items(rows, key = { it.id }) { row ->
-                Column(Modifier.padding(vertical = 8.dp)) {
-                    Text("${row.itemNome ?: row.itemId} · ${formatCentavos(row.valorCentavos)}")
+                val titulo = row.descricao?.takeIf { it.isNotBlank() } ?: (row.itemNome ?: "Lançamento")
+                Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            titulo,
+                            modifier = Modifier.weight(1f),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                        Text(formatCentavos(row.valorCentavos), maxLines = 1, softWrap = false)
+                    }
                     Text(
-                        "${dataVisivel(row.dataTransacao)} · ${rotuloMeio(row)}",
+                        "${dataVisivel(row.dataTransacao)} · ${row.itemNome ?: "item"} · ${rotuloMeio(row)}",
                         style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     RowActions(
                         onEdit = {

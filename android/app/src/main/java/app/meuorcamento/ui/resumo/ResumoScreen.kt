@@ -2,11 +2,13 @@ package app.meuorcamento.ui.resumo
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -17,8 +19,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import app.meuorcamento.ui.theme.ValorDisplay
 import app.meuorcamento.data.ApiClient
 import app.meuorcamento.data.ApiException
 import app.meuorcamento.domain.formatCentavos
@@ -132,57 +137,93 @@ fun ResumoScreen(
     }
 
     val totais = data?.totais
-    Column(Modifier.fillMaxSize().padding(16.dp)) {
-        Text("Resumo", style = MaterialTheme.typography.headlineSmall)
+    Column(Modifier.fillMaxSize()) {
         CompetenciaPicker(competencia, onCompetencia)
-        OfflineBanner(offline || error != null, error)
-
-        when {
-            loading && totais == null -> CircularProgressIndicator(Modifier.padding(24.dp))
-            totais == null -> Text("Não foi possível carregar o orçamento.")
-            else -> {
-                val ainda = totais.aindaPodeGastarCentavos
-                val orcado = totais.totalOrcadoDespesasCentavos
-                val gasto = totais.totalGastoDespesasCentavos
-                val dias = diasRestantesNoMes(competencia)
-                Text(
-                    if (ainda < 0) "Passou do orçado" else "Ainda pode gastar",
-                    modifier = Modifier.padding(top = 12.dp),
-                )
-                Text(formatCentavos(ainda), style = MaterialTheme.typography.headlineMedium)
-                if (orcado > 0) {
-                    val frase = buildString {
-                        append("Gastou ${formatCentavos(gasto)} de ${formatCentavos(orcado)}")
-                        if (dias != null) append(". Faltam $dias dias neste mês, incluindo hoje")
-                    }
-                    Text(frase, modifier = Modifier.padding(top = 8.dp))
-                    val frac = (gasto.toFloat() / orcado.toFloat()).coerceIn(0f, 1f)
-                    LinearProgressIndicator(
-                        progress = { frac },
-                        modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                        color = MaterialTheme.colorScheme.primary,
+        Column(
+            Modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp),
+        ) {
+            OfflineBanner(offline || error != null, error)
+            when {
+                loading && totais == null -> CircularProgressIndicator(Modifier.padding(24.dp))
+                totais == null -> Text("Não foi possível carregar o orçamento.")
+                else -> {
+                    val ainda = totais.aindaPodeGastarCentavos
+                    val orcado = totais.totalOrcadoDespesasCentavos
+                    val gasto = totais.totalGastoDespesasCentavos
+                    val dias = diasRestantesNoMes(competencia)
+                    val estourou = ainda < 0
+                    Text(if (estourou) "Passou do orçado" else "Ainda pode gastar")
+                    Text(
+                        formatCentavos(ainda),
+                        style = ValorDisplay,
+                        color = if (estourou) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
                     )
-                } else if (dias != null) {
-                    Text("Faltam $dias dias neste mês, incluindo hoje")
-                }
-                Text("Total orçado ${formatCentavos(orcado)}", modifier = Modifier.padding(top = 12.dp))
-                Text("Total gasto ${formatCentavos(gasto)}")
-                LazyColumn(Modifier.padding(top = 12.dp).weight(1f)) {
-                    items(totais.porTipo) { tipo ->
-                        Column(
-                            Modifier
-                                .fillMaxWidth()
-                                .clickable { onOpenTipo(tipo.tipo) }
-                                .padding(vertical = 8.dp),
-                        ) {
-                            Text(labelTipo(tipo.tipo), style = MaterialTheme.typography.titleMedium)
-                            Text("realizado ${formatCentavos(tipo.realizadoCentavos)} · planejado ${formatCentavos(tipo.planoCentavos)}")
+                    if (orcado > 0) {
+                        val frase = buildString {
+                            append("Gastou ${formatCentavos(gasto)} de ${formatCentavos(orcado)}")
+                            if (dias != null) append(". Faltam $dias dias neste mês, incluindo hoje")
                         }
+                        Text(
+                            frase,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(top = 4.dp, bottom = 8.dp),
+                        )
+                        val frac = (gasto.toFloat() / orcado.toFloat()).coerceIn(0f, 1f)
+                        LinearProgressIndicator(
+                            progress = { frac },
+                            modifier = Modifier.fillMaxWidth().height(4.dp),
+                            color = if (estourou) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                            trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                        )
+                    } else if (dias != null) {
+                        Text(
+                            "Faltam $dias dias neste mês, incluindo hoje",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                    totais.porTipo.forEach { tipo ->
+                        LinhaTipo(tipo, onClick = { onOpenTipo(tipo.tipo) })
                     }
                 }
             }
         }
     }
+}
+
+@Composable
+private fun LinhaTipo(tipo: TotalTipoDto, onClick: () -> Unit) {
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(vertical = 12.dp),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                labelTipo(tipo.tipo),
+                modifier = Modifier.weight(1f),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Text(formatCentavos(tipo.realizadoCentavos), maxLines = 1, softWrap = false)
+        }
+        Text(
+            "planejado ${formatCentavos(tipo.planoCentavos)}",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
+
+fun labelChip(tipo: String): String = when (tipo) {
+    "R" -> "Receitas"
+    "F" -> "Fixas"
+    "V" -> "Variáveis"
+    "E" -> "Anuais"
+    else -> tipo
 }
 
 fun labelTipo(tipo: String): String = when (tipo) {
