@@ -9,12 +9,10 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,6 +27,9 @@ import app.meuorcamento.BuildConfig
 import app.meuorcamento.data.ApiException
 import app.meuorcamento.data.AuthRepository
 import app.meuorcamento.ui.OfflineBanner
+import app.meuorcamento.ui.components.BotaoPrimario
+import app.meuorcamento.ui.components.BotaoTexto
+import app.meuorcamento.ui.copy.Strings
 import app.meuorcamento.ui.theme.Marca
 import kotlinx.coroutines.launch
 import java.io.IOException
@@ -58,7 +59,7 @@ fun LoginScreen(
     ) {
         Marca()
         Text(
-            "Meu Orçamento",
+            Strings.appNome,
             style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier.padding(top = 12.dp, bottom = 24.dp),
         )
@@ -76,7 +77,7 @@ fun LoginScreen(
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("E-mail") },
+            label = { Text(Strings.email) },
             modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
@@ -84,7 +85,7 @@ fun LoginScreen(
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Senha") },
+            label = { Text(Strings.senha) },
             modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
             singleLine = true,
             visualTransformation = PasswordVisualTransformation(),
@@ -99,11 +100,12 @@ fun LoginScreen(
         if (loading) {
             CircularProgressIndicator()
         } else {
-            Button(
+            BotaoPrimario(
+                text = if (signUpMode) Strings.criarConta else "Entrar",
                 onClick = {
                     if (isReleaseProd && email.trim().equals("demo@local.test", ignoreCase = true)) {
-                        error = "Use sua conta de produção."
-                        return@Button
+                        error = Strings.useContaProducao
+                        return@BotaoPrimario
                     }
                     scope.launch {
                         loading = true
@@ -121,19 +123,17 @@ fun LoginScreen(
                             error = e.message ?: "Falha ao autenticar"
                         } catch (e: IOException) {
                             offline = true
-                            error = e.message ?: "Sem conexão"
+                            error = e.message ?: Strings.semConexao
                         } finally {
                             loading = false
                         }
                     }
                 },
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text(if (signUpMode) "Cadastrar" else "Entrar")
-            }
-            TextButton(onClick = { signUpMode = !signUpMode; error = null }) {
-                Text(if (signUpMode) "Já tenho conta" else "Criar conta")
-            }
+            )
+            BotaoTexto(
+                text = if (signUpMode) Strings.jaTenhoConta else Strings.criarConta,
+                onClick = { signUpMode = !signUpMode; error = null },
+            )
         }
     }
 }

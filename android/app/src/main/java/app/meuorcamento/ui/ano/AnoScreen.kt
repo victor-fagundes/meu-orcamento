@@ -10,7 +10,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -25,11 +24,10 @@ import app.meuorcamento.data.ApiException
 import app.meuorcamento.domain.formatCentavos
 import app.meuorcamento.ui.BarraTitulo
 import app.meuorcamento.ui.OfflineBanner
+import app.meuorcamento.ui.copy.Strings
 import kotlinx.serialization.Serializable
 import java.io.IOException
 import java.util.Calendar
-
-private val MESES = listOf("jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez")
 
 @Serializable
 data class AnoResponse(
@@ -80,8 +78,8 @@ fun AnoScreen(api: ApiClient, onUnauthorized: () -> Unit) {
             titulo = confirmado.toString(),
             onAnterior = { pedido = confirmado - 1 },
             onProximo = { pedido = confirmado + 1 },
-            rotuloAnterior = "Ano anterior",
-            rotuloProximo = "Próximo ano",
+            rotuloAnterior = Strings.anoAnterior,
+            rotuloProximo = Strings.proximoAno,
         )
         Column(
             Modifier
@@ -91,7 +89,7 @@ fun AnoScreen(api: ApiClient, onUnauthorized: () -> Unit) {
         ) {
         OfflineBanner(offline || error != null, error)
         when {
-            grade == null -> Text("Não foi possível carregar o ano.")
+            grade == null -> Text(Strings.erroCarregarAno)
             vazio -> Text("Este ano ainda não tem valores.")
             else -> {
                 grade.realizado.forEach { cell ->
@@ -102,7 +100,7 @@ fun AnoScreen(api: ApiClient, onUnauthorized: () -> Unit) {
                             style = MaterialTheme.typography.titleMedium,
                         )
                         Row(Modifier.horizontalScroll(rememberScrollState())) {
-                            MESES.forEachIndexed { index, nome ->
+                            Strings.mesesAbreviados.forEachIndexed { index, nome ->
                                 Column(Modifier.width(120.dp).padding(end = 8.dp)) {
                                     Text(nome, style = MaterialTheme.typography.labelSmall)
                                     Text(
@@ -111,7 +109,7 @@ fun AnoScreen(api: ApiClient, onUnauthorized: () -> Unit) {
                                         softWrap = false,
                                     )
                                     Text(
-                                        "plano ${formatCentavos(plano.getOrElse(index) { 0L })}",
+                                        "${Strings.plano} ${formatCentavos(plano.getOrElse(index) { 0L })}",
                                         maxLines = 1,
                                         softWrap = false,
                                         style = MaterialTheme.typography.bodySmall,

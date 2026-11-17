@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -17,7 +16,6 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,6 +30,9 @@ import app.meuorcamento.data.ApiException
 import app.meuorcamento.ui.BarraTitulo
 import app.meuorcamento.domain.formatCentavos
 import app.meuorcamento.ui.OfflineBanner
+import app.meuorcamento.ui.components.BotaoPrimario
+import app.meuorcamento.ui.components.BotaoTexto
+import app.meuorcamento.ui.copy.Strings
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
@@ -179,7 +180,7 @@ fun PlanilhaImportScreen(
                 .verticalScroll(rememberScrollState()),
         ) {
         OfflineBanner(offline, status)
-        Button(onClick = { picker.launch("*/*") }) { Text("Escolher arquivo") }
+        BotaoPrimario(text = Strings.escolherArquivo, onClick = { picker.launch("*/*") })
         status?.let { Text(it, modifier = Modifier.padding(top = 8.dp)) }
         linhasPlano.forEach { line ->
             Text(
@@ -206,13 +207,14 @@ fun PlanilhaImportScreen(
             )
         }
         if (parsed != null) {
-            TextButton(onClick = { limpar() }) { Text("Cancelar") }
+            BotaoTexto(text = Strings.cancelar, onClick = { limpar() })
         }
-        Button(
+        BotaoPrimario(
+            text = Strings.confirmarImportacao,
             enabled = parsed != null && preview != null && !faltaEscolha,
             onClick = {
-                val p = parsed ?: return@Button
-                if (faltaEscolha) return@Button
+                val p = parsed ?: return@BotaoPrimario
+                if (faltaEscolha) return@BotaoPrimario
                 scope.launch {
                     try {
                         val payload = escolhas.filterValues { it.isNotBlank() }
@@ -240,7 +242,7 @@ fun PlanilhaImportScreen(
                 }
             },
             modifier = Modifier.padding(top = 8.dp),
-        ) { Text("Confirmar importação") }
+        )
         }
     }
 }
