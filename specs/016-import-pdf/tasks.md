@@ -17,6 +17,10 @@ Spec: `spec.md` · Status alvo: `verified`
 - [x] `ImportPdfPanel` editável em Ajustes
 - **AC:** AC-903
 
+## T5 — Correção do worker (2026-11-17)
+- [x] `src/lib/parse-pdf.ts` aponta `workerSrc` para `pdf.worker.mjs`. Sem isso a prévia falha com “No GlobalWorkerOptions.workerSrc specified”.
+- **AC:** AC-901.1
+
 ## T4 — Verify
 - [ ] Smoke com PDF real do banco
 - [ ] Spec → `verified` após teste do PM

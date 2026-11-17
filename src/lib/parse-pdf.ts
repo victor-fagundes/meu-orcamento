@@ -1,4 +1,9 @@
+import { createRequire } from "node:module";
+import path from "node:path";
+import { pathToFileURL } from "node:url";
 import { detectPdfScan } from "@/domain/import-pdf";
+
+const require = createRequire(path.join(process.cwd(), "package.json"));
 
 export const MAX_PDF_BYTES = 4 * 1024 * 1024;
 
@@ -13,8 +18,9 @@ export async function extractPdfText(buf: ArrayBuffer): Promise<PdfExtractResult
   try {
     // Legacy build funciona melhor em Node/server actions
     const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
-    // Sem worker no server action (Node)
-    pdfjs.GlobalWorkerOptions.workerSrc = "";
+    pdfjs.GlobalWorkerOptions.workerSrc = pathToFileURL(
+      require.resolve("pdfjs-dist/legacy/build/pdf.worker.mjs"),
+    ).href;
     const loadingTask = pdfjs.getDocument({
       data: new Uint8Array(buf),
       useSystemFonts: true,
