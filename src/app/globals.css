@@ -1811,6 +1811,31 @@ body {
   margin-top: 16px;
 }
 
+.sheet .r2 > .field,
+.sheet .plano-grid > .field,
+.sheet .plano-bulk > .field,
+.sheet .resumo-filters > .field,
+.sheet .lanc-filters > .field,
+.sheet .plano-bulk > .outline,
+.sheet .plano-copy > .outline {
+  margin-top: 0;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+}
+
+.sheet .plano-bulk > .outline,
+.sheet .plano-copy > .outline {
+  height: 56px;
+}
+
+.sheet .r2 > .field input,
+.sheet .r2 > .field select,
+.sheet .plano-grid > .field input,
+.sheet .plano-bulk > .field input {
+  min-width: 0;
+}
+
 .track {
   height: 8px;
   border-radius: 4px;
