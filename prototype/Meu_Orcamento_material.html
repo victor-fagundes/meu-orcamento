@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Meu Orçamento — protótipo Material 3</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap">
+<style>
+  :root {
+    color-scheme: light;
+    --pr: #0058be;
+    --on-pr: #ffffff;
+    --pc: #d7e3ff;
+    --on-pc: #001b3f;
+    --sc: #dae2f9;
+    --on-sc: #131b2c;
+    --tc: #ffe169;
+    --on-tc: #221b00;
+    --sf: #f8f9ff;
+    --s-low: #f2f3fb;
+    --s: #eceef6;
+    --s-high: #e6e8f0;
+    --s-highest: #e0e2ea;
+    --s-lowest: #ffffff;
+    --on-sf: #191c20;
+    --on-sv: #43474e;
+    --ol: #73777f;
+    --olv: #c3c6d0;
+    --er: #ba1a1a;
+    --ec: #ffdad6;
+    --on-ec: #410002;
+    --inv: #2e3036;
+    --on-inv: #f0f0f7;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 2px 6px 2px rgba(0,0,0,.15);
+  }
+  html[data-theme="dark"] {
+    color-scheme: dark;
+    --pr: #abc7ff;
+    --on-pr: #002f67;
+    --pc: #004493;
+    --on-pc: #d7e3ff;
+    --sc: #3e4759;
+    --on-sc: #dae2f9;
+    --tc: #e9c400;
+    --on-tc: #3a3000;
+    --sf: #111318;
+    --s-low: #191c20;
+    --s: #1d2024;
+    --s-high: #272a2f;
+    --s-highest: #32353a;
+    --s-lowest: #0c0e13;
+    --on-sf: #e1e2ea;
+    --on-sv: #c3c6d0;
+    --ol: #8d9199;
+    --olv: #43474e;
+    --er: #ffb4ab;
+    --ec: #93000a;
+    --on-ec: #ffdad6;
+    --inv: #e1e2ea;
+    --on-inv: #2e3036;
+    --shadow: 0 1px 3px rgba(0,0,0,.5), 0 4px 8px 3px rgba(0,0,0,.35);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: #dfe3ea;
+    color: var(--on-sf);
+    font: 400 14px/20px Roboto, system-ui, sans-serif;
+    letter-spacing: .25px;
+  }
+  button, input, select { font: inherit; letter-spacing: inherit; color: inherit; }
+  button { cursor: pointer; }
+  .material-symbols-outlined {
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+    font-size: 24px;
+    line-height: 1;
+    width: 24px;
+    height: 24px;
+    user-select: none;
+  }
+  .on .material-symbols-outlined { font-variation-settings: "FILL" 1, "wght" 500, "GRAD" 0, "opsz" 24; }
+
+  .proto {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 48px;
+    padding: 0 16px;
+    background: #1b1b1f;
+    color: #e6e1e5;
+    font-size: 13px;
+  }
+  .proto b { font-weight: 500; color: #fff; }
+  .proto span { color: #c4c7c5; }
+  .proto .sp { flex: 1; }
+  .seg { display: flex; background: #2c2c31; border-radius: 20px; padding: 2px; }
+  .seg button {
+    border: 0;
+    background: transparent;
+    color: #c4c7c5;
+    height: 28px;
+    padding: 0 12px;
+    border-radius: 16px;
+  }
+  .seg button.on { background: #d7e3ff; color: #001b3f; font-weight: 500; }
+
+  .stage { padding: 20px 16px 32px; }
+  .device {
+    margin: 0 auto;
+    background: var(--sf);
+    min-height: calc(100vh - 100px);
+    max-height: calc(100vh - 88px);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  body.desk .device { max-width: 1120px; border-radius: 16px; overflow: hidden; box-shadow: var(--shadow); min-height: 760px; }
+  body.phone .stage { display: flex; justify-content: center; }
+  body.phone .device {
+    width: 390px;
+    min-height: 780px;
+    border-radius: 32px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    border: 8px solid #1b1b1f;
+  }
+
+  .top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 64px;
+    padding: 0 12px 0 16px;
+    background: var(--sf);
+  }
+  .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .mark {
+    width: 32px; height: 32px; border-radius: 10px;
+    background: var(--tc); color: var(--on-tc);
+    display: grid; place-items: center; flex: none;
+    font-weight: 700; font-size: 16px;
+  }
+  .brand h1 { margin: 0; font: 500 22px/28px Roboto, sans-serif; letter-spacing: 0; }
+  .top .grow { flex: 1; }
+  .icon-btn, .nav-btn {
+    position: relative;
+    border: 0;
+    background: transparent;
+    width: 40px; height: 40px;
+    border-radius: 20px;
+    display: grid; place-items: center;
+    color: var(--on-sv);
+    overflow: hidden;
+  }
+  .icon-btn::before, .text-btn::before, .btn::before, .outline::before, .chip::before, .tab::before, .ni::before, .list-row::before, .icon-btn-sm::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: currentColor; opacity: 0;
+  }
+  .icon-btn:hover::before, .text-btn:hover::before, .chip:hover::before, .tab:hover::before, .ni:hover::before, .outline:hover::before, .list-row:hover::before { opacity: .08; }
+  .icon-btn:active::before, .btn:active::before, .text-btn:active::before { opacity: .12; }
+  .avatar {
+    width: 32px; height: 32px; border-radius: 16px;
+    background: var(--pc); color: var(--on-pc);
+    display: grid; place-items: center; font: 500 14px/20px Roboto, sans-serif;
+  }
+  .btn, .text-btn, .outline {
+    position: relative;
+    border: 0;
+    height: 40px;
+    padding: 0 24px;
+    border-radius: 20px;
+    font: 500 14px/20px Roboto, sans-serif;
+    letter-spacing: .1px;
+    overflow: hidden;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn { background: var(--pr); color: var(--on-pr); }
+  .text-btn { background: transparent; color: var(--pr); padding: 0 12px; }
+  .outline { background: transparent; color: var(--pr); border: 1px solid var(--ol); }
+  body.phone .desk-only { display: none !important; }
+  body.desk .phone-only { display: none !important; }
+
+  .tabs {
+    display: flex;
+    gap: 0;
+    padding: 0 12px;
+    background: var(--sf);
+    border-bottom: 1px solid var(--olv);
+  }
+  .tab {
+    position: relative;
+    border: 0;
+    background: transparent;
+    color: var(--on-sv);
+    height: 48px;
+    padding: 0 16px;
+    font: 500 14px/20px Roboto, sans-serif;
+    letter-spacing: .1px;
+    overflow: hidden;
+  }
+  .tab.on { color: var(--pr); }
+  .tab.on::after {
+    content: "";
+    position: absolute; left: 12px; right: 12px; bottom: 0;
+    height: 3px; border-radius: 3px 3px 0 0;
+    background: var(--pr);
+  }
+
+  .content { padding: 8px 24px 32px; flex: 1; min-height: 0; overflow: auto; }
+  body.phone .content { padding: 4px 16px 120px; }
+  .page-title { margin: 16px 0 0; font: 400 28px/36px Roboto, sans-serif; letter-spacing: 0; }
+  body.phone .page-title { font-size: 24px; line-height: 32px; }
+  .month {
+    display: flex; align-items: center; gap: 4px;
+    margin: 2px 0 12px;
+  }
+  .month b { font: 500 16px/24px Roboto, sans-serif; letter-spacing: .15px; min-width: 168px; text-align: center; }
+
+  .chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 12px; scrollbar-width: none; }
+  .chip {
+    position: relative;
+    height: 32px; padding: 0 16px;
+    border-radius: 8px;
+    border: 1px solid var(--ol);
+    background: transparent;
+    color: var(--on-sv);
+    font: 500 14px/20px Roboto, sans-serif;
+    flex: none;
+    overflow: hidden;
+  }
+  .chip.on { background: var(--sc); color: var(--on-sc); border-color: transparent; }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1.4fr .8fr;
+    gap: 12px;
+  }
+  body.phone .hero-grid { grid-template-columns: 1fr; }
+  .hero {
+    background: var(--pc); color: var(--on-pc);
+    border-radius: 28px; padding: 20px 24px;
+  }
+  .eyebrow { font: 500 12px/16px Roboto, sans-serif; letter-spacing: .5px; text-transform: uppercase; opacity: .75; }
+  .hero .value { margin: 6px 0 12px; font: 400 40px/48px Roboto, sans-serif; letter-spacing: 0; }
+  body.phone .hero .value { font-size: 32px; line-height: 40px; }
+  .track { height: 8px; border-radius: 4px; background: color-mix(in srgb, var(--on-pc) 18%, transparent); overflow: hidden; }
+  .track i { display: block; height: 100%; border-radius: 4px; background: var(--on-pc); }
+  .hero .hint { margin-top: 8px; font-size: 13px; opacity: .85; }
+  .stack { display: grid; gap: 12px; }
+  body.phone .stack { grid-template-columns: 1fr 1fr; }
+  .stat {
+    background: var(--s-low);
+    border-radius: 16px;
+    padding: 16px;
+  }
+  .stat .value { margin-top: 4px; font: 500 22px/28px Roboto, sans-serif; }
+  .muted { color: var(--on-sv); font-size: 12px; line-height: 16px; letter-spacing: .4px; }
+  .stat .muted { margin-top: 4px; }
+
+  .banner {
+    display: flex; gap: 12px; align-items: flex-start;
+    background: var(--tc); color: var(--on-tc);
+    border-radius: 12px; padding: 12px 16px; margin: 12px 0;
+  }
+  .banner b { display: block; font-weight: 500; }
+
+  .section { margin: 20px 0 8px; font: 500 16px/24px Roboto, sans-serif; letter-spacing: .15px; }
+  .type-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  body.phone .type-grid { grid-template-columns: 1fr 1fr; }
+  .type {
+    background: var(--s-lowest);
+    border-radius: 16px;
+    padding: 14px 16px 12px;
+    box-shadow: 0 1px 2px rgba(0,0,0,.08);
+  }
+  html[data-theme="dark"] .type { box-shadow: none; background: var(--s); }
+  .type .value { margin: 6px 0 2px; font: 500 18px/24px Roboto, sans-serif; }
+  .linkish {
+    margin-top: 8px;
+    border: 0; background: none; color: var(--pr);
+    padding: 0; font: 500 13px/20px Roboto, sans-serif;
+  }
+
+  .charts { display: grid; grid-template-columns: .9fr 1.1fr; gap: 12px; margin-top: 12px; }
+  body.phone .charts { grid-template-columns: 1fr; }
+  .card {
+    background: var(--s-low);
+    border-radius: 16px;
+    padding: 16px;
+  }
+  .card h3 { margin: 0 0 12px; font: 500 16px/24px Roboto, sans-serif; }
+  .donut { display: flex; gap: 16px; align-items: center; }
+  body.phone .donut { flex-direction: column; align-items: stretch; }
+  .ring {
+    width: 132px; height: 132px; border-radius: 50%;
+    flex: none;
+    display: grid; place-items: center;
+  }
+  .ring span {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: var(--s-low);
+    display: grid; place-items: center;
+    font: 500 12px/16px Roboto, sans-serif;
+    text-align: center;
+  }
+  .legend { flex: 1; display: grid; gap: 6px; }
+  .legend div { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; }
+  .legend i { width: 10px; height: 10px; border-radius: 5px; display: inline-block; margin-right: 8px; }
+  .bars { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; align-items: end; height: 140px; }
+  .bar-col { display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end; }
+  .bar-pair { display: flex; gap: 4px; align-items: flex-end; height: 110px; }
+  .bar-pair i { width: 14px; border-radius: 4px 4px 0 0; display: block; }
+  .bar-pair i.p { background: var(--pr); }
+  .bar-pair i.r { background: var(--tc); }
+  .bar-col em { font-style: normal; font-size: 11px; color: var(--on-sv); text-align: center; }
+  .legend-inline { display: flex; gap: 16px; margin-top: 10px; font-size: 12px; color: var(--on-sv); }
+  .legend-inline i { width: 10px; height: 10px; border-radius: 5px; display: inline-block; margin-right: 6px; }
+
+  .sum {
+    display: flex; justify-content: space-between; align-items: center;
+    background: var(--s-low); border-radius: 16px; padding: 14px 16px; margin-bottom: 8px;
+  }
+  .group {
+    background: var(--s-lowest);
+    border-radius: 16px;
+    margin-bottom: 8px;
+    overflow: hidden;
+  }
+  html[data-theme="dark"] .group { background: var(--s); }
+  .grow-head, .item-row {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    text-align: left;
+    padding: 12px 16px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .grow-head { position: relative; }
+  .g-name { font: 500 14px/20px Roboto, sans-serif; }
+  .g-meta { margin-left: auto; font: 500 14px/20px Roboto, sans-serif; white-space: nowrap; }
+  .g-meta small { font-weight: 400; color: var(--on-sv); }
+  .track.slim { height: 4px; margin: 0 16px 8px; background: var(--s-high); }
+  .track.slim i { background: var(--pr); }
+  .track.slim i.warn { background: #8a7000; }
+  html[data-theme="dark"] .track.slim i.warn { background: var(--tc); }
+  .track.slim i.over { background: var(--er); }
+  .note { margin: 0 16px 12px; color: var(--on-sv); font-size: 12px; }
+  .note.over { color: var(--er); }
+  .item-row { border-top: 1px solid var(--olv); }
+  .item-row .sub { color: var(--on-sv); font-size: 12px; }
+  .badge {
+    display: inline-block; margin-left: 6px;
+    border: 1px solid var(--ol); border-radius: 8px;
+    padding: 0 6px; font-size: 11px; line-height: 18px; color: var(--on-sv); font-weight: 400;
+  }
+
+  .search {
+    display: flex; align-items: center; gap: 8px;
+    height: 56px; padding: 0 16px; margin: 8px 0 12px;
+    background: var(--s-highest); border-radius: 28px; color: var(--on-sv);
+  }
+  .search input {
+    flex: 1; border: 0; background: transparent; outline: 0; height: 40px; color: var(--on-sf);
+  }
+  .list { background: var(--s-lowest); border-radius: 16px; overflow: hidden; }
+  html[data-theme="dark"] .list { background: var(--s); }
+  .list-row {
+    position: relative;
+    width: 100%;
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 8px 12px 16px;
+    border: 0; border-top: 1px solid var(--olv);
+    background: transparent; text-align: left;
+  }
+  .list-row:first-child { border-top: 0; }
+  .av {
+    width: 40px; height: 40px; border-radius: 20px;
+    display: grid; place-items: center; flex: none;
+    background: var(--pc); color: var(--on-pc); font: 500 16px/24px Roboto, sans-serif;
+  }
+  .av.in { background: #c8e6c9; color: #1b5e20; }
+  html[data-theme="dark"] .av.in { background: #1b5e20; color: #c8e6c9; }
+  .lt { flex: 1; min-width: 0; }
+  .lt b { display: block; font-weight: 500; }
+  .money { font: 500 14px/20px Roboto, sans-serif; white-space: nowrap; }
+  .money.in { color: #1b5e20; }
+  html[data-theme="dark"] .money.in { color: #81c784; }
+  .icon-btn-sm {
+    position: relative;
+    width: 40px; height: 40px; border: 0; border-radius: 20px;
+    background: transparent; color: var(--on-sv);
+    display: grid; place-items: center;
+  }
+
+  .table-wrap { overflow-x: auto; background: var(--s-low); border-radius: 16px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 10px 12px; text-align: right; white-space: nowrap; }
+  th { color: var(--on-sv); font-weight: 500; font-size: 12px; }
+  td:first-child, th:first-child { text-align: left; }
+  tr + tr td { border-top: 1px solid var(--olv); }
+  tr.total td { font-weight: 500; }
+
+  .settings { display: grid; gap: 8px; }
+  .set {
+    display: flex; gap: 12px; align-items: center;
+    background: var(--s-low); border-radius: 16px; padding: 14px 16px;
+  }
+  .set .material-symbols-outlined { color: var(--pr); }
+  .set p { margin: 2px 0 0; }
+
+  .bottom {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    display: flex;
+    background: var(--s);
+    padding: 12px 0 16px;
+  }
+  .ni {
+    position: relative;
+    flex: 1; border: 0; background: transparent;
+    color: var(--on-sv);
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    font: 500 12px/16px Roboto, sans-serif;
+    letter-spacing: .4px;
+  }
+  .pill { width: 56px; height: 32px; border-radius: 16px; display: grid; place-items: center; }
+  .ni.on { color: var(--on-sf); }
+  .ni.on .pill { background: var(--sc); color: var(--on-sc); }
+
+  .fab {
+    position: absolute; right: 16px; bottom: 96px;
+    height: 56px; padding: 0 16px;
+    border: 0; border-radius: 16px;
+    background: var(--pc); color: var(--on-pc);
+    display: flex; align-items: center; gap: 8px;
+    font: 500 14px/20px Roboto, sans-serif;
+    box-shadow: var(--shadow);
+  }
+
+  .scrim {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,.32);
+    display: flex; align-items: flex-end; justify-content: center;
+    z-index: 5;
+  }
+  .scrim[hidden] { display: none; }
+  .sheet {
+    width: 100%;
+    max-height: 92%;
+    overflow: auto;
+    background: var(--s-low);
+    border-radius: 28px 28px 0 0;
+    padding: 12px 24px 24px;
+  }
+  body.desk .sheet { max-width: 520px; margin-bottom: 24px; border-radius: 28px; }
+  .handle { width: 32px; height: 4px; border-radius: 2px; background: var(--olv); margin: 0 auto 12px; }
+  .sheet h2 { margin: 0 0 8px; font: 400 24px/32px Roboto, sans-serif; }
+  .fields { display: grid; gap: 16px; margin-top: 16px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .field { position: relative; }
+  .field input, .field select {
+    width: 100%; height: 56px; padding: 20px 16px 6px;
+    border: 1px solid var(--ol); border-radius: 4px;
+    background: transparent; outline: none; appearance: none;
+  }
+  .field input:focus, .field select:focus { border: 2px solid var(--pr); padding-left: 15px; }
+  .field label {
+    position: absolute; left: 12px; top: 16px;
+    color: var(--on-sv); pointer-events: none;
+    transition: .15s;
+  }
+  .field input:focus + label, .field input:not(:placeholder-shown) + label, .field select + label,
+  .field.filled label {
+    top: 6px; font-size: 12px; line-height: 16px;
+  }
+  .field input:focus + label, .field select:focus + label { color: var(--pr); }
+  .actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
+  .preview { margin: 4px 0 0; color: var(--on-sv); font-size: 13px; }
+
+  .snack {
+    position: absolute; left: 16px; right: 16px; bottom: 24px;
+    margin: 0 auto; max-width: 420px;
+    background: var(--inv); color: var(--on-inv);
+    border-radius: 4px; padding: 14px 16px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    z-index: 6;
+  }
+  body.phone .snack { bottom: 96px; }
+  .snack[hidden] { display: none; }
+  .snack button { border: 0; background: none; color: #abc7ff; font: 500 14px/20px Roboto, sans-serif; }
+</style>
+</head>
+<body class="desk">
+  <div class="proto">
+    <b>Protótipo Material 3</b>
+    <span>cor do produto · nada é gravado no app</span>
+    <div class="sp"></div>
+    <div class="seg" role="group" aria-label="Tema">
+      <button type="button" id="theme-light" class="on">Claro</button>
+      <button type="button" id="theme-dark">Escuro</button>
+    </div>
+    <div class="seg" role="group" aria-label="Tamanho">
+      <button type="button" id="mode-desk" class="on">Desktop</button>
+      <button type="button" id="mode-phone">Celular</button>
+    </div>
+  </div>
+  <div class="stage">
+    <div class="device" id="device">
+      <header class="top">
+        <div class="brand">
+          <div class="mark" aria-hidden="true">M</div>
+          <h1>Meu Orçamento</h1>
+        </div>
+        <div class="grow"></div>
+        <button class="btn desk-only" type="button" data-open-sheet>
+          <span class="material-symbols-outlined" style="font-size:18px;width:18px;height:18px">add</span>
+          Novo lançamento
+        </button>
+        <button class="icon-btn" type="button" aria-label="Alertas" data-go="orc">
+          <span class="material-symbols-outlined">notifications</span>
+        </button>
+        <div class="avatar desk-only" title="Victor">V</div>
+      </header>
+      <nav class="tabs desk-only" aria-label="Principal" id="tabs"></nav>
+      <main class="content" id="view"></main>
+      <button class="fab phone-only" type="button" data-open-sheet>
+        <span class="material-symbols-outlined">add</span>
+        Novo lançamento
+      </button>
+      <nav class="bottom phone-only" aria-label="Principal" id="bottom"></nav>
+      <div class="scrim" id="scrim" hidden></div>
+      <div class="snack" id="snack" hidden>
+        <span>Lançamento salvo neste protótipo.</span>
+        <button type="button" id="snack-ok">Ok</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+const TABS = [
+  ["resumo", "home", "Resumo"],
+  ["orc", "account_balance_wallet", "Orçamento"],
+  ["lanc", "receipt_long", "Lançamentos"],
+  ["ano", "calendar_month", "Ano"],
+  ["ajustes", "settings", "Ajustes"],
+];
+const MESES = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+const state = { tab: "resumo", mes: 10, tipo: "F", open: { Moradia: true }, q: "", sheet: false };
+
+const ORC = {
+  R: [{ grupo: "Renda", itens: [{ nome: "Salário", p: 920000, r: 920000 }] }],
+  F: [
+    { grupo: "Moradia", itens: [{ nome: "Aluguel", p: 180000, r: 180000 }, { nome: "Condomínio", p: 52000, r: 45000 }] },
+    { grupo: "Contas", itens: [{ nome: "Energia", p: 28000, r: 24080 }, { nome: "Internet", p: 12000, r: 12000 }, { nome: "Plano de saúde", p: 138000, r: 78920 }] },
+  ],
+  V: [
+    { grupo: "Alimentação", itens: [{ nome: "Mercado", p: 110000, r: 98000 }] },
+    { grupo: "Transporte", itens: [{ nome: "Uber e apps", p: 90000, r: 24000 }] },
+    { grupo: "Lazer", itens: [{ nome: "Restaurantes", p: 80000, r: 20000 }] },
+  ],
+  E: [
+    { grupo: "Obrigações", itens: [{ nome: "IPVA", p: 30000, r: 30000 }, { nome: "Seguro do carro", p: 80000, r: 0 }, { nome: "Material escolar", p: 45000, r: 0 }] },
+  ],
+};
+const TIPOS = [
+  ["R", "Receitas"],
+  ["F", "Despesas fixas"],
+  ["V", "Despesas variáveis"],
+  ["E", "Despesas anuais"],
+];
+const LANC = [
+  { dia: "16/11", desc: "Supermercado Extra", sub: "Alimentação · Mercado · Nubank", valor: 18640, inn: false },
+  { dia: "14/11", desc: "Aluguel", sub: "Moradia · Aluguel · PIX", valor: 180000, inn: false },
+  { dia: "12/11", desc: "Uber", sub: "Transporte · Débito", valor: 2890, inn: false },
+  { dia: "08/11", desc: "Netflix", sub: "Contas · Assinaturas · Nubank", valor: 5590, inn: false },
+  { dia: "03/11", desc: "Salário", sub: "Renda · Salário · PIX", valor: 920000, inn: true },
+];
+const ANO = [
+  ["Receitas", [9200,9200,9200,9800,9200,9200,9200,9200,9200,9200,9200,0]],
+  ["Despesas fixas", [3900,3900,4050,4100,4100,4100,4100,3400,4100,4100,3400,0]],
+  ["Despesas variáveis", [2100,1800,2400,1900,2200,2600,3100,1700,1500,1600,1420,0]],
+  ["Despesas anuais", [0,300,0,0,0,800,0,0,450,0,300,0]],
+];
+
+const brl = (c) => (c / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+const sum = (rows, key) => rows.reduce((s, r) => s + r.itens.reduce((a, i) => a + i[key], 0), 0);
+const ic = (n) => `<span class="material-symbols-outlined" aria-hidden="true">${n}</span>`;
+
+function despesas() {
+  return ["F", "V", "E"].reduce((s, t) => {
+    s.p += sum(ORC[t], "p");
+    s.r += sum(ORC[t], "r");
+    return s;
+  }, { p: 0, r: 0 });
+}
+
+function pct(r, p) { return p > 0 ? Math.round((r / p) * 100) : 0; }
+
+function viewResumo() {
+  const d = despesas();
+  const saldo = d.p - d.r;
+  const usado = pct(d.r, d.p);
+  const slices = [
+    ["Moradia", 225000, "var(--pr)"],
+    ["Contas", 115000, "#565e71"],
+    ["Alimentação", 98000, "#8a7000"],
+    ["Transporte", 24000, "#7a8bc9"],
+    ["Outros", 50000, "var(--olv)"],
+  ];
+  const tot = slices.reduce((s, x) => s + x[1], 0);
+  let acc = 0;
+  const stops = slices.map((x) => {
+    const a = acc / tot * 100;
+    acc += x[1];
+    const b = acc / tot * 100;
+    return `${x[2]} ${a}% ${b}%`;
+  }).join(", ");
+  const tipos = TIPOS.map(([id, nome]) => {
+    const p = sum(ORC[id], "p");
+    const r = sum(ORC[id], "r");
+    return `<article class="type"><div class="muted">${nome}</div><div class="value">${brl(r)}</div><div class="muted">planejado ${brl(p)}</div><button class="linkish" data-go="orc" data-tipo="${id}">Ver detalhes</button></article>`;
+  }).join("");
+  const max = 980000;
+  const bars = TIPOS.map(([id, nome]) => {
+    const p = sum(ORC[id], "p");
+    const r = sum(ORC[id], "r");
+    const hp = Math.max(4, Math.round(p / max * 110));
+    const hr = Math.max(4, Math.round(r / max * 110));
+    return `<div class="bar-col"><div class="bar-pair"><i class="p" style="height:${hp}px" title="Planejado ${brl(p)}"></i><i class="r" style="height:${hr}px" title="Realizado ${brl(r)}"></i></div><em>${nome.replace("Despesas ", "")}</em></div>`;
+  }).join("");
+  return `
+    <h2 class="page-title">Resumo</h2>
+    ${monthBar()}
+    <div class="chips">
+      <button class="chip on" type="button">Todas as formas</button>
+      <button class="chip" type="button">Todas as categorias</button>
+    </div>
+    <div class="hero-grid">
+      <section class="hero">
+        <div class="eyebrow">Ainda pode gastar</div>
+        <div class="value">${brl(saldo)}</div>
+        <div class="track"><i style="width:${usado}%"></i></div>
+        <div class="hint">${usado}% do orçado de despesas em ${MESES[state.mes].toLowerCase()}</div>
+      </section>
+      <div class="stack">
+        <article class="stat"><div class="muted">Total orçado</div><div class="value">${brl(d.p)}</div><div class="muted">despesas previstas no mês</div></article>
+        <article class="stat"><div class="muted">Total gasto</div><div class="value">${brl(d.r)}</div><div class="muted">${usado}% do orçado</div></article>
+      </div>
+    </div>
+    <div class="banner">${ic("warning")}<div><b>Alimentação chegou a 89% do planejado.</b><span class="muted" style="color:inherit">Mercado · o alerta preventivo começa em 80%.</span></div></div>
+    <h3 class="section">Por tipo</h3>
+    <div class="type-grid">${tipos}</div>
+    <div class="charts">
+      <section class="card">
+        <h3>Gastos por categoria</h3>
+        <div class="donut">
+          <div class="ring" style="background:conic-gradient(${stops})"><span>${usado}%<br>gasto</span></div>
+          <div class="legend">
+            ${slices.map((x) => `<div><span><i style="background:${x[2]}"></i>${x[0]}</span><b>${Math.round(x[1] / tot * 100)}%</b></div>`).join("")}
+          </div>
+        </div>
+      </section>
+      <section class="card">
+        <h3>Planejado × realizado</h3>
+        <div class="bars">${bars}</div>
+        <div class="legend-inline"><span><i style="background:var(--pr)"></i>Planejado</span><span><i style="background:var(--tc)"></i>Realizado</span></div>
+      </section>
+    </div>`;
+}
+
+function monthBar() {
+  return `<div class="month"><button class="icon-btn" type="button" data-mes="-1" aria-label="Mês anterior">${ic("chevron_left")}</button><b>${MESES[state.mes]} 2026</b><button class="icon-btn" type="button" data-mes="1" aria-label="Próximo mês">${ic("chevron_right")}</button></div>`;
+}
+
+function viewOrc() {
+  const rows = ORC[state.tipo];
+  const p = sum(rows, "p");
+  const r = sum(rows, "r");
+  const nome = TIPOS.find((t) => t[0] === state.tipo)[1];
+  const chips = TIPOS.map(([id, label]) => {
+    const short = label.replace("Despesas ", "");
+    const pretty = short.charAt(0).toUpperCase() + short.slice(1);
+    return `<button class="chip${id === state.tipo ? " on" : ""}" type="button" data-tipo="${id}">${pretty}</button>`;
+  }).join("");
+  const cards = rows.map((g) => {
+    const gp = g.itens.reduce((s, i) => s + i.p, 0);
+    const gr = g.itens.reduce((s, i) => s + i.r, 0);
+    const pc = gp > 0 ? Math.min(100, Math.round(gr / gp * 100)) : 0;
+    const over = gr > gp;
+    const warn = !over && pc >= 80;
+    const open = !!state.open[g.grupo];
+    const items = open ? g.itens.map((i) => `<button class="item-row" type="button"><span><span class="g-name">${i.nome}</span><div class="sub">planejado ${brl(i.p)}</div></span><span class="money">${brl(i.r)}</span></button>`).join("") : "";
+    const rest = gp - gr;
+    const msg = state.tipo === "R"
+      ? (rest > 0 ? `Falta receber ${brl(rest)}` : "Meta de receita atingida")
+      : (rest >= 0 ? `Ainda pode gastar ${brl(rest)}` : `Estourou em ${brl(-rest)}`);
+    return `<section class="group">
+      <button class="grow-head" type="button" data-grupo="${g.grupo}">
+        <span class="g-name">${g.grupo}${warn ? `<span class="badge">${pc}%</span>` : ""}</span>
+        <span class="g-meta">${brl(gr)} <small>/ ${brl(gp)}</small></span>
+        ${ic(open ? "expand_less" : "expand_more")}
+      </button>
+      <div class="track slim"><i class="${over ? "over" : warn ? "warn" : ""}" style="width:${pc}%"></i></div>
+      <p class="note${over ? " over" : ""}">${msg}</p>
+      ${items}
+    </section>`;
+  }).join("");
+  return `<h2 class="page-title">Orçamento</h2>${monthBar()}<div class="chips">${chips}</div>
+    <div class="sum"><span class="g-name">${nome}</span><span class="g-meta">${brl(r)} <small>/ ${brl(p)}</small></span></div>
+    ${cards}
+    <button class="outline" type="button" style="margin-top:8px">Novo item</button>`;
+}
+
+function viewLanc() {
+  const q = state.q.trim().toLowerCase();
+  const rows = LANC.filter((l) => !q || l.desc.toLowerCase().includes(q) || l.sub.toLowerCase().includes(q));
+  const list = rows.length ? `<div class="list">${rows.map((l) => `<button class="list-row" type="button" data-open-sheet>
+      <span class="av${l.inn ? " in" : ""}">${l.desc[0]}</span>
+      <span class="lt"><b>${l.desc}</b><span class="muted">${l.dia} · ${l.sub}</span></span>
+      <span class="money${l.inn ? " in" : ""}">${l.inn ? "+ " : ""}${brl(l.valor)}</span>
+    </button>`).join("")}</div>` : `<p class="muted" style="text-align:center;padding:32px 0">Nenhum lançamento encontrado.</p>`;
+  return `<h2 class="page-title">Lançamentos</h2>${monthBar()}
+    <label class="search">${ic("search")}<input id="q" placeholder="Buscar por descrição ou item" value="${state.q.replace(/"/g, "&quot;")}"></label>
+    ${list}`;
+}
+
+function viewAno() {
+  const head = MESES.map((m) => `<th>${m.slice(0, 3)}</th>`).join("");
+  const body = ANO.map((row) => {
+    const tot = row[1].reduce((s, n) => s + n, 0);
+    return `<tr><td>${row[0]}</td>${row[1].map((n) => `<td>${n ? n.toLocaleString("pt-BR") : "—"}</td>`).join("")}<td>${tot.toLocaleString("pt-BR")}</td></tr>`;
+  }).join("");
+  const saldo = ANO[0][1].map((n, i) => n - ANO[1][1][i] - ANO[2][1][i] - ANO[3][1][i]);
+  const saldoTot = saldo.reduce((s, n) => s + n, 0);
+  return `<h2 class="page-title">Ano</h2>
+    <div class="month"><button class="icon-btn" type="button" aria-label="Ano anterior">${ic("chevron_left")}</button><b>2026</b><button class="icon-btn" type="button" aria-label="Próximo ano">${ic("chevron_right")}</button></div>
+    <div class="chips"><button class="chip" type="button">Planejado</button><button class="chip on" type="button">Realizado</button></div>
+    <div class="table-wrap"><table>
+      <thead><tr><th></th>${head}<th>Total</th></tr></thead>
+      <tbody>${body}<tr class="total"><td>Saldo</td>${saldo.map((n) => `<td>${n.toLocaleString("pt-BR")}</td>`).join("")}<td>${saldoTot.toLocaleString("pt-BR")}</td></tr></tbody>
+    </table></div>
+    <p class="muted" style="margin-top:8px">Valores em reais, sem centavos, como na visão anual. Deslize para o lado no celular.</p>`;
+}
+
+function viewAjustes() {
+  const items = [
+    ["credit_card", "Cartões", "Nubank · fecha dia 2 · vence dia 9"],
+    ["notifications", "Limites de alerta", "Preventivo em 80% do planejado"],
+    ["upload_file", "Importar planilha", "CSV, XLSX ou ODS, com mapeamento"],
+    ["picture_as_pdf", "Importar fatura", "PDF com texto selecionável"],
+    ["download", "Exportar", "Planilha do orçamento e dos lançamentos"],
+  ];
+  return `<h2 class="page-title">Ajustes</h2>
+    <div class="settings" style="margin-top:16px">${items.map((it) => `<article class="set">${ic(it[0])}<div><b>${it[1]}</b><p class="muted">${it[2]}</p></div></article>`).join("")}</div>`;
+}
+
+function renderNav(root, cls) {
+  root.innerHTML = TABS.map(([id, icon, label]) => {
+    const on = state.tab === id ? " on" : "";
+    return `<button class="${cls}${on}" type="button" data-go="${id}">${cls === "ni" ? `<span class="pill">${ic(icon)}</span>` : ""}${label}</button>`;
+  }).join("");
+}
+
+function render() {
+  const view = document.getElementById("view");
+  const html = { resumo: viewResumo, orc: viewOrc, lanc: viewLanc, ano: viewAno, ajustes: viewAjustes }[state.tab]();
+  view.innerHTML = html;
+  renderNav(document.getElementById("tabs"), "tab");
+  renderNav(document.getElementById("bottom"), "ni");
+  const scrim = document.getElementById("scrim");
+  scrim.hidden = !state.sheet;
+  if (state.sheet) {
+    scrim.innerHTML = `<div class="sheet" role="dialog" aria-labelledby="sheet-title">
+      <div class="handle"></div>
+      <h2 id="sheet-title">Novo lançamento</h2>
+      <div class="fields">
+        <div class="field filled"><select id="f-tipo"><option>Despesa</option><option>Receita</option></select><label for="f-tipo">Tipo</label></div>
+        <div class="field filled"><select id="f-item"><option>Alimentação · Mercado</option><option>Moradia · Aluguel</option><option>Transporte · Uber e apps</option></select><label for="f-item">Item do orçamento</label></div>
+        <div class="field"><input id="f-desc" placeholder=" "><label for="f-desc">Descrição (opcional)</label></div>
+        <div class="row2">
+          <div class="field"><input id="f-valor" inputmode="decimal" placeholder=" " value="86,40"><label for="f-valor">Valor (R$)</label></div>
+          <div class="field filled"><input id="f-data" type="date" value="2026-11-16"><label for="f-data">Data</label></div>
+        </div>
+        <div class="field filled"><select><option>Nubank</option><option>Débito</option><option>PIX</option><option>Dinheiro</option></select><label>Pagamento</label></div>
+        <p class="preview" id="prev">Lançamento único em novembro de 2026.</p>
+        <div class="actions">
+          <button class="text-btn" type="button" data-close>Cancelar</button>
+          <button class="btn" type="button" id="save">Salvar</button>
+        </div>
+      </div>
+    </div>`;
+  }
+  const q = document.getElementById("q");
+  if (q) q.addEventListener("input", (e) => { state.q = e.target.value; const pos = q.selectionStart; render(); const n = document.getElementById("q"); if (n) { n.focus(); n.selectionStart = n.selectionEnd = pos; } });
+}
+
+document.body.addEventListener("click", (e) => {
+  const t = e.target.closest("[data-go],[data-mes],[data-tipo],[data-grupo],[data-open-sheet],[data-close],#save");
+  if (!t) {
+    if (e.target.id === "scrim") { state.sheet = false; render(); }
+    return;
+  }
+  if (t.dataset.go) {
+    state.tab = t.dataset.go;
+    if (t.dataset.tipo) state.tipo = t.dataset.tipo;
+    state.sheet = false;
+    render();
+  } else if (t.dataset.mes) {
+    state.mes = (state.mes + Number(t.dataset.mes) + 12) % 12;
+    render();
+  } else if (t.dataset.tipo) {
+    state.tipo = t.dataset.tipo;
+    render();
+  } else if (t.dataset.grupo) {
+    state.open[t.dataset.grupo] = !state.open[t.dataset.grupo];
+    render();
+  } else if (t.hasAttribute("data-open-sheet")) {
+    state.sheet = true;
+    render();
+  } else if (t.hasAttribute("data-close")) {
+    state.sheet = false;
+    render();
+  } else if (t.id === "save") {
+    state.sheet = false;
+    render();
+    const snack = document.getElementById("snack");
+    snack.hidden = false;
+    clearTimeout(render.toast);
+    render.toast = setTimeout(() => { snack.hidden = true; }, 3200);
+  }
+});
+
+document.getElementById("snack-ok").onclick = () => { document.getElementById("snack").hidden = true; };
+document.getElementById("theme-light").onclick = () => setTheme(false);
+document.getElementById("theme-dark").onclick = () => setTheme(true);
+document.getElementById("mode-desk").onclick = () => setMode(false);
+document.getElementById("mode-phone").onclick = () => setMode(true);
+
+function setTheme(dark) {
+  document.documentElement.toggleAttribute("data-theme", dark);
+  document.documentElement.dataset.theme = dark ? "dark" : "light";
+  if (!dark) document.documentElement.removeAttribute("data-theme");
+  document.getElementById("theme-light").classList.toggle("on", !dark);
+  document.getElementById("theme-dark").classList.toggle("on", dark);
+}
+function setMode(phone) {
+  document.body.classList.toggle("phone", phone);
+  document.body.classList.toggle("desk", !phone);
+  document.getElementById("mode-phone").classList.toggle("on", phone);
+  document.getElementById("mode-desk").classList.toggle("on", !phone);
+}
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && state.sheet) { state.sheet = false; render(); }
+});
+render();
+</script>
+</body>
+</html>

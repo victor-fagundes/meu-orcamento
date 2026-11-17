@@ -1,0 +1,30 @@
+ID,Épico,Release,Prioridade,Título,Tamanho,Sprint sugerido,Dependências,Status
+MO-101,Conta,A,P0,Cadastro e login,L,1,,Done
+MO-102,Conta,A,P0,Isolamento na API,M,1,MO-101,Done
+MO-103,Conta,A,P0,Modelo de dados em centavos,M,1,MO-101,Done
+MO-201,Catálogo,A,P0,Catálogo inicial e primeiro orçamento,M,1,MO-101;MO-103,Done
+MO-202,Catálogo,A,P0,CRUD de itens (criar e arquivar),M,2,MO-201,Done
+MO-203,Catálogo,A,P0,Planejamento mensal por item (12 meses),M,2,MO-202,Done
+MO-301,Cartões,A,P0,Cadastro de cartões,M,2,MO-101,Done
+MO-302,Cartões,A,P0,Competência por fatura,L,2,MO-301;MO-103,Done
+MO-303,Lançamentos,A,P0,Criar lançamento (simples e parcelado),L,3,MO-202;MO-302,Done
+MO-304,Lançamentos,A,P0,Listar e buscar lançamentos no mês,M,3,MO-303,Done
+MO-305,Lançamentos,A,P0,Editar lançamento e parcelas (por escopo),L,3,MO-303,Done
+MO-306,Lançamentos,A,P0,Excluir lançamento/parcelas com desfazer,M,3,MO-303,Done
+MO-401,Orçamento,A,P0,Visão Orçamento por tipo e categoria,L,4,MO-203;MO-303,Done
+MO-701,Alertas,A,P1,Configurar limites global e por categoria,S,4,MO-401,Done
+MO-702,Alertas,A,P1,Exibir alertas (banner barra sininho),M,4,MO-701;MO-601,Done
+MO-501,Ano,A,P1,Tabela anual Jan-Dez,M,5,MO-302;MO-401,Done
+MO-601,Resumo,A,P1,Cards e filtros do Resumo,L,5,MO-401;MO-304,Done
+MO-602,Resumo,A,P1,Gráficos e ritmo do mês,M,5,MO-601,Done
+MO-1102,QA,A,P0,Testes de reconciliação (QA transversal),M,6,MO-501;MO-601;MO-306,Done
+MO-801,Importação,B,P1,Upload e detecção de layout planilha,M,7,MO-103;MO-201,To Do
+MO-802,Importação,B,P1,Mapeamento de colunas e prévia,L,7,MO-801,To Do
+MO-803,Importação,B,P1,Confirmar importação e relatório,M,7,MO-802;MO-302,To Do
+MO-804,Importação,B,P2,Importar planejamento (layout mensal),M,9,MO-801;MO-203,To Do
+MO-901,PDF,B,P1,Upload e extração de texto PDF,M,8,MO-301,To Do
+MO-902,PDF,B,P1,Parser por emissor + genérico,XL,8,MO-901,To Do
+MO-903,PDF,B,P1,Prévia editável e confirmação,M,8,MO-902;MO-302,To Do
+MO-1001,Exportação,B,P2,Exportar CSV e JSON,S,9,MO-103,To Do
+MO-1002,Conta,A,P2,Exclusão de conta,S,9,MO-101,Done
+MO-1101,Telemetria,B,P2,Eventos mínimos,M,9,MO-303,To Do

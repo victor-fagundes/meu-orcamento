@@ -1,0 +1,397 @@
+﻿PRODUCT REQUIREMENTS DOCUMENT
+Meu Orçamento
+Aplicativo de planejamento e controle orçamentário pessoal
+Versão 1.0  ·  08/11/2026  ·  Status: proposta para validação
+Este documento é a fonte da verdade do MVP. As histórias de desenvolvimento são recortes diretos dele. Toda regra de negócio, campo e comportamento esperado está descrito nas seções de Solução.
+O que mudou na v1.0
+•  Importação de qualquer planilha financeira (CSV, XLSX, XLS, ODS) com mapeamento de colunas e detecção de layout (seção 5.12).
+•  Importação de fatura de cartão em PDF com extração de linhas, prévia e vinculação ao cartão (seção 5.13).
+•  “Vida Financeira” vira preset automático quando o layout é reconhecido — não é mais o único formato aceito.
+•  Competência do cartão passa a ser o mês da fatura (seção 5.7). Decisão de 04/11/2026.
+•  Saldo com dois nomes: “Saldo do período” (orçado − gasto) no Resumo e “Saldo final” (receitas − despesas) na visão Ano (seções 5.2, 5.4 e 6).
+•  Edição e exclusão de parcelas com regras completas por escopo (seção 5.5).
+•  Estados de alerta definidos, inclusive o de 100% (seções 5.3 e 5.10).
+•  Filtros do Resumo com estado visível e ação “Limpar filtros” (seção 5.2).
+•  Casos de aceite das regras compartilhadas (seção 6) e critérios gerais de aceite do MVP (seção 11).
+•  Decisão D-03: importação universal e PDF entram no MVP (seção 10).
+1. Contexto
+Meu Orçamento substitui a planilha “Vida Financeira”. O usuário planeja receitas e despesas por item e mês, registra o que já aconteceu, acompanha o consumo do orçamento e projeta o impacto de compras parceladas.
+O produto foi desenhado para uso frequente no celular, com suporte a desktop. Cada pessoa tem seu próprio orçamento. Dados são isolados por conta. Não há compartilhamento familiar nesta versão.
+A interface e os fluxos principais já foram explorados em protótipo HTML funcional. As telas abaixo servem de referência visual. O que o protótipo demonstra de comportamento entra no MVP, com as exceções explicitadas na seção 4.
+2. Problemas
+A planilha resolve o controle básico, mas cria atrito real no dia a dia:
+•  Lançar e categorizar exige tempo e disciplina. Fórmulas quebram com facilidade.
+•  Cartões e parcelas não têm tratamento adequado. O usuário perde a visão dos compromissos futuros.
+•  No celular a planilha é hostil. A maior parte das decisões de gasto acontece longe do computador.
+•  Perguntas simples (“ainda posso gastar em alimentação?”) exigem navegação e cálculo mental.
+•  Não há alerta antes do estouro. O usuário só descobre que passou do limite quando o mês já acabou.
+O custo disso é perda de controle, surpresas no final do mês e abandono intermitente da própria planilha.
+3. Resultado esperado
+Com o MVP no ar, o usuário consegue:
+•  Registrar um lançamento em menos de 30 segundos.
+•  Entender, em uma tela, quanto ainda pode gastar por categoria e no total.
+•  Ser avisado visualmente quando se aproxima de um limite que ele mesmo definiu.
+•  Fechar a revisão do mês em menos de 10 minutos.
+•  Migrar de qualquer planilha financeira existente sem reformatar o arquivo manualmente.
+•  Importar uma fatura de cartão em PDF e revisar os lançamentos antes de confirmar.
+•  Abandonar a planilha após dois a três meses de uso contínuo.
+Métricas
+•  Tempo para fechar o mês < 10 minutos.
+•  Após 60 dias, ≥ 90% dos lançamentos permanecem sem edição (denominador = lançamentos com mais de 7 dias de idade).
+•  Usuário declara ter deixado a planilha por 3 meses consecutivos (pesquisa).
+Telemetria mínima: lançamento criado/editado/excluído, navegação de mês, tempo de sessão, acionamento de alerta de limite.
+4. Fora de escopo do MVP
+Os itens abaixo foram conscientemente excluídos para proteger o prazo e a qualidade do núcleo:
+•  Seção de Insights com orientações de saldo e indicador de endividamento.
+•  Open Finance, conexão bancária e sincronização automática.
+•  Lançamento por frase em linguagem natural.
+•  OCR de foto de fatura (somente PDF com texto selecionável no MVP).
+•  Compartilhamento familiar de orçamento.
+•  Tipo Investimentos, metas e recomendações automatizadas.
+•  Notificações push e e-mail.
+•  Recorrência automática de despesas.
+•  Estorno como tipo de lançamento.
+•  Uso offline.
+•  Alterar o número de parcelas de um parcelamento já lançado (para corrigir, exclui-se o grupo e lança-se de novo).
+•  Recalcular a competência de lançamentos antigos ao mudar o fechamento do cartão.
+•  Campo de Observação separado da descrição e busca em todo o histórico.
+•  Importação 100% automática sem revisão humana (sempre há prévia obrigatória).
+Por que cortamos Insights e Open Finance
+Insights (orientações de saldo e indicador de endividamento) e Open Finance aumentam escopo sem serem necessários para abandonar a planilha. Gráficos de composição e planejado × realizado permanecem no MVP. Open Finance entra em fase seguinte.
+5. Solução
+5.1 Visão geral
+O aplicativo é organizado em cinco áreas, acessíveis por navegação inferior no mobile e superior no desktop:
+•  Resumo — situação do período, cards, filtros, gráficos, alertas e média diária.
+•  Orçamento — visão mensal por tipo, categorias, itens e consumo.
+•  Ano — tabela anual Jan–Dez.
+•  Lançamentos — lista, busca, criação, edição e exclusão.
+•  Ajustes — cartões, limites de alerta, importação (planilha e PDF), dados e conta.
+Hierarquia: Tipo → Categoria → Item. Todo lançamento aponta para um Item. Tipo e categoria são derivados.
+Tipos do MVP: R (Receitas), F (Despesas fixas), V (Despesas variáveis), E (Anuais/eventuais). O tipo Investimentos permanece oculto.
+5.2 Resumo
+Figura 1 — Tela Resumo (referência do protótipo). Gráficos entram no MVP; a seção Insights não.
+Tela de entrada. Mostra a situação do período e permite explorar os números com um toque.
+Filtros
+•  Mês de competência (padrão = mês atual), pelas setas anterior/próximo. Intervalo livre de datas fica fora desta versão.
+•  Forma de pagamento (Todas, Débito, PIX, Dinheiro ou cartão específico).
+•  Categoria (Todas ou uma categoria).
+Os seletores de pagamento e categoria mostram o valor atual. “Limpar filtros” volta os dois para Todas e não muda o mês. Filtros nunca alteram lançamentos nem orçamento.
+Como os filtros afetam cada elemento
+Mês de competência — afeta todos os cards e gráficos. Só entram lançamentos e planejados com essa competência.
+Forma de pagamento:
+•  Quando = Todas: tudo normal.
+•  Quando ≠ Todas: Total gasto e as barras de Realizado usam só os lançamentos da forma escolhida. Total orçado e Saldo do período mostram “—”, com texto explicando que o planejado não é dividido por forma de pagamento. As barras de Planejado continuam integrais, com legenda indicando o filtro no Realizado.
+Categoria:
+•  Quando = Todas: distribuição completa.
+•  Quando uma categoria está selecionada: cards restringem aos itens dela.
+Cards
+•  Total orçado: soma do planejado das despesas (F + V + E) no período.
+•  Total gasto: soma das despesas realizadas (F + V + E) no período.
+•  Saldo do período: Total orçado − Total gasto, ou seja, quanto ainda pode gastar. Negativo = passou do orçado. Não é receitas − despesas: esse é o “Saldo final” da visão Ano.
+•  Cards por tipo (Receitas, Fixas, Variáveis, Anuais) com realizado e planejado.
+Todos os big numbers e cards são clicáveis. Levam ao Orçamento filtrado ou à lista de Lançamentos do período, conforme o contexto.
+Gráficos
+•  Rosca — gastos por categoria no período filtrado. Máximo 4 categorias + “Outros”. Empty state quando não há despesas. Quando o filtro de categoria ≠ Todas, o gráfico é escondido ou substituído por empty state orientativo.
+•  Barras — planejado × realizado por tipo. Forma de pagamento afeta apenas o Realizado; Planejado continua integral, com legenda esclarecendo o filtro. Empty state com eixos vazios quando não há dados.
+Ambos têm título, legenda e aria-label.
+Indicadores auxiliares
+•  Média diária de gasto (realizado do mês ÷ dia atual).
+•  Dias restantes no mês.
+Aparecem quando o período inclui o mês corrente.
+O que não entra
+A seção de orientações de saldo e o indicador de comprometimento com dívidas do protótipo ficam fora do MVP.
+5.3 Orçamento mensal
+Figura 2 — Tela Orçamento (referência do protótipo).
+Visão principal de acompanhamento do mês.
+•  Navegação por mês.
+•  Chips de tipo (R, F, V, E).
+•  Categorias expansíveis com realizado / planejado e barra de consumo.
+•  Barra visual limitada a 100%. Estados conforme a seção 5.10: preventivo a partir do limite preventivo (padrão 80%), atingido em 100% e ultrapassado acima de 100%.
+•  Texto: “Ainda pode gastar R$ X”, “Orçamento atingido” (consumo = 100%) ou “Estourou em R$ X”.
+•  Itens com realizado > 0 e planejado = 0 recebem destaque e o texto “Gasto sem orçamento planejado”, sem percentual. Itens sem gasto e sem planejado não exibem alerta.
+•  Toque no item abre o planejamento. Botão para criar novo item no tipo atual.
+•  Totais do tipo também são clicáveis.
+5.4 Visão anual
+Figura 3 — Visão anual (referência do protótipo).
+•  Ciclo civil (janeiro–dezembro).
+•  Alternância Planejado / Realizado.
+•  Tabela Jan–Dez + Total, por tipo, total de despesas e Saldo final (receitas − despesas, no planejado ou no realizado conforme a alternância).
+•  Usa a mesma competência do Resumo e do Orçamento, inclusive para compras no cartão e parcelas.
+•  Cada linha de tipo é expansível: ao tocar, mostra as categorias daquele tipo com valores mês a mês e total. Não desce até item.
+•  Valores negativos destacados. Rolagem horizontal em telas estreitas.
+5.5 Lançamentos
+Figura 4 — Lista de lançamentos (referência do protótipo).
+Lista
+•  Ordenação por data decrescente.
+•  Cada linha: descrição, data, categoria, item, forma de pagamento, valor e progresso da parcela (“Parcela 2 de 6 · restam 4”).
+•  Busca por texto (descrição ou nome do item), limitada ao mês selecionado e combinada com os filtros ativos de forma de pagamento e tipo. Sem resultados: mensagem específica e ação para limpar busca e filtros.
+•  Filtros rápidos por forma de pagamento e tipo.
+Criação
+Figura 5 — Modal de novo lançamento (referência do protótipo).
+Campos:
+•  Tipo (Receita / Despesa).
+•  Item (obrigatório; filtrado pelo tipo; arquivados não aparecem).
+•  Descrição (opcional; se vazia, usa o nome do item).
+•  Valor total (obrigatório, > 0, até 2 casas).
+•  Data da transação.
+•  Forma de pagamento: Débito, PIX, Dinheiro ou Cartão de crédito.
+•  Cartão (obrigatório se forma = crédito; só ativos).
+•  Parcelas (1–60; só para cartão; padrão 1).
+Prévia mostra valores reais de cada parcela (com diferença de centavos) e o intervalo de competências. Gravação é atômica. Validação inline.
+Edição
+É possível editar valor, descrição, data, item e forma de pagamento.
+Se o lançamento pertence a um grupo de parcelas, o sistema pergunta o escopo: “Somente esta parcela” ou “Esta e as próximas”. A confirmação é obrigatória. Regras:
+•  Valor: o novo valor é por parcela. “Somente esta” não altera as demais. “Esta e as próximas” aplica o mesmo valor a cada parcela selecionada e não recalcula as anteriores nem o total original.
+•  Descrição, item e forma de pagamento seguem o escopo escolhido.
+•  Data: a nova data vale para a parcela selecionada. Em “Esta e as próximas”, as seguintes avançam um mês cada, mantendo o dia (ajustado ao último dia do mês quando necessário). A competência é recalculada pela regra do cartão (seção 5.7).
+•  O número de parcelas não muda ao editar. Para corrigi-lo, exclui-se o grupo e lança-se de novo.
+•  Nenhuma edição pode duplicar ou remover parcelas indevidamente. O sistema valida antes de salvar.
+Por que essa regra de edição
+Recalcular o total original quebra a expectativa de quem lançou uma compra de R$ 900 em 3×. Aplicar a mudança só no escopo escolhido preserva o histórico e evita surpresas nos meses seguintes.
+Exclusão
+•  Escopos: “Somente esta parcela”, “Esta e as próximas” ou “Todas as parcelas do grupo”. Antes de excluir, o sistema informa quantos lançamentos serão removidos.
+•  Toast “Desfazer” por 10 segundos. Desfazer restaura exatamente os registros removidos (valores, datas, competências, itens e vínculo de parcelamento), sem duplicar. Depois do prazo, a exclusão não pode mais ser desfeita.
+•  Uma exclusão parcial nunca deixa vínculos de parcelamento inconsistentes.
+5.6 Planejamento de item
+•  Doze campos mensais do ano.
+•  “Aplicar a todos” — copia o valor para os 12 meses.
+•  “Copiar do mês anterior” — um toque para o mês corrente.
+•  “Copiar do ano anterior” — nesta versão não há plano de outro ano. A ação mostra que a cópia não está disponível e não altera os doze valores.
+•  Valores ≥ 0, até 2 casas decimais.
+5.7 Cartões e formas de pagamento
+Figura 6 — Ajustes / cartões (referência do protótipo).
+Formas: Débito, PIX, Dinheiro e Cartão de crédito (separadas).
+Cadastro de cartão: apelido obrigatório. O dia de fechamento é recomendado: com ele, a competência segue a fatura; sem ele, o cartão usa o mês da compra e a tela mostra um aviso. Dia de vencimento (informativo), instituição e últimos 4 dígitos são opcionais.
+Cartão com histórico não é apagado — apenas inativado.
+Competência no MVP: mês da fatura (mês de fechamento). Regras:
+•  Cada cartão tem um dia de fechamento. Compra feita antes desse dia pertence à fatura que fecha no mês da compra. Compra feita no dia do fechamento ou depois pertence à fatura do mês seguinte.
+•  A competência da despesa é o mês em que a fatura fecha. O vencimento não altera a competência.
+•  Parcelas: a primeira cai na competência da fatura da compra, e cada parcela seguinte, um mês depois.
+•  Débito, PIX e Dinheiro: competência = mês da data.
+•  Sem dia de fechamento cadastrado: competência = mês da compra, com aviso na tela.
+•  Resumo, Orçamento e Ano usam a mesma competência. A prévia do lançamento mostra competências e valores antes de salvar.
+•  A competência é gravada no lançamento. Mudar o fechamento do cartão vale só para novos lançamentos.
+•  Exemplo (fechamento dia 25): compra em 10/05 → maio. Compra em 26/05 → junho. Compra de 26/05 em 3× → junho, julho e agosto.
+Por que o mês da fatura
+Usar o mês de fechamento faz o orçamento do mês bater com o total da fatura e com o histórico de quem hoje lança por fatura. Sem dia de fechamento, o cartão cai no mês da compra e a tela avisa. Decisão D-04: compra no dia do fechamento vai para a fatura do mês seguinte em qualquer emissor. O cadastro avisa que alguns bancos podem tratar esse dia de outro jeito. Não há override de competência por lançamento nesta versão. O dia de fechamento aceito é de 1 a 28.
+5.8 Parcelas
+Divisão exata em centavos:
+•  base = floor(T / N); resto = T − base × N.
+•  As primeiras “resto” parcelas recebem base + 1 centavo.
+•  Soma das parcelas = T exatamente.
+•  A diferença de centavos vai sempre para as primeiras parcelas. Os testes de aceite usam essa ordem.
+•  Todas as parcelas de uma compra pertencem ao mesmo grupo de parcelas.
+•  Exemplo: R$ 100,00 em 3× → R$ 33,34 + R$ 33,33 + R$ 33,33.
+Se o dia da compra não existir no mês futuro, a data original e a competência são armazenadas separadamente.
+5.9 Catálogo
+Primeiro orçamento: catálogo completo, planejados zerados, sem lançamentos. “Carregar exemplo” só por ação explícita.
+•  Criar e arquivar itens. Renomear e reordenar categorias ou itens ficam fora desta versão.
+•  Arquivar é soft-delete: o item sai da lista ativa e do seletor de novos lançamentos. Lançamentos já gravados permanecem. Não há exclusão física de item.
+Catálogo inicial cobre Receitas, Fixas (Moradia, Educação, Transporte, Saúde, Outros), Variáveis (Habitação, Transporte, Alimentação, Lazer, Outros) e Anuais/eventuais (Educação, Saúde, Manutenção, Vestuário, Cuidados pessoais, Outros).
+5.10 Alertas de limite
+O usuário configura um limite global (percentual do planejado) e, opcionalmente, limites por categoria que sobrescrevem o global.
+Estados de consumo, para cada categoria ou item com planejado maior que zero (limite preventivo padrão: 80%, editável em Ajustes):
+•  Abaixo do limite preventivo: apenas o percentual.
+•  Do limite preventivo até menos de 100%: alerta preventivo.
+•  Igual a 100%: “Orçamento atingido”.
+•  Acima de 100%: “Orçamento ultrapassado”, com o valor excedente.
+•  Planejado = 0 e gasto > 0: “Gasto sem orçamento planejado”, sem percentual.
+•  Planejado = 0 e gasto = 0: nenhum alerta.
+Os mesmos critérios valem no Resumo e no Orçamento. A visão Ano mostra valores e não cria regra própria de alerta.
+•  Banner fixo no topo do Resumo e do Orçamento, com o alerta mais crítico e contagem dos demais.
+•  Badge e cor na barra de consumo de cada categoria afetada.
+•  Sininho na barra superior com badge de quantidade; ao tocar, lista todos os alertas do mês (total e categorias).
+•  Alerta de total do mês usa o limite global.
+•  Sem push e sem e-mail no MVP.
+•  Preferências salvas por orçamento.
+Além disso, o sistema destaca automaticamente itens com gasto e sem planejado.
+5.11 Conta, dados e segurança
+•  Cadastro, login e recuperação de acesso.
+•  Isolamento total por usuário (interface e API).
+•  Backend obrigatório: os dados persistem entre sessões. Cada registro guarda createdAt e updatedAt. Não há trilha de auditoria separada nesta versão.
+•  Exportação em CSV e JSON, preservando os valores em centavos sem perda de precisão.
+•  Exclusão de conta: o usuário digita EXCLUIR. A conta e o orçamento (itens, cartões, lançamentos e sessão) são apagados na hora. Não há prazo de 30 dias nesta versão. Frase diferente de EXCLUIR não apaga nada.
+•  Minimização de dados: sem CPF por padrão. HTTPS. Autorização no servidor em toda operação.
+Importação e exportação (visão geral)
+•  Duas entradas de importação no MVP: planilha financeira (5.12) e fatura em PDF (5.13).
+•  Toda importação exige prévia, relatório final e confirmação explícita.
+•  Dados existentes não são excluídos nem sobrescritos sem confirmação.
+•  Duplicata (D-05): mesma data, mesmo valor em centavos, mesma descrição normalizada (trim, minúsculas, sem acento) e mesmo meio de pagamento, inclusive o cartão. Na prévia a linha vem marcada e não importa por padrão. O usuário pode marcar “importar mesmo assim”.
+5.12 Importação de planilha financeira (qualquer formato)
+Objetivo: permitir migração e carga de dados a partir de planilhas pessoais, exportações bancárias e modelos de terceiros, sem exigir conversão prévia para um layout único.
+Formatos aceitos: CSV (UTF-8 ou Latin-1, delimitador vírgula ou ponto-e-vírgula), XLSX, XLS e ODS. Tamanho máximo: 10 MB no MVP.
+Fluxo
+•  1. Upload do arquivo em Ajustes → Importar planilha.
+•  2. Seleção da aba (quando houver mais de uma).
+•  3. Detecção automática de layout:
+  — Lista de lançamentos (linhas com data, valor e descrição).
+  — Orçamento “Vida Financeira” (tipos, categorias, itens e colunas mensais Jan–Dez).
+  — Misto (abrir mapeamento manual).
+•  4. Tela de mapeamento de colunas quando o layout não for reconhecido com confiança.
+•  5. Prévia com até 200 linhas visíveis; inválidas com motivo.
+•  6. Confirmação e relatório (importados, ignorados, rejeitados, itens criados).
+Mapeamento (modo lista de lançamentos)
+Campos obrigatórios: Data, Valor.
+Campos opcionais: Descrição, Categoria, Item, Tipo (R/F/V/E), Forma de pagamento, Parcelas.
+O sistema sugere o mapeamento a partir dos cabeçalhos (sinônimos em pt-BR: data, dt, valor, amount, descrição, histórico, categoria, etc.). O usuário pode corrigir antes de importar.
+Itens e categorias não encontrados: opção “Criar itens faltantes” (padrão ligada) ou “Usar item padrão” (Outros · Variáveis).
+Modo orçamento (layout mensal): quando colunas forem meses (Jan–Dez ou 01–12), importa planejamento por item/mês em vez de lançamentos. Requer colunas Tipo, Categoria e Item (ou equivalentes reconhecidos no preset Vida Financeira).
+Validação: data válida; valor > 0; competência calculada pelas regras de cartão quando forma = crédito.
+Reimportação: hash do arquivo + data de importação; duplicatas potenciais são sinalizadas na prévia (mesma data, valor e descrição).
+5.13 Importação de fatura de cartão (PDF)
+Objetivo: eliminar digitação manual das compras do cartão a partir do PDF da fatura.
+Escopo do MVP
+•  PDF com texto selecionável (não imagem escaneada). PDFs baseados em imagem ficam fora do MVP.
+•  Emissores: heurísticas para Inter, Nubank, Itaú, Bradesco e C6; demais emissores usam parser genérico com prévia editável.
+Fluxo
+•  1. Upload em Ajustes → Importar fatura (PDF).
+•  2. Seleção ou criação do cartão de destino (obrigatório).
+•  3. Extração de texto no servidor (produção) ou no cliente (protótipo).
+•  4. Identificação de linhas de compra: data, descrição, valor, parcela (quando houver).
+•  5. Prévia: cada linha pode ser ignorada, editada ou ter item do orçamento associado (sugestão por palavra-chave na descrição).
+•  6. Confirmação: gera lançamentos no cartão, aplica competência pela fatura (5.7) e regra de parcelas (5.8).
+Regras de parsing
+•  Ignorar linhas de totais, pagamentos, juros, IOF e cabeçalhos.
+•  Valores negativos na fatura = despesa; estornos = receita ou exclusão conforme escolha na prévia.
+•  Parcelas detectadas por padrões “3/12”, “03 de 12”, “Parc. 2/6”.
+•  Confiança baixa (< 70% das linhas parseadas): aviso e revisão obrigatória linha a linha.
+•  Nenhuma linha é gravada sem passar pela prévia.
+Segurança e privacidade (PDF)
+•  Arquivo processado em memória; não armazenar PDF após importação concluída, salvo opt-in explícito do usuário.
+•  Log apenas de metadados (emissor detectado, linhas importadas), sem conteúdo da fatura.
+6. Regras transversais de cálculo
+Valores monetários são inteiros de centavos. Conversão ocorre uma vez na entrada. Operações usam só inteiros.
+•  Total orçado = planejado das despesas (F+V+E). Total gasto = realizado das despesas (F+V+E). Saldo do período = Total orçado − Total gasto.
+•  Saldo final (visão Ano) = receitas − despesas, no planejado ou no realizado.
+•  Restante = planejado − realizado. Texto e sinal conforme o sinal do restante.
+•  Percentual consumido só quando planejado > 0. Nunca dividir por zero.
+•  Apresentação em pt-BR. Arredondar só na exibição.
+•  Importações, exportações e telas usam sempre os mesmos valores em centavos. Nenhum cálculo usa decimais.
+Saldo orçamentário não deve ser chamado de “dinheiro disponível no banco”.
+Regras compartilhadas
+Competência do cartão (5.7), parcelas (5.8) e estados de alerta (5.10) são definidos uma única vez e valem no Resumo, no Orçamento e no Ano. Nenhuma tela cria regra própria.
+Casos de aceite das regras compartilhadas
+•  Parcelamento: R$ 100,00 em 3× gera R$ 33,34, R$ 33,33 e R$ 33,33. A soma é exatamente R$ 100,00.
+•  Competência: cartão com fechamento no dia 25. Compra em 10/05 → maio. Compra em 25/05 → junho. Compra em 26/05 → junho. Compra de 26/05 em 3× → junho, julho e agosto, nos mesmos meses em todas as telas. Dia de fechamento fora de 1–28 é rejeitado.
+•  Edição: ao editar a 3ª parcela de uma compra em 6×, “Somente esta” mantém as outras cinco intactas. “Esta e as próximas” altera apenas a 3ª, 4ª, 5ª e 6ª.
+•  Exclusão: excluir e desfazer um parcelamento restaura os mesmos lançamentos, sem duplicar nem alterar valores.
+•  Alertas: planejado R$ 100 e gasto R$ 80 → preventivo. Gasto R$ 100 → atingido. Gasto R$ 105 → excedente de R$ 5. Planejado R$ 0 e gasto R$ 20 → “Gasto sem orçamento planejado”.
+•  Saldos: planejado de despesas R$ 3.000 e gasto R$ 2.400 → Saldo do período R$ 600. Receitas R$ 5.000 e despesas R$ 2.400 → Saldo final R$ 2.600 (visão Ano).
+•  Filtro de forma de pagamento: com um cartão selecionado, Total orçado e Saldo do período mostram “—”, e Total gasto mostra só os lançamentos desse cartão.
+7. Princípios de produto e interface
+•  Clareza acima de densidade. Um número confuso é pior que um número a menos.
+•  Todo agregado mostra a competência ou a origem.
+•  Status nunca depende só de cor.
+•  Ações destrutivas exigem confirmação com a consequência explícita.
+•  Alvos de toque ≥ 48 px. Erros inline. Empty states com CTA.
+•  Realizado em destaque; planejado em peso secundário.
+•  Barra de consumo limitada a 100% visualmente.
+•  Desfazer exclusão por 10 segundos.
+•  Big numbers e cards principais são clicáveis.
+8. Ordem de entrega sugerida
+Se o prazo apertar, a ordem abaixo protege o valor mínimo:
+•  1. Conta, isolamento e persistência.
+•  2. Catálogo + planejamento mensal.
+•  3. Cartões (competência pela fatura), lançamentos, parcelas, edição por escopo e exclusão com undo.
+•  4. Orçamento mensal (barras, restante, destaque sem planejado).
+•  5. Visão anual.
+•  6. Resumo (cards clicáveis, filtros, gráficos, média diária, banner de alertas).
+•  7. Alertas de limite (global, por categoria, sininho).
+•  7b. Visão anual com categorias expansíveis.
+•  8. Importação de planilha universal (mapeamento + prévia) e exportação.
+•  8b. Importação de fatura PDF (parser + prévia + vínculo ao cartão).
+•  9. Telemetria.
+Itens 1–4 formam o núcleo indispensável. 5–7 elevam a percepção de valor. 8–8b fecham migração e rotina de fechamento do mês.
+9. Riscos principais
+Risco
+Impacto
+Mitigação
+Importação universal gera mapeamentos errados
+Dados incorretos e perda de confiança
+Preset Vida Financeira automático; mapeamento manual; prévia obrigatória; criar itens faltantes com aviso
+PDF heterogêneo entre emissores
+Linhas perdidas ou valores errados
+Parser por emissor + genérico; prévia editável; confiança < 70% bloqueia importação automática
+Regra de competência de cartão frustrar usuários
+Desconfiança nos números do mês
+Competência pela fatura exige o dia de fechamento: aviso quando ausente. D-04 fecha a compra no dia do fechamento na fatura seguinte, com aviso de que o banco pode diferir.
+Edição de parcelas gerar inconsistência
+Totais quebrados e suporte
+Pergunta de escopo + confirmação + testes de CA
+Baixa adoção por falta de alertas úteis
+Usuário volta para a planilha
+Alertas de limite no MVP; defaults 80% e 100%
+Protótipo diferente do MVP (decimais e dados no navegador)
+A demonstração mostra um comportamento e o desenvolvimento entrega outro
+Atualizar o protótipo (v3) com centavos inteiros e as regras desta versão antes de qualquer validação
+10. Decisões e questões em aberto
+ID
+Questão
+Recomendação
+Q-01
+Mapeamento exato da importação da planilha
+Decidido (v1.0): mapeamento universal com preset automático para Vida Financeira
+Q-06
+Regra de duplicidade na reimportação
+Decidido (D-05): prévia marca duplicata (data + centavos + descrição normalizada + meio) e não importa por padrão; o usuário pode forçar
+Q-07
+PDF escaneado (sem texto)
+Decidido: fora desta versão. Mensagem pede o PDF com texto selecionável ou o lançamento manual
+Q-02
+Limiares padrão de alerta
+Decidido: limite preventivo padrão de 80% (editável) e 100% como orçamento atingido
+Q-03
+Busca de lançamentos só no mês ou no histórico
+Decidido: busca só no mês selecionado no MVP
+Q-04
+Campo de observação separado da descrição
+Decidido: só Descrição no MVP
+Q-05
+Compras feitas no dia do fechamento vão para a próxima fatura em todos os emissores?
+Decidido (D-04): sim, em qualquer emissor. Aviso no cadastro de que o banco pode tratar o dia de outro jeito. Sem override por lançamento
+D-01
+Competência das despesas no cartão
+Decidido em 04/11/2026: mês da fatura (mês de fechamento)
+D-02
+Nomes do saldo
+Decidido em 04/11/2026: “Saldo do período” (orçado − gasto) no Resumo; “Saldo final” (receitas − despesas) na visão Ano
+D-03
+Escopo de importação no MVP
+Decidido em 08/11/2026: qualquer planilha financeira (CSV/XLSX/XLS/ODS) com mapeamento + fatura PDF com texto selecionável
+D-04
+Compra no dia do fechamento
+Decidido: fatura do mês seguinte, dia de fechamento de 1 a 28, aviso de variação entre bancos
+D-05
+Duplicata na importação
+Decidido: data + centavos + descrição normalizada + meio; não importa por padrão; pode forçar na prévia
+D-06
+Exclusão de conta
+Decidido: imediata, após digitar EXCLUIR, com cascade da conta e do orçamento. Sem retenção de 30 dias nesta versão
+D-07
+Renomear e reordenar itens
+Decidido: fora desta versão. Entram criar e arquivar
+D-08
+Copiar ano anterior
+Decidido: a ação existe e informa que não há plano de outro ano. Não altera valores
+D-09
+Filtro de período do Resumo
+Decidido: mês de competência, não intervalo livre de datas
+11. Critérios gerais de aceite do MVP
+O MVP é considerado concluído quando:
+•  Os dados persistem após atualizar a página, encerrar a sessão e entrar de novo, e ficam no servidor. Armazenamento local do navegador não conta como persistência.
+•  Cada usuário acessa somente os próprios dados, na interface e na API.
+•  Competência, parcelamento e arredondamento seguem as mesmas regras em todas as telas.
+•  Os totais do Resumo, do Orçamento e do Ano reconciliam com os lançamentos registrados.
+•  Importação de planilha e de PDF foram testadas com arquivos reais (mínimo 3 layouts de planilha e 2 emissores de fatura).
+•  Criação, edição, exclusão e desfazer foram testados, inclusive em compras parceladas.
+•  Filtros, alertas e gráficos mostram resultados consistentes com o recorte selecionado.
+•  Os fluxos principais funcionam em celular e em desktop.
+•  Erros de validação são claros e nenhum dado inválido é salvo.
+•  Os testes de aceite de tudo que entra no MVP foram aprovados antes da liberação.
+12. Próximos passos
+•  Validar a v1.0.
+•  Q-05, Q-06 e Q-07 fechadas (D-04, D-05 e PDF escaneado fora desta versão).
+•  Atualizar o protótipo com fluxos de importação (planilha + PDF), centavos inteiros e competência pela fatura.
+•  Quebrar em histórias (Contexto → Objetivos → Descritivo → Critérios de aceite).
+•  Iniciar pela ordem da seção 8.
+Documento para validação. Versão 1.0 — 08/11/2026.
