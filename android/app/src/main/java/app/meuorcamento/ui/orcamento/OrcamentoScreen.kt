@@ -14,7 +14,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -45,6 +44,9 @@ import app.meuorcamento.data.ApiException
 import app.meuorcamento.domain.formatCentavos
 import app.meuorcamento.ui.CompetenciaPicker
 import app.meuorcamento.ui.OfflineBanner
+import app.meuorcamento.ui.components.BotaoPrimario
+import app.meuorcamento.ui.components.BotaoTexto
+import app.meuorcamento.ui.copy.Strings
 import app.meuorcamento.ui.reaisParaCentavos
 import app.meuorcamento.ui.resumo.ResumoItemDto
 import app.meuorcamento.ui.resumo.ResumoResponse
@@ -171,17 +173,17 @@ fun OrcamentoScreen(
         }
         when {
             loading && totais == null -> CircularProgressIndicator(Modifier.padding(24.dp))
-            totais == null -> Text("Não foi possível carregar o orçamento.", modifier = Modifier.padding(horizontal = 16.dp))
+            totais == null -> Text(Strings.erroCarregarOrcamento, modifier = Modifier.padding(horizontal = 16.dp))
             else -> {
                 val cabe = (linha?.planoCentavos ?: 0) - (linha?.realizadoCentavos ?: 0)
                 Column(Modifier.padding(horizontal = 16.dp)) {
-                    Text("Ainda cabe em ${labelTipo(tipo).lowercase()}", modifier = Modifier.padding(top = 12.dp))
+                    Text("${Strings.aindaCabeEm} ${labelTipo(tipo).lowercase()}", modifier = Modifier.padding(top = 12.dp))
                     Text(
                         formatCentavos(cabe),
                         style = ValorDisplay,
                         color = if (cabe < 0) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
                     )
-                    TextButton(onClick = { novoAberto = true }) { Text("Novo item") }
+                    BotaoTexto(text = Strings.novoItem, onClick = { novoAberto = true })
                 }
                 LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp)) {
                     items(comMovimento, key = { "${it.tipo}-${it.grupo}" }) { grupo ->
@@ -315,7 +317,7 @@ private fun GrupoBloco(
             else -> MaterialTheme.colorScheme.onSurfaceVariant
         }
         Text(
-            grupo.frase.ifBlank { "planejado ${formatCentavos(grupo.planoCentavos)} · realizado ${formatCentavos(grupo.realizadoCentavos)}" },
+            grupo.frase.ifBlank { "${Strings.plano} ${formatCentavos(grupo.planoCentavos)} · ${Strings.realizado} ${formatCentavos(grupo.realizadoCentavos)}" },
             color = fraseCor,
         )
         if (grupo.planoCentavos > 0 || grupo.realizadoCentavos > 0) {
@@ -334,17 +336,18 @@ private fun GrupoBloco(
                 Column(Modifier.weight(1f).clickable { onEdit(item) }) {
                     Text(item.nome, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     Text(
-                        "realizado ${formatCentavos(realizado)} · plano ${formatCentavos(item.planoMesCentavos)}",
+                        "${Strings.realizado} ${formatCentavos(realizado)} · ${Strings.plano} ${formatCentavos(item.planoMesCentavos)}",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
                 val armed = armedId == item.id
-                TextButton(onClick = {
-                    if (armed) onArchive(item.id) else onArm(item.id)
-                }) {
-                    Text(if (armed) "Confirmar arquivar ${item.nome}" else "Arquivar ${item.nome}")
-                }
+                BotaoTexto(
+                    text = if (armed) "${Strings.confirmarArquivar} ${item.nome}" else "${Strings.arquivar} ${item.nome}",
+                    onClick = {
+                        if (armed) onArchive(item.id) else onArm(item.id)
+                    },
+                )
             }
         }
     }
@@ -396,30 +399,33 @@ private fun PlanoMesSheet(
             )
             aviso?.let { Text(it, color = MaterialTheme.colorScheme.error) }
             Row {
-                TextButton(onClick = onClose) { Text("Cancelar") }
-                Button(onClick = {
-                    val cents = reaisParaCentavos(texto, permitirZero = true)
-                    if (cents == null) {
-                        aviso = "Informe um valor em reais, como 10,50."
-                        return@Button
-                    }
-                    val next = meses.toMutableList()
-                    while (next.size < 12) next.add(0L)
-                    next[mes] = cents
-                    scope.launch {
-                        try {
-                            api.putJson(
-                                "/api/v1/plano",
-                                api.json.encodeToString(PlanoPutBody(item.id, next.take(12))),
-                            )
-                            onSaved()
-                        } catch (e: ApiException) {
-                            if (e.status == 401) onUnauthorized() else aviso = e.message
-                        } catch (e: Exception) {
-                            aviso = e.message
+                BotaoTexto(text = Strings.cancelar, onClick = onClose)
+                BotaoPrimario(
+                    text = Strings.salvar,
+                    onClick = {
+                        val cents = reaisParaCentavos(texto, permitirZero = true)
+                        if (cents == null) {
+                            aviso = "Informe um valor em reais, como 10,50."
+                            return@BotaoPrimario
                         }
-                    }
-                }) { Text("Salvar") }
+                        val next = meses.toMutableList()
+                        while (next.size < 12) next.add(0L)
+                        next[mes] = cents
+                        scope.launch {
+                            try {
+                                api.putJson(
+                                    "/api/v1/plano",
+                                    api.json.encodeToString(PlanoPutBody(item.id, next.take(12))),
+                                )
+                                onSaved()
+                            } catch (e: ApiException) {
+                                if (e.status == 401) onUnauthorized() else aviso = e.message
+                            } catch (e: Exception) {
+                                aviso = e.message
+                            }
+                        }
+                    },
+                )
             }
             Box(Modifier.height(24.dp))
         }
@@ -440,29 +446,32 @@ private fun NovoItemSheet(
     LaunchedEffect(Unit) { focus.requestFocus() }
     ModalBottomSheet(onDismissRequest = onClose, shape = CantoPainel) {
         Column(Modifier.padding(16.dp)) {
-            Text("Novo item · ${labelTipo(tipo)}", style = MaterialTheme.typography.titleLarge)
+            Text("${Strings.novoItem} · ${labelTipo(tipo)}", style = MaterialTheme.typography.titleLarge)
             OutlinedTextField(
                 value = nome,
                 onValueChange = { nome = it },
-                label = { Text("Nome do item") },
+                label = { Text(Strings.nomeDoItem) },
                 modifier = Modifier.fillMaxWidth().focusRequester(focus),
             )
             OutlinedTextField(
                 value = grupo,
                 onValueChange = { grupo = it },
-                label = { Text("Grupo") },
+                label = { Text(Strings.grupo) },
                 modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
             )
             aviso?.let { Text(it, color = MaterialTheme.colorScheme.error) }
             Row {
-                TextButton(onClick = onClose) { Text("Cancelar") }
-                Button(onClick = {
-                    if (nome.isBlank()) {
-                        aviso = "Informe o nome do item."
-                        return@Button
-                    }
-                    onSave(nome, grupo)
-                }) { Text("Salvar") }
+                BotaoTexto(text = Strings.cancelar, onClick = onClose)
+                BotaoPrimario(
+                    text = Strings.salvar,
+                    onClick = {
+                        if (nome.isBlank()) {
+                            aviso = "Informe o nome do item."
+                            return@BotaoPrimario
+                        }
+                        onSave(nome, grupo)
+                    },
+                )
             }
             Box(Modifier.height(24.dp))
         }
