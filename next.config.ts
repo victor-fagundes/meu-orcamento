@@ -9,6 +9,9 @@ const nextConfig: NextConfig = {
   },
   // PGlite WASM: fora do bundle (não colocar pglite em transpilePackages)
   serverExternalPackages: ["@electric-sql/pglite", "pdfjs-dist"],
+  outputFileTracingIncludes: {
+    "/app/ajustes": ["./node_modules/pdfjs-dist/legacy/build/pdf.worker.mjs"],
+  },
   transpilePackages: ["@material/web", "lit"],
 };
 

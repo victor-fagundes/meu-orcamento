@@ -18,7 +18,7 @@ Spec: `spec.md` · Status alvo: `verified`
 - **AC:** AC-903
 
 ## T5 — Correção do worker (2026-11-17)
-- [x] `src/lib/parse-pdf.ts` aponta `workerSrc` para `pdf.worker.mjs`. Sem isso a prévia falha com “No GlobalWorkerOptions.workerSrc specified”.
+- [x] `src/lib/parse-pdf.ts` aponta `workerSrc` para `pdf.worker.mjs` por caminho de arquivo. `require.resolve` quebra na Vercel (“Cannot read properties of undefined (reading 'resolve')”).
 - **AC:** AC-901.1
 
 ## T4 — Verify
