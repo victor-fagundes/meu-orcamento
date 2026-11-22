@@ -296,7 +296,7 @@ export async function importVfPlano(
       continue;
     }
 
-    let it = all.find(
+    const it = all.find(
       (i) =>
         isItemAtivoParaLancamento(i.arquivado) &&
         i.tipo === alvo.tipo &&
