@@ -16,7 +16,6 @@
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.5.15",
-    "@material/web": "^2.5.0",
     "@meu-orcamento/design-system": "file:./packages/design-system",
     "better-auth": "^1.2.8",
     "drizzle-orm": "^0.45.2",

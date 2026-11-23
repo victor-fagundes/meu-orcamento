@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { ThemeProvider } from "@meu-orcamento/design-system";
-import { MaterialRegistry } from "@/components/material/register";
 import "@meu-orcamento/design-system/tokens.css";
 import "@meu-orcamento/design-system/web.css";
 import "./globals.css";
@@ -30,10 +29,8 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: scriptTema }} />
       </head>
-      <body className="antialiased">
-        <MaterialRegistry>
-          <ThemeProvider>{<>{children}</>}</ThemeProvider>
-        </MaterialRegistry>
+      <body>
+        <ThemeProvider>{<>{children}</>}</ThemeProvider>
       </body>
     </html>
   );

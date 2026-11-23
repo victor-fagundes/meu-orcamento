@@ -12,7 +12,7 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     "/app/ajustes": ["./node_modules/pdfjs-dist/legacy/build/pdf.worker.mjs"],
   },
-  transpilePackages: ["@meu-orcamento/design-system", "@material/web", "lit"],
+  transpilePackages: ["@meu-orcamento/design-system"],
 };
 
 export default nextConfig;
