@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
@@ -14,22 +15,52 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.isSystemInDarkTheme
+import app.meuorcamento.R
 
 val AzulAcao = Color(0xFF0058BE)
 val MarcaAmarela = Color(0xFFFFE600)
 val AvisoClaro = Color(0xFF8A7000)
 val AvisoEscuro = Color(0xFFD7B07A)
 
+val Manrope = FontFamily(
+    Font(R.font.manrope_medium, FontWeight.Medium),
+    Font(R.font.manrope_medium, FontWeight.Normal),
+    Font(R.font.manrope_bold, FontWeight.Bold),
+    Font(R.font.manrope_extrabold, FontWeight.ExtraBold),
+)
+
+private fun estilo(peso: FontWeight, tamanho: Int, altura: Int) = TextStyle(
+    fontFamily = Manrope,
+    fontWeight = peso,
+    fontSize = tamanho.sp,
+    lineHeight = altura.sp,
+)
+
+private val Tipo = Typography(
+    displayLarge = estilo(FontWeight.ExtraBold, 40, 44),
+    headlineSmall = estilo(FontWeight.Bold, 28, 34),
+    titleLarge = estilo(FontWeight.Bold, 22, 28),
+    titleMedium = estilo(FontWeight.Bold, 16, 22),
+    bodyLarge = estilo(FontWeight.Medium, 16, 22),
+    bodyMedium = estilo(FontWeight.Medium, 14, 20),
+    bodySmall = estilo(FontWeight.Medium, 12, 16),
+    labelLarge = estilo(FontWeight.Bold, 14, 20),
+)
+
 val ValorDisplay = TextStyle(
-    fontSize = 45.sp,
-    lineHeight = 52.sp,
-    fontWeight = FontWeight.Normal,
-    letterSpacing = (-0.02).em,
+    fontFamily = Manrope,
+    fontSize = 40.sp,
+    lineHeight = 44.sp,
+    fontWeight = FontWeight.ExtraBold,
+    letterSpacing = (-0.04).em,
 )
 
 fun aviso(escuro: Boolean): Color = if (escuro) AvisoEscuro else AvisoClaro
@@ -78,20 +109,40 @@ private val escuro = darkColorScheme(
 fun MeuOrcamentoTheme(content: @Composable () -> Unit) {
     MaterialTheme(
         colorScheme = if (isSystemInDarkTheme()) escuro else claro,
+        typography = Tipo,
         content = content,
     )
 }
 
+/** Dentro do plano, abaixo de 80%: azul. De 80% até 100%, inclusive chegou: aviso. Acima de 100%: erro. Plano zero: aviso. */
+fun corMedidor(plano: Long, realizado: Long, escuro: Boolean): Color {
+    if (plano <= 0) return aviso(escuro)
+    val pct = realizado.toDouble() / plano.toDouble()
+    return when {
+        pct > 1.0 -> if (escuro) Color(0xFFFFB4AB) else Color(0xFFBA1A1A)
+        pct >= 0.8 -> aviso(escuro)
+        else -> AzulAcao
+    }
+}
+
 /** Marca amarela com a inicial. Não colore barra, chip, pílula nem aviso. */
 @Composable
-fun Marca(modifier: Modifier = Modifier) {
+fun Marca(modifier: Modifier = Modifier, tamanho: Dp = 32.dp) {
+    val letra = if (tamanho >= 48.dp) 28.sp else 16.sp
+    val canto = if (tamanho >= 48.dp) 16.dp else 10.dp
     Box(
         modifier
-            .size(32.dp)
-            .clip(RoundedCornerShape(10.dp))
+            .size(tamanho)
+            .clip(RoundedCornerShape(canto))
             .background(MarcaAmarela),
         contentAlignment = Alignment.Center,
     ) {
-        Text("M", color = Color(0xFF221B00), fontWeight = FontWeight.Bold, fontSize = 16.sp)
+        Text(
+            "M",
+            color = Color(0xFF221B00),
+            fontFamily = Manrope,
+            fontWeight = FontWeight.ExtraBold,
+            fontSize = letra,
+        )
     }
 }

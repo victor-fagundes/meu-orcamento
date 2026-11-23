@@ -13,11 +13,26 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
+    "allowImportingTsExtensions": true,
     "plugins": [{ "name": "next" }],
     "paths": {
       "@/*": ["./src/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    "meu-orcamento-design-system",
+    "packages/design-system/src/native",
+    "packages/design-system/src/native.ts",
+    "packages/design-system/src/index.web.ts",
+    "packages/design-system/src/index.native.ts",
+    "packages/design-system/src/base/*.web.tsx",
+    "packages/design-system/src/base/*.native.tsx",
+    "packages/design-system/src/modulos/*.web.tsx",
+    "packages/design-system/src/modulos/*.native.tsx",
+    "packages/design-system/tests",
+    "packages/design-system/vitest.config.ts",
+    "packages/design-system/scripts"
+  ]
 }

@@ -2,6 +2,7 @@ import { mkdirSync } from "node:fs";
 import path from "node:path";
 import { PGlite } from "@electric-sql/pglite";
 import { drizzle } from "drizzle-orm/pglite";
+import { preencherCategoriasExistentes } from "@/application/categorias";
 import { ensureDevOrcamento, ensureDevUser } from "./seed-dev-user";
 import * as schema from "./schema";
 import type { Db } from "./types";
@@ -114,6 +115,54 @@ async function bootstrapSchema(client: PGlite) {
       cats_json text NOT NULL DEFAULT '{}',
       updated_at timestamptz NOT NULL DEFAULT now()
     );
+    CREATE TABLE IF NOT EXISTS categorias (
+      id text PRIMARY KEY,
+      orcamento_id text NOT NULL REFERENCES orcamentos(id) ON DELETE CASCADE,
+      tipo text NOT NULL,
+      nome text NOT NULL,
+      arquivada boolean NOT NULL DEFAULT false,
+      created_at timestamptz NOT NULL DEFAULT now(),
+      updated_at timestamptz NOT NULL DEFAULT now(),
+      CONSTRAINT categorias_tipo_check CHECK (tipo in ('R', 'F', 'V', 'E'))
+    );
+    CREATE UNIQUE INDEX IF NOT EXISTS categorias_nome_ativo
+      ON categorias (orcamento_id, tipo, lower(nome))
+      WHERE arquivada = false;
+  `);
+  await client.exec(`
+    WITH canonical AS (
+      SELECT DISTINCT ON (orcamento_id, tipo, lower(grupo))
+        orcamento_id,
+        tipo,
+        lower(grupo) AS chave,
+        grupo AS nome
+      FROM itens
+      ORDER BY orcamento_id, tipo, lower(grupo),
+        CASE WHEN arquivado = 0 THEN 0 ELSE 1 END,
+        grupo
+    )
+    UPDATE itens AS i
+    SET grupo = c.nome, updated_at = now()
+    FROM canonical AS c
+    WHERE i.orcamento_id = c.orcamento_id
+      AND i.tipo = c.tipo
+      AND lower(i.grupo) = c.chave
+      AND i.grupo <> c.nome;
+
+    INSERT INTO categorias (id, orcamento_id, tipo, nome, arquivada, created_at, updated_at)
+    SELECT gen_random_uuid()::text, g.orcamento_id, g.tipo, g.grupo, NOT g.tem_ativo, now(), now()
+    FROM (
+      SELECT orcamento_id, tipo, grupo, bool_or(arquivado = 0) AS tem_ativo
+      FROM itens
+      GROUP BY orcamento_id, tipo, grupo
+    ) AS g
+    WHERE NOT EXISTS (
+      SELECT 1 FROM categorias c
+      WHERE c.orcamento_id = g.orcamento_id
+        AND c.tipo = g.tipo
+        AND lower(c.nome) = lower(g.grupo)
+        AND c.arquivada = (NOT g.tem_ativo)
+    );
   `);
   try {
     await client.exec(`ALTER TABLE itens ADD COLUMN IF NOT EXISTS divida integer NOT NULL DEFAULT 0;`);
@@ -153,6 +202,7 @@ export async function openPglite(): Promise<Db> {
   globalForPglite.__meuOrcPglite = client;
   await bootstrapSchema(client);
   const db = drizzle({ client, schema }) as unknown as Db;
+  await preencherCategoriasExistentes(db);
   await ensureDevUser(db);
   await ensureDevOrcamento(db);
   globalForPglite.__meuOrcPgliteDb = db;

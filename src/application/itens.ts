@@ -1,4 +1,5 @@
 import { and, eq } from "drizzle-orm";
+import { garantirCategoriaAtiva } from "@/application/categorias";
 import type { Db } from "@/db";
 import { itens } from "@/db/schema";
 import type { TipoOrcamento } from "@/domain/catalog";
@@ -16,18 +17,26 @@ export async function createItem(
   const parsed = validateCreateItem(input);
   if (!parsed.ok) return parsed;
 
-  const id = crypto.randomUUID();
-  await db.insert(itens).values({
-    id,
-    orcamentoId,
-    tipo: input.tipo,
-    grupo: parsed.grupo,
-    nome: parsed.nome,
-    planoCentavosJson: parsed.planoCentavosJson,
-    arquivado: 0,
-    divida: 0,
-  });
-  return { ok: true, id };
+  try {
+    return await db.transaction(async (tx) => {
+      const categoria = await garantirCategoriaAtiva(tx, orcamentoId, input.tipo, parsed.grupo);
+      if (!categoria.ok) return categoria;
+      const id = crypto.randomUUID();
+      await tx.insert(itens).values({
+        id,
+        orcamentoId,
+        tipo: input.tipo,
+        grupo: parsed.grupo,
+        nome: parsed.nome,
+        planoCentavosJson: parsed.planoCentavosJson,
+        arquivado: 0,
+        divida: 0,
+      });
+      return { ok: true as const, id };
+    });
+  } catch {
+    return { ok: false, error: "Não foi possível salvar. Os campos continuam preenchidos." };
+  }
 }
 
 export async function archiveItem(

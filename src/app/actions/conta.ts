@@ -4,17 +4,18 @@ import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { runDb } from "@/db";
 import { user } from "@/db/schema";
+import { confirmarFraseExclusao } from "@/domain/exclusao-conta";
 import { getAuth } from "@/lib/auth";
 
 /**
  * Exclui a conta. FK CASCADE remove sessão, orçamento, itens, lançamentos, etc.
- * Confirmação de frase fica na UI (digite EXCLUIR).
+ * A frase tem de ser exatamente EXCLUIR, também neste servidor.
  */
 export async function excluirContaAction(confirmPhrase: string): Promise<
   { ok: true } | { ok: false; error: string }
 > {
-  if (confirmPhrase.trim().toUpperCase() !== "EXCLUIR") {
-    return { ok: false, error: "Digite EXCLUIR para confirmar." };
+  if (!confirmarFraseExclusao(confirmPhrase).ok) {
+    return { ok: false, error: "Não foi possível excluir a conta." };
   }
 
   try {
@@ -35,7 +36,7 @@ export async function excluirContaAction(confirmPhrase: string): Promise<
     }
 
     return { ok: true };
-  } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "Falha ao excluir conta" };
+  } catch {
+    return { ok: false, error: "Não foi possível excluir a conta." };
   }
 }

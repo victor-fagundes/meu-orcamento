@@ -17,10 +17,14 @@ export type CreateCartaoParsed =
     }
   | { ok: false; error: string };
 
-function optionalDay(n: number | null | undefined, label: string): { ok: true; v: number | null } | { ok: false; error: string } {
+function optionalDay(
+  n: number | null | undefined,
+  label: string,
+  max: number,
+): { ok: true; v: number | null } | { ok: false; error: string } {
   if (n == null || Number.isNaN(n as number)) return { ok: true, v: null };
   const d = Math.trunc(n);
-  if (d < 1 || d > 28) return { ok: false, error: `${label} deve ser entre 1 e 28.` };
+  if (d < 1 || d > max) return { ok: false, error: `${label} deve ser entre 1 e ${max}.` };
   return { ok: true, v: d };
 }
 
@@ -29,9 +33,9 @@ export function validateCreateCartao(input: CreateCartaoInput): CreateCartaoPars
   if (!apelido) return { ok: false, error: "Informe o apelido do cartão." };
   if (apelido.length > 60) return { ok: false, error: "Apelido muito longo." };
 
-  const fech = optionalDay(input.diaFechamento ?? null, "Dia de fechamento");
+  const fech = optionalDay(input.diaFechamento ?? null, "Dia de fechamento", 28);
   if (!fech.ok) return fech;
-  const venc = optionalDay(input.diaVencimento ?? null, "Dia de vencimento");
+  const venc = optionalDay(input.diaVencimento ?? null, "Dia de vencimento", 31);
   if (!venc.ok) return venc;
 
   let ultimos4: string | null = null;
@@ -59,4 +63,18 @@ export function isCartaoAtivo(ativo: number | boolean): boolean {
 
 export function cartaoSemFechamento(diaFechamento: number | null | undefined): boolean {
   return diaFechamento == null;
+}
+
+const AVISO_SEM_FECHAMENTO = "Sem dia de fechamento, a competência é o mês da compra.";
+
+export function textoLinhaCartao(cartao: {
+  diaFechamento: number | null;
+  diaVencimento: number | null;
+}): string {
+  if (cartao.diaFechamento == null) {
+    if (cartao.diaVencimento == null) return AVISO_SEM_FECHAMENTO;
+    return `${AVISO_SEM_FECHAMENTO} · vence dia ${cartao.diaVencimento}`;
+  }
+  if (cartao.diaVencimento == null) return `Fecha dia ${cartao.diaFechamento}`;
+  return `Fecha dia ${cartao.diaFechamento} · vence dia ${cartao.diaVencimento}`;
 }

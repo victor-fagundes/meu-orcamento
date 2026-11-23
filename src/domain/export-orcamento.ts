@@ -40,6 +40,17 @@ export type OrcamentoExport = {
   lancamentos: ExportLancamento[];
 };
 
+export const MSG_SEM_MOVIMENTO = "Não havia movimento para exportar.";
+export const MSG_ARQUIVO_INCOMPLETO = "Arquivo incompleto não é compartilhado.";
+
+export function haMovimentoParaExportar(data: {
+  itens: { planoCentavos: number[] }[];
+  lancamentos: unknown[];
+}): boolean {
+  if (data.lancamentos.length > 0) return true;
+  return data.itens.some((item) => item.planoCentavos.some((centavos) => centavos !== 0));
+}
+
 export function buildExportJson(data: Omit<OrcamentoExport, "version" | "exportedAt">): string {
   const payload: OrcamentoExport = {
     version: 1,

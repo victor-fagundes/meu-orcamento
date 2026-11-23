@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { ERRO_NOME_CATEGORIA_LINHA, ERRO_NOME_CATEGORIA_VAZIO } from "./categorias";
 import {
   isItemAtivoParaLancamento,
   normalizeItemLabel,
@@ -7,8 +8,15 @@ import {
 
 describe("validateCreateItem", () => {
   it("exige categoria e nome", () => {
-    expect(validateCreateItem({ tipo: "V", grupo: "", nome: "Netflix" }).ok).toBe(false);
+    expect(validateCreateItem({ tipo: "V", grupo: "", nome: "Netflix" })).toEqual({
+      ok: false,
+      error: ERRO_NOME_CATEGORIA_VAZIO,
+    });
     expect(validateCreateItem({ tipo: "V", grupo: "Habitação", nome: "  " }).ok).toBe(false);
+    expect(validateCreateItem({ tipo: "V", grupo: "Lazer\n", nome: "Cinema" })).toEqual({
+      ok: false,
+      error: ERRO_NOME_CATEGORIA_LINHA,
+    });
   });
 
   it("normaliza e aceita plano mensal", () => {

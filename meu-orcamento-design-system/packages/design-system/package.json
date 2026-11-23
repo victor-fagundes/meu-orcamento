@@ -1,0 +1,74 @@
+{
+  "name": "@meu-orcamento/design-system",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Design System multiplataforma (Next.js/React Web e React Native/Expo) do projeto Meu Orçamento",
+  "main": "./src/index.ts",
+  "react-native": "./src/index.native.ts",
+  "types": "./src/index.ts",
+  "sideEffects": [
+    "./src/core/tokens.css"
+  ],
+  "exports": {
+    ".": {
+      "react-native": {
+        "types": "./src/index.native.ts",
+        "default": "./src/index.native.ts"
+      },
+      "browser": {
+        "types": "./src/index.web.ts",
+        "default": "./src/index.web.ts"
+      },
+      "default": {
+        "types": "./src/index.ts",
+        "default": "./src/index.ts"
+      }
+    },
+    "./tokens": {
+      "types": "./src/core/tokens.ts",
+      "default": "./src/core/tokens.ts"
+    },
+    "./tokens.css": "./src/core/tokens.css",
+    "./formatters": {
+      "types": "./src/core/formatters.ts",
+      "default": "./src/core/formatters.ts"
+    },
+    "./icons": {
+      "types": "./src/core/icons-paths.ts",
+      "default": "./src/core/icons-paths.ts"
+    },
+    "./types": {
+      "types": "./src/core/types.ts",
+      "default": "./src/core/types.ts"
+    },
+    "./fonts/*": "./assets/fonts/*"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "peerDependencies": {
+    "react": ">=18.2.0",
+    "react-dom": ">=18.2.0",
+    "react-native": ">=0.74.0",
+    "react-native-svg": ">=15.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react-dom": {
+      "optional": true
+    },
+    "react-native": {
+      "optional": true
+    },
+    "react-native-svg": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.4"
+  }
+}

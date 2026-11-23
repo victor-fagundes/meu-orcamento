@@ -1,6 +1,8 @@
 package app.meuorcamento.ui.navigation
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Assessment
 import androidx.compose.material.icons.filled.CalendarMonth
@@ -30,7 +32,15 @@ import androidx.navigation.compose.rememberNavController
 import app.meuorcamento.AppGraph
 import app.meuorcamento.R
 import app.meuorcamento.ui.ajustes.AjustesScreen
+import app.meuorcamento.ui.ajustes.ArquivadosScreen
+import app.meuorcamento.ui.ajustes.CartoesAjusteScreen
+import app.meuorcamento.ui.ajustes.ExcluirContaScreen
+import app.meuorcamento.ui.ajustes.ExemploScreen
+import app.meuorcamento.ui.ajustes.LimitesAjusteScreen
+import app.meuorcamento.ui.ajustes.SimuladorScreen
 import app.meuorcamento.ui.ano.AnoScreen
+import app.meuorcamento.ui.corCartao
+import app.meuorcamento.ui.corDivisor
 import app.meuorcamento.ui.currentCompetencia
 import app.meuorcamento.ui.exportacao.ExportScreen
 import app.meuorcamento.ui.importacao.PdfImportScreen
@@ -59,10 +69,19 @@ fun AppNav(
     )
     val backStack by nav.currentBackStackEntryAsState()
     val current = backStack?.destination?.route
-    val ajustesSelected = current == "ajustes" ||
-        current == "import_planilha" ||
-        current == "import_pdf" ||
-        current == "export"
+    val ajustesFilhos = setOf(
+        "ajustes",
+        "import_planilha",
+        "import_pdf",
+        "export",
+        "ajustes_cartoes",
+        "ajustes_limites",
+        "ajustes_simulador",
+        "ajustes_arquivados",
+        "ajustes_exemplo",
+        "ajustes_excluir",
+    )
+    val ajustesSelected = current in ajustesFilhos
 
     fun openTab(route: String) {
         nav.navigate(route) {
@@ -74,7 +93,9 @@ fun AppNav(
 
     Scaffold(
         bottomBar = {
-            NavigationBar(containerColor = MaterialTheme.colorScheme.surfaceContainer) {
+            Column {
+            HorizontalDivider(color = corDivisor())
+            NavigationBar(containerColor = corCartao()) {
                 tabs.forEach { tab ->
                     val selected = if (tab.route == "ajustes") ajustesSelected else current == tab.route
                     NavigationBarItem(
@@ -85,13 +106,14 @@ fun AppNav(
                         alwaysShowLabel = true,
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                            selectedTextColor = MaterialTheme.colorScheme.onSurface,
+                            selectedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
                             indicatorColor = MaterialTheme.colorScheme.primaryContainer,
                             unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
                             unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
                         ),
                     )
                 }
+            }
             }
         },
     ) { padding ->
@@ -137,9 +159,39 @@ fun AppNav(
                     auth = graph.auth,
                     onUnauthorized = onUnauthorized,
                     onSignedOut = onSignedOut,
+                    onCartoes = { nav.navigate("ajustes_cartoes") },
+                    onLimites = { nav.navigate("ajustes_limites") },
                     onImportPlanilha = { nav.navigate("import_planilha") },
                     onImportPdf = { nav.navigate("import_pdf") },
                     onExport = { nav.navigate("export") },
+                    onSimulador = { nav.navigate("ajustes_simulador") },
+                    onArquivados = { nav.navigate("ajustes_arquivados") },
+                    onExemplo = { nav.navigate("ajustes_exemplo") },
+                    onExcluir = { nav.navigate("ajustes_excluir") },
+                )
+            }
+            composable("ajustes_cartoes") {
+                CartoesAjusteScreen(graph.api, onBack = { nav.popBackStack() }, onUnauthorized = onUnauthorized)
+            }
+            composable("ajustes_limites") {
+                LimitesAjusteScreen(graph.api, onBack = { nav.popBackStack() }, onUnauthorized = onUnauthorized)
+            }
+            composable("ajustes_simulador") {
+                SimuladorScreen(graph.api, onBack = { nav.popBackStack() }, onUnauthorized = onUnauthorized)
+            }
+            composable("ajustes_arquivados") {
+                ArquivadosScreen(graph.api, onBack = { nav.popBackStack() }, onUnauthorized = onUnauthorized)
+            }
+            composable("ajustes_exemplo") {
+                ExemploScreen(graph.api, onBack = { nav.popBackStack() }, onUnauthorized = onUnauthorized)
+            }
+            composable("ajustes_excluir") {
+                ExcluirContaScreen(
+                    api = graph.api,
+                    auth = graph.auth,
+                    onBack = { nav.popBackStack() },
+                    onSignedOut = onSignedOut,
+                    onUnauthorized = onUnauthorized,
                 )
             }
             composable("import_planilha") {

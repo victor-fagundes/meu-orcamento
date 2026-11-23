@@ -29,9 +29,10 @@ export async function PUT(request: Request) {
     return jsonError(400, "JSON inválido");
   }
 
-  const limites = await saveLimites(ctx.db, ctx.orcamento.id, {
+  const saved = await saveLimites(ctx.db, ctx.orcamento.id, {
     globalPct: body.globalPct ?? 80,
     cats: body.cats ?? {},
   });
-  return jsonOk({ limites });
+  if (!saved.ok) return jsonError(400, saved.error);
+  return jsonOk({ limites: saved.limites });
 }

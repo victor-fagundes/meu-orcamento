@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Sistema · Módulos</title>
+<script src="./support.js"></script>
+<style>@font-face {
+  font-family: "Manrope";
+  src: url("fonts/Manrope-VariableFont_wght.ttf") format("truetype");
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+/* Meu Orçamento · tokens v0.1 (proposta para aprovação)
+   Tema claro. Tema escuro: pendente. */
+:root {
+  /* Cor · marca */
+  --md-brand-yellow: #ffe600;
+  --md-brand-ink: #191c20;
+  --md-brand-blue: #0058be;
+
+  /* Cor · função */
+  --md-action: #0058be;
+  --md-on-action: #ffffff;
+  --md-text: #191c20;
+  --md-text-muted: #43474e;
+  --md-surface: #f8f9ff;
+  --md-card: #ffffff;
+  --md-line: #e3e6ef;
+  --md-field: #eceef6;
+  --md-selected: #d7e3ff;
+  --md-on-selected: #001b3f;
+
+  /* Cor · estado */
+  --md-success: #2e7d32;
+  --md-warn-text: #6b4b00;
+  --md-warn-bar: #9a6b00;
+  --md-warn-bg: #fff3c4;
+  --md-error: #ba1a1a;
+  --md-error-text: #410002;
+  --md-error-bg: #ffdad6;
+  --md-snackbar: #2f3033;
+  --md-snackbar-text: #f1f0f4;
+  --md-snackbar-action: #adc6ff;
+
+  /* Espaço (escala de 4) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+
+  /* Raio */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 14px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+  --radius-sheet: 28px;
+  --radius-full: 999px;
+
+  /* Elevação */
+  --elevation-0: none;
+  --elevation-1: 0 1px 2px rgba(25, 28, 32, 0.06);
+  --elevation-2: 0 8px 24px rgba(25, 28, 32, 0.16);
+  --elevation-fab: 0 4px 12px rgba(0, 88, 190, 0.3);
+
+  /* Tipo: família e escala */
+  --font-family: "Manrope", "Segoe UI", sans-serif;
+  --type-display-lg-size: 56px; --type-display-lg-line: 60px;
+  --type-display-md-size: 40px; --type-display-md-line: 44px;
+  --type-title-lg-size: 28px;   --type-title-lg-line: 32px;
+  --type-title-md-size: 20px;   --type-title-md-line: 24px;
+  --type-body-size: 16px;       --type-body-line: 24px;
+  --type-label-size: 14px;      --type-label-line: 20px;
+  --type-caption-size: 12px;    --type-caption-line: 16px;
+
+  /* Movimento */
+  --motion-fast: 150ms;
+  --motion-base: 200ms;
+  --motion-slow: 300ms;
+  --motion-easing: cubic-bezier(0.2, 0, 0, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --motion-fast: 0ms; --motion-base: 0ms; --motion-slow: 0ms; }
+}
+
+/* Estados de interação (v0.2) */
+:root {
+  --state-hover-filter: brightness(0.94);
+  --state-pressed-scale: 0.98;
+  --state-focus-width: 2px;
+  --state-focus-offset: 2px;
+  --state-disabled-opacity: 0.38;
+}
+
+/* Grid (v0.2) */
+:root {
+  --breakpoint-desktop: 720px;     /* a partir daqui: barra lateral e grid de 12 colunas */
+  --sidebar-width: 240px;
+
+  /* Celular (até 719 px): 4 colunas */
+  --grid-columns-mobile: 4;
+  --grid-margin-mobile: 16px;
+  --grid-gutter-mobile: 16px;
+
+  /* Desktop (a partir de 720 px): 12 colunas dentro da área de conteúdo */
+  --grid-columns-desktop: 12;
+  --grid-margin-desktop: 40px;
+  --grid-gutter-desktop: 24px;
+}
+</style>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width:1280px;height:800px;box-sizing:border-box;padding:24px;background:var(--md-surface);color:var(--md-text);font-family:Manrope,sans-serif;overflow:hidden">
+<div style="font-size:12px;font-weight:700;color:var(--md-text-muted);letter-spacing:.08em;margin-bottom:16px">MÓDULOS · COMPOSIÇÕES REUTILIZÁVEIS (VER MODULOS.MD)</div>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:start"><div><div style="font-size:12px;font-weight:700;color:var(--md-text-muted);letter-spacing:.08em;margin-bottom:8px">1 · Cabeçalho</div><div style="height:48px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;background:var(--md-surface);color:var(--md-text)">‹ novembro de 2026 ›</div></div><div><div style="font-size:12px;font-weight:700;color:var(--md-text-muted);letter-spacing:.08em;margin-bottom:8px">2 · Bloco de saldo</div><div style="background:var(--md-card);border-radius:20px;padding:16px;box-shadow:var(--elevation-1)"><div style="font-size:14px;font-weight:700;color:var(--md-text-muted)">Disponível neste mês</div><div style="font-size:40px;line-height:44px;font-weight:800">R$ 698,20</div><div style="font-size:12px;color:var(--md-text-muted)">Usou 87% do planejado · Faltam 13 dias</div></div></div><div><div style="font-size:12px;font-weight:700;color:var(--md-text-muted);letter-spacing:.08em;margin-bottom:8px">3 · Grade de totais</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div style="background:var(--md-card);border-radius:16px;padding:16px;box-shadow:var(--elevation-1)"><div style="font-size:12px;font-weight:700;color:var(--md-text-muted)">Receitas</div><div style="font-size:26px;font-weight:800">R$ 8.200</div><div style="font-size:12px;color:var(--md-text-muted)">de R$ 8.200 planejados</div></div><div style="background:var(--md-card);border-radius:16px;padding:16px;box-shadow:var(--elevation-1)"><div style="font-size:12px;font-weight:700;color:var(--md-text-muted)">Fixas</div><div style="font-size:26px;font-weight:800">R$ 3.590</div><div style="font-size:12px;color:var(--md-text-muted)">de R$ 3.610 planejados</div></div></div></div><div><div style="font-size:12px;font-weight:700;color:var(--md-text-muted);letter-spacing:.08em;margin-bottom:8px">4 · Grupo com medidor</div><div style="background:var(--md-card);border-radius:16px;padding:16px;box-shadow:var(--elevation-1)"><div style="display:flex;justify-content:space-between"><b>Moradia</b><span>R$ 2.100 <span style="font-size:12px;color:var(--md-text-muted)">/ R$ 2.100</span></span></div><div style="height:8px;border-radius:99px;background:var(--md-line);margin:8px 0;overflow:hidden"><i style="display:block;height:100%;width:100%;background:var(--md-action)"></i></div><div style="font-size:12px;color:var(--md-action)">No limite do planejado</div></div></div><div><div style="font-size:12px;font-weight:700;color:var(--md-text-muted);letter-spacing:.08em;margin-bottom:8px">6 · Linha de lançamento</div><div style="background:var(--md-card);border-radius:16px;padding:16px;box-shadow:var(--elevation-1)"><div style="display:flex;justify-content:space-between"><b>Supermercado</b><span>R$ 186,40</span></div><div style="font-size:12px;color:var(--md-text-muted)">12/11/2026 · Mercado · Débito</div></div></div><div><div style="font-size:12px;font-weight:700;color:var(--md-text-muted);letter-spacing:.08em;margin-bottom:8px">7 · Seletor de tipo</div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:var(--md-field);border-radius:14px;padding:4px;font-size:13px;font-weight:700;text-align:center"><span style="padding:8px 0;border-radius:10px;background:var(--md-selected);color:var(--md-on-selected)">Fixas</span><span style="padding:8px 0;color:var(--md-text-muted)">Receitas</span><span style="padding:8px 0;color:var(--md-text-muted)">Variáveis</span><span style="padding:8px 0;color:var(--md-text-muted)">Anuais</span></div></div><div><div style="font-size:12px;font-weight:700;color:var(--md-text-muted);letter-spacing:.08em;margin-bottom:8px">8 · Formulário</div><div style="background:var(--md-card);border-radius:20px;padding:16px;box-shadow:var(--elevation-1)"><label style="font-size:12px;font-weight:700">Valor (R$)</label><div style="height:52px;border-radius:14px;background:var(--md-field);box-shadow:inset 0 0 0 1.5px var(--md-error);padding:0 16px;display:flex;align-items:center">0,00</div><div style="font-size:12px;color:var(--md-error);margin-top:4px">Informe um valor maior que zero.</div><div style="margin-top:12px"><div style="display:flex;gap:8px"><div style="flex:1;height:48px;display:flex;align-items:center;justify-content:center;color:var(--md-action);font-weight:700">Cancelar</div><div style="flex:1;height:48px;border-radius:14px;background:var(--md-action);color:var(--md-on-action);font-weight:800;display:flex;align-items:center;justify-content:center">Salvar</div></div></div></div></div><div><div style="font-size:12px;font-weight:700;color:var(--md-text-muted);letter-spacing:.08em;margin-bottom:8px">9 · Rodapé de ações</div><div style="display:flex;gap:8px"><div style="flex:1;height:48px;display:flex;align-items:center;justify-content:center;color:var(--md-action);font-weight:700">Cancelar</div><div style="flex:1;height:48px;border-radius:14px;background:var(--md-action);color:var(--md-on-action);font-weight:800;display:flex;align-items:center;justify-content:center">Salvar</div></div></div><div><div style="font-size:12px;font-weight:700;color:var(--md-text-muted);letter-spacing:.08em;margin-bottom:8px">11 · Cartão de vazio</div><div style="background:var(--md-card);border-radius:16px;padding:24px;text-align:center;box-shadow:var(--elevation-1)"><b style="font-size:18px">Nenhum lançamento neste mês</b><div style="font-size:14px;color:var(--md-text-muted);margin-top:8px">Registre cada gasto para acompanhar o que já foi usado.</div></div></div><div><div style="font-size:12px;font-weight:700;color:var(--md-text-muted);letter-spacing:.08em;margin-bottom:8px">12 · Banner de estado</div><div style="display:grid;gap:8px"><div role="status" style="background:var(--md-selected);color:var(--md-on-selected);border-radius:14px;padding:12px 16px;font-size:13px">Informação</div><div role="status" style="background:var(--md-warn-bg);color:var(--md-warn-text);border-radius:14px;padding:12px 16px;font-size:13px">Atenção</div><div role="alert" style="background:var(--md-error-bg);color:var(--md-error-text);border-radius:14px;padding:12px 16px;font-size:13px">Erro</div></div></div><div><div style="font-size:12px;font-weight:700;color:var(--md-text-muted);letter-spacing:.08em;margin-bottom:8px">13 · Linha de ajuste</div><div style="background:var(--md-card);border-radius:16px;box-shadow:var(--elevation-1);overflow:hidden"><div style="padding:16px;display:flex;justify-content:space-between;align-items:center"><span style="display:flex;gap:12px;align-items:center"><svg viewBox="0 0 24 24" width="20" height="20" fill="var(--md-text-muted)" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>Conta</span><span style="color:var(--md-text-muted)">›</span></div></div></div><div><div style="font-size:12px;font-weight:700;color:var(--md-text-muted);letter-spacing:.08em;margin-bottom:8px">16 · Snackbar</div><div role="status" style="background:var(--md-snackbar);color:var(--md-snackbar-text);border-radius:14px;padding:16px 16px;display:flex;justify-content:space-between;font-size:14px"><span>Lançamento excluído.</span><b style="color:var(--md-action)">Desfazer</b></div></div></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

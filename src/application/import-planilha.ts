@@ -11,7 +11,9 @@ import {
   type ColumnMap,
   type PreviewRow,
 } from "@/domain/import-planilha";
+import { garantirCategoriaAtiva } from "@/application/categorias";
 import { zeroPlanoJson } from "@/domain/catalog";
+import { validarNomeCategoria } from "@/domain/categorias";
 import { isItemAtivoParaLancamento } from "@/domain/itens";
 import {
   assignPlanoAlvo,
@@ -92,12 +94,16 @@ async function resolveItem(
   if (found) return found.id;
 
   if (createItems) {
+    const nome = validarNomeCategoria(row.grupo);
+    if (!nome.ok) return null;
+    const categoria = await garantirCategoriaAtiva(db, orcamentoId, row.tipo, nome.nome);
+    if (!categoria.ok) return null;
     const id = crypto.randomUUID();
     await db.insert(itens).values({
       id,
       orcamentoId,
       tipo: row.tipo,
-      grupo: row.grupo,
+      grupo: nome.nome,
       nome: row.itemNome,
       planoCentavosJson: zeroPlanoJson(),
       arquivado: 0,
@@ -296,7 +302,7 @@ export async function importVfPlano(
       continue;
     }
 
-    let it = all.find(
+    const it = all.find(
       (i) =>
         isItemAtivoParaLancamento(i.arquivado) &&
         i.tipo === alvo.tipo &&
@@ -305,12 +311,22 @@ export async function importVfPlano(
     );
 
     if (!it && alvo.alvo === "outros" && opts.createItems) {
+      const nome = validarNomeCategoria(alvo.grupo);
+      if (!nome.ok) {
+        rejected += 1;
+        continue;
+      }
+      const categoria = await garantirCategoriaAtiva(db, orcamentoId, alvo.tipo, nome.nome);
+      if (!categoria.ok) {
+        rejected += 1;
+        continue;
+      }
       const id = crypto.randomUUID();
       const created = {
         id,
         orcamentoId,
         tipo: alvo.tipo,
-        grupo: alvo.grupo,
+        grupo: nome.nome,
         nome: row.nome,
         planoCentavosJson: JSON.stringify(row.plano),
         arquivado: 0,

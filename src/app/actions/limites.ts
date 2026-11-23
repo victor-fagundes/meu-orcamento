@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { saveLimites } from "@/application/limites";
+import { salvarLimiteGlobal, saveLimites } from "@/application/limites";
 import { requireSessionOrcamento } from "@/lib/session";
 
 export async function salvarLimitesAction(input: {
@@ -15,12 +15,29 @@ export async function salvarLimitesAction(input: {
       if (v == null) continue;
       cats[k] = v;
     }
-    await saveLimites(db, orcamento.id, { globalPct: input.globalPct, cats });
+    const saved = await saveLimites(db, orcamento.id, { globalPct: input.globalPct, cats });
+    if (!saved.ok) return saved;
     revalidatePath("/app/ajustes");
     revalidatePath("/app/resumo");
     revalidatePath("/app/orcamento");
     return { ok: true };
-  } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "Falha ao salvar limites" };
+  } catch {
+    return { ok: false, error: "Não foi possível salvar. Os campos continuam preenchidos." };
+  }
+}
+
+export async function salvarLimiteGlobalAction(
+  globalPct: number,
+): Promise<{ ok: true; globalPct: number } | { ok: false; error: string }> {
+  try {
+    const { db, orcamento } = await requireSessionOrcamento();
+    const saved = await salvarLimiteGlobal(db, orcamento.id, globalPct);
+    if (!saved.ok) return saved;
+    revalidatePath("/app/ajustes", "layout");
+    revalidatePath("/app/resumo");
+    revalidatePath("/app/orcamento");
+    return saved;
+  } catch {
+    return { ok: false, error: "Não foi possível salvar. Os campos continuam preenchidos." };
   }
 }

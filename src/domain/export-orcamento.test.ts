@@ -1,5 +1,35 @@
 import { describe, expect, it } from "vitest";
-import { buildExportCsv, buildExportJson } from "./export-orcamento";
+import { buildExportCsv, buildExportJson, haMovimentoParaExportar } from "./export-orcamento";
+
+const zeros = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+describe("haMovimentoParaExportar", () => {
+  it("é falso sem lançamento e com plano zerado", () => {
+    expect(
+      haMovimentoParaExportar({
+        itens: [{ planoCentavos: zeros }],
+        lancamentos: [],
+      }),
+    ).toBe(false);
+  });
+
+  it("é verdadeiro com lançamento ou com mês diferente de zero", () => {
+    expect(
+      haMovimentoParaExportar({
+        itens: [{ planoCentavos: zeros }],
+        lancamentos: [{}],
+      }),
+    ).toBe(true);
+    const plano = [...zeros];
+    plano[3] = 100;
+    expect(
+      haMovimentoParaExportar({
+        itens: [{ planoCentavos: plano }],
+        lancamentos: [],
+      }),
+    ).toBe(true);
+  });
+});
 
 describe("export orcamento", () => {
   const sample = {

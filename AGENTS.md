@@ -34,9 +34,40 @@ Cada história/card (MO-xxx) entrega **back + front juntos** na mesma entrega.
 | Decisões Q/D | `docs/DECISOES_ASSUMIDAS_v1_0.md` |
 | UX referência | `prototype/Meu_Orcamento_prototipo_v3.html` |
 
+## Identidade visual e Design System (obrigatório)
+
+Antes de qualquer tarefa que altere interface (`src/app`, `src/components`, estilos), leia:
+
+1. `docs/identidade-visual/LEIA-ME.md`: ordem de leitura e regras de aparência.
+2. `docs/identidade-visual/decisoes/`: decisões de marca, cor, layout, formulários, estados e textos.
+3. `packages/design-system/README-USO.md` e `packages/design-system/CHECKLIST.md`: como usar o DS e a checklist de revisão.
+
+Regras:
+- A **aparência** segue `docs/identidade-visual/telas-web/` (e `telas-app/` na Fase 2). Em caso de dúvida, a referência visual vence.
+- A **estrutura** (componentes, tokens, nomes) segue o DS em `packages/design-system/`. Não criar componentes de interface fora dele.
+- Nenhum valor de cor, espaço ou tipo literal em estilo. Use tokens.
+- Textos seguem `docs/identidade-visual/decisoes/MICROCOPY.md`.
+- Ao concluir uma tela, comparar com o artboard de referência correspondente (mesmo nome, prefixo `web-`) e registrar no `spec.md` qualquer diferença intencional.
+
 ## Ordem de trabalho atual
 
 Release A e Release B `verified` (PM 2026-11-16). Specs 001–022 `verified`.  
 Spec 025 `implemented` (chegar no mês). Spec 027 Android `implemented` (casca). Spec **028** `implemented`: Resumo e Orçamento no Android exibem os totais do mês calculados em `totaisDoMes`.  
-Specs **029–037** `implemented` (17 nov 2026). 029 revisa o computador. 030–036 são a casca e as telas Android. 037 fecha o GAP-007 no computador: foco ao abrir o diálogo, Arquivar nomeia o item na confirmação e região principal. O roteiro no aparelho das specs 030–036 continua em aberto. Spec **038** `implemented`: a aparência Material do Android (mês na barra, valor em display, entrada com a marca). O roteiro no aparelho da 038 continua em aberto. Falta o PM marcar `verified` (025, 027, 028, 029–037 e 038).  
+Specs **029–037** `implemented` (17 nov 2026). 029 revisa o computador. 030–036 são a casca e as telas Android. 037 fecha o GAP-007 no computador: foco ao abrir o diálogo, Arquivar nomeia o item na confirmação e região principal. O roteiro no aparelho das specs 030–036 continua em aberto. Spec **038** `implemented`: a aparência Material do Android (mês na barra, valor em display, entrada com a marca). O roteiro no aparelho da 038 continua em aberto.
+Spec **040** `Cancelled` (17 nov 2026): o PM manteve a 039. Spec **039** `implemented`: acabamento do Android segundo `prototype/2026-11-17-acabamento.html` (ícone, splash, Manrope, seis telas, menus de Ajustes com os ícones do site). O roteiro no aparelho da 039 continua em aberto. Falta o PM marcar `verified` (025, 027, 028, 029–039).  
 GAP-001…006 fechados. GAP-007 no computador está implementado na spec 037 e segue aberto até o PM marcar `verified`. No Android, o foco do sheet e o nome de Arquivar estão na spec 032.
+
+Rebuild do front web (22 nov 2026), branch `rebuild-web`. A branch `legacy-front` marca o commit anterior a este rebuild. Specs **041**, **042**, **043**, **044**, **045**, **046**, **047** e **048** `verified` (23 nov 2026): categorias, casca, Resumo, Orçamento, Lançamentos, Ano, Ajustes e Entrada. Spec **040** (DS no Next) continua `implemented`. A spec **049** está `ready`:
+
+- `specs/040-ds-integrado-next`
+- `specs/041-categorias`
+- `specs/042-shell-web`
+- `specs/043-resumo-web`
+- `specs/044-orcamento-web`
+- `specs/045-lancamentos-web`
+- `specs/046-ano-web`
+- `specs/047-ajustes-web`
+- `specs/048-entrada-web`
+- `specs/049-remocao-front-antigo`
+
+A pasta `specs/040-replicar-front-prototipo` continua Cancelled (17 nov 2026) e não é a spec 040 deste rebuild. A 048 está `verified`. A 049 pode começar. Specs 050–057 (mobile) não começam agora.

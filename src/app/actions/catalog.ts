@@ -12,7 +12,7 @@ export async function carregarExemploAction(): Promise<{ ok: true; updated: numb
     revalidatePath("/app/ajustes");
     revalidatePath("/app/resumo");
     return { ok: true, updated };
-  } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "Falha ao carregar exemplo" };
+  } catch {
+    return { ok: false, error: "Não foi possível aplicar o exemplo." };
   }
 }

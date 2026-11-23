@@ -4,6 +4,9 @@ import { cartoes, itens, lancamentos } from "@/db/schema";
 import {
   buildExportCsv,
   buildExportJson,
+  haMovimentoParaExportar,
+  MSG_ARQUIVO_INCOMPLETO,
+  MSG_SEM_MOVIMENTO,
   type ExportCartao,
   type ExportItem,
   type ExportLancamento,
@@ -54,10 +57,30 @@ async function loadExportData(db: Db, orcamentoId: string) {
   return { itens: exportItens, cartoes: exportCartoes, lancamentos: exportLanc };
 }
 
-export async function exportOrcamentoJson(db: Db, orcamentoId: string): Promise<string> {
-  return buildExportJson(await loadExportData(db, orcamentoId));
+export type ExportArquivo =
+  | { ok: true; content: string }
+  | { ok: false; error: string };
+
+async function exportar(
+  db: Db,
+  orcamentoId: string,
+  build: (data: Awaited<ReturnType<typeof loadExportData>>) => string,
+): Promise<ExportArquivo> {
+  const data = await loadExportData(db, orcamentoId);
+  if (!haMovimentoParaExportar(data)) {
+    return { ok: false, error: MSG_SEM_MOVIMENTO };
+  }
+  try {
+    return { ok: true, content: build(data) };
+  } catch {
+    return { ok: false, error: MSG_ARQUIVO_INCOMPLETO };
+  }
 }
 
-export async function exportOrcamentoCsv(db: Db, orcamentoId: string): Promise<string> {
-  return buildExportCsv(await loadExportData(db, orcamentoId));
+export async function exportOrcamentoJson(db: Db, orcamentoId: string): Promise<ExportArquivo> {
+  return exportar(db, orcamentoId, buildExportJson);
+}
+
+export async function exportOrcamentoCsv(db: Db, orcamentoId: string): Promise<ExportArquivo> {
+  return exportar(db, orcamentoId, buildExportCsv);
 }

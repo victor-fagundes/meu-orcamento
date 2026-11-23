@@ -1,5 +1,6 @@
 import type { TipoOrcamento } from "./catalog";
 import { planoJsonFromBRL, zeroPlanoJson } from "./catalog";
+import { validarNomeCategoria } from "./categorias";
 
 export type CreateItemInput = {
   tipo: TipoOrcamento;
@@ -23,11 +24,12 @@ export function validateCreateItem(input: CreateItemInput): CreateItemResult {
   if (!TIPOS.includes(input.tipo)) {
     return { ok: false, error: "Tipo inválido." };
   }
-  const grupo = normalizeItemLabel(input.grupo);
+  const grupoValidado = validarNomeCategoria(input.grupo);
+  if (!grupoValidado.ok) return grupoValidado;
+  const grupo = grupoValidado.nome;
   const nome = normalizeItemLabel(input.nome);
-  if (!grupo) return { ok: false, error: "Informe a categoria." };
   if (!nome) return { ok: false, error: "Informe o nome do item." };
-  if (grupo.length > 80 || nome.length > 80) {
+  if (nome.length > 80) {
     return { ok: false, error: "Categoria ou nome muito longo." };
   }
 

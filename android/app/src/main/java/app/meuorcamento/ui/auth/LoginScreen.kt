@@ -11,8 +11,8 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -20,16 +20,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import app.meuorcamento.BuildConfig
 import app.meuorcamento.data.ApiException
 import app.meuorcamento.data.AuthRepository
+import app.meuorcamento.ui.BotaoCheio
+import app.meuorcamento.ui.Campo
 import app.meuorcamento.ui.OfflineBanner
-import app.meuorcamento.ui.components.BotaoPrimario
-import app.meuorcamento.ui.components.BotaoTexto
-import app.meuorcamento.ui.copy.Strings
+import app.meuorcamento.ui.theme.AzulAcao
 import app.meuorcamento.ui.theme.Marca
 import kotlinx.coroutines.launch
 import java.io.IOException
@@ -57,37 +59,37 @@ fun LoginScreen(
             .navigationBarsPadding()
             .padding(horizontal = 24.dp, vertical = 32.dp),
     ) {
-        Marca()
+        Marca(tamanho = 56.dp)
         Text(
-            Strings.appNome,
+            "Meu Orçamento",
             style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.padding(top = 12.dp, bottom = 24.dp),
+            letterSpacing = (-0.03).em,
+            modifier = Modifier.padding(top = 16.dp),
         )
+        if (!signUpMode) {
+            Text(
+                "O que ainda cabe neste mês.",
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 6.dp, bottom = 8.dp),
+            )
+        } else {
+            Spacer(Modifier.height(20.dp))
+        }
         OfflineBanner(offline, error)
 
         if (signUpMode) {
-            OutlinedTextField(
-                value = name,
-                onValueChange = { name = it },
-                label = { Text("Nome") },
-                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                singleLine = true,
-            )
+            Campo(rotulo = "Nome", value = name, onValueChange = { name = it })
         }
-        OutlinedTextField(
+        Campo(
+            rotulo = "E-mail",
             value = email,
             onValueChange = { email = it },
-            label = { Text(Strings.email) },
-            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-            singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
         )
-        OutlinedTextField(
+        Campo(
+            rotulo = "Senha",
             value = password,
             onValueChange = { password = it },
-            label = { Text(Strings.senha) },
-            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-            singleLine = true,
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         )
@@ -100,12 +102,13 @@ fun LoginScreen(
         if (loading) {
             CircularProgressIndicator()
         } else {
-            BotaoPrimario(
-                text = if (signUpMode) Strings.criarConta else "Entrar",
+            BotaoCheio(
+                texto = if (signUpMode) "Cadastrar" else "Entrar",
+                modifier = Modifier.padding(top = 20.dp),
                 onClick = {
                     if (isReleaseProd && email.trim().equals("demo@local.test", ignoreCase = true)) {
-                        error = Strings.useContaProducao
-                        return@BotaoPrimario
+                        error = "Use sua conta de produção."
+                        return@BotaoCheio
                     }
                     scope.launch {
                         loading = true
@@ -123,17 +126,20 @@ fun LoginScreen(
                             error = e.message ?: "Falha ao autenticar"
                         } catch (e: IOException) {
                             offline = true
-                            error = e.message ?: Strings.semConexao
+                            error = e.message ?: "Sem conexão"
                         } finally {
                             loading = false
                         }
                     }
                 },
             )
-            BotaoTexto(
-                text = if (signUpMode) Strings.jaTenhoConta else Strings.criarConta,
-                onClick = { signUpMode = !signUpMode; error = null },
-            )
+            TextButton(onClick = { signUpMode = !signUpMode; error = null }, modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    if (signUpMode) "Já tenho conta" else "Criar conta",
+                    color = AzulAcao,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
         }
     }
 }

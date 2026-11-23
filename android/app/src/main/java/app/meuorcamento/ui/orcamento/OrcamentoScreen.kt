@@ -1,23 +1,26 @@
 package app.meuorcamento.ui.orcamento
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -33,20 +36,27 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.isSystemInDarkTheme
 import app.meuorcamento.data.ApiClient
 import app.meuorcamento.data.ApiException
 import app.meuorcamento.domain.formatCentavos
+import app.meuorcamento.ui.Campo
 import app.meuorcamento.ui.CompetenciaPicker
+import app.meuorcamento.ui.rotuloMesCivil
 import app.meuorcamento.ui.OfflineBanner
-import app.meuorcamento.ui.components.BotaoPrimario
-import app.meuorcamento.ui.components.BotaoTexto
-import app.meuorcamento.ui.copy.Strings
+import app.meuorcamento.ui.Rotulo
+import app.meuorcamento.ui.cartao
+import app.meuorcamento.ui.corCampo
+import app.meuorcamento.ui.corDivisor
+import app.meuorcamento.ui.corTrilha
 import app.meuorcamento.ui.reaisParaCentavos
 import app.meuorcamento.ui.resumo.ResumoItemDto
 import app.meuorcamento.ui.resumo.ResumoResponse
@@ -55,25 +65,14 @@ import app.meuorcamento.ui.resumo.labelChip
 import app.meuorcamento.ui.resumo.labelTipo
 import app.meuorcamento.ui.theme.AzulAcao
 import app.meuorcamento.ui.theme.ValorDisplay
-import app.meuorcamento.ui.theme.aviso
+import app.meuorcamento.ui.theme.corMedidor
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import java.io.IOException
 
 private val TIPOS = listOf("R", "F", "V", "E")
-private val ERRO = Color(0xFFBA1A1A)
 private val CantoPainel = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)
-
-private fun corBarra(plano: Long, realizado: Long, escuro: Boolean): Color {
-    if (plano <= 0) return aviso(escuro)
-    val pct = realizado.toDouble() / plano.toDouble()
-    return when {
-        pct > 1.0 -> ERRO
-        pct >= 0.8 -> aviso(escuro)
-        else -> AzulAcao
-    }
-}
 
 @Serializable
 private data class PlanoItemDto(
@@ -156,34 +155,43 @@ fun OrcamentoScreen(
         CompetenciaPicker(competencia, onCompetencia)
         Column(Modifier.padding(horizontal = 16.dp)) {
             OfflineBanner(offline || error != null, error)
-            Row(Modifier.horizontalScroll(rememberScrollState())) {
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(corCampo())
+                    .padding(4.dp),
+            ) {
                 TIPOS.forEach { code ->
-                    FilterChip(
-                        selected = tipo == code,
-                        onClick = { onTipo(code) },
-                        label = { Text(labelChip(code)) },
-                        modifier = Modifier.padding(end = 8.dp),
-                        colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                            selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                        ),
+                    val ativo = tipo == code
+                    Text(
+                        labelChip(code),
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(if (ativo) MaterialTheme.colorScheme.primaryContainer else Color.Transparent)
+                            .clickable { onTipo(code) }
+                            .padding(vertical = 8.dp),
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.Bold,
+                        color = if (ativo) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             }
         }
         when {
             loading && totais == null -> CircularProgressIndicator(Modifier.padding(24.dp))
-            totais == null -> Text(Strings.erroCarregarOrcamento, modifier = Modifier.padding(horizontal = 16.dp))
+            totais == null -> Text("Não foi possível carregar o orçamento.", modifier = Modifier.padding(horizontal = 16.dp))
             else -> {
                 val cabe = (linha?.planoCentavos ?: 0) - (linha?.realizadoCentavos ?: 0)
                 Column(Modifier.padding(horizontal = 16.dp)) {
-                    Text("${Strings.aindaCabeEm} ${labelTipo(tipo).lowercase()}", modifier = Modifier.padding(top = 12.dp))
+                    Rotulo("Ainda cabe em ${labelTipo(tipo).lowercase()}", modifier = Modifier.padding(top = 12.dp))
                     Text(
                         formatCentavos(cabe),
                         style = ValorDisplay,
                         color = if (cabe < 0) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
                     )
-                    BotaoTexto(text = Strings.novoItem, onClick = { novoAberto = true })
+                    TextButton(onClick = { novoAberto = true }) { Text("Novo item") }
                 }
                 LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp)) {
                     items(comMovimento, key = { "${it.tipo}-${it.grupo}" }) { grupo ->
@@ -294,8 +302,8 @@ private fun GrupoBloco(
 ) {
     val doGrupo = itens.filter { it.tipo == grupo.tipo && it.grupo == grupo.grupo }
     val escuro = isSystemInDarkTheme()
-    val cor = corBarra(grupo.planoCentavos, grupo.realizadoCentavos, escuro)
-    Column(Modifier.padding(vertical = 8.dp)) {
+    val cor = corMedidor(grupo.planoCentavos, grupo.realizadoCentavos, escuro)
+    Column(Modifier.padding(top = 8.dp).cartao().padding(horizontal = 14.dp, vertical = 12.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 grupo.grupo,
@@ -317,7 +325,7 @@ private fun GrupoBloco(
             else -> MaterialTheme.colorScheme.onSurfaceVariant
         }
         Text(
-            grupo.frase.ifBlank { "${Strings.plano} ${formatCentavos(grupo.planoCentavos)} · ${Strings.realizado} ${formatCentavos(grupo.realizadoCentavos)}" },
+            grupo.frase.ifBlank { "planejado ${formatCentavos(grupo.planoCentavos)} · realizado ${formatCentavos(grupo.realizadoCentavos)}" },
             color = fraseCor,
         )
         if (grupo.planoCentavos > 0 || grupo.realizadoCentavos > 0) {
@@ -325,9 +333,9 @@ private fun GrupoBloco(
             else (grupo.realizadoCentavos.toFloat() / grupo.planoCentavos.toFloat()).coerceIn(0f, 1f)
             LinearProgressIndicator(
                 progress = { frac },
-                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp).height(4.dp),
+                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp).height(8.dp).clip(RoundedCornerShape(99.dp)),
                 color = cor,
-                trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                trackColor = corTrilha(),
             )
         }
         doGrupo.forEach { item ->
@@ -336,18 +344,17 @@ private fun GrupoBloco(
                 Column(Modifier.weight(1f).clickable { onEdit(item) }) {
                     Text(item.nome, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     Text(
-                        "${Strings.realizado} ${formatCentavos(realizado)} · ${Strings.plano} ${formatCentavos(item.planoMesCentavos)}",
+                        "realizado ${formatCentavos(realizado)} · plano ${formatCentavos(item.planoMesCentavos)}",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
                 val armed = armedId == item.id
-                BotaoTexto(
-                    text = if (armed) "${Strings.confirmarArquivar} ${item.nome}" else "${Strings.arquivar} ${item.nome}",
-                    onClick = {
-                        if (armed) onArchive(item.id) else onArm(item.id)
-                    },
-                )
+                TextButton(onClick = {
+                    if (armed) onArchive(item.id) else onArm(item.id)
+                }) {
+                    Text(if (armed) "Confirmar arquivar ${item.nome}" else "Arquivar ${item.nome}")
+                }
             }
         }
     }
@@ -390,42 +397,54 @@ private fun PlanoMesSheet(
 
     ModalBottomSheet(onDismissRequest = onClose, shape = CantoPainel) {
         Column(Modifier.padding(16.dp)) {
+            Box(
+                Modifier
+                    .padding(bottom = 12.dp)
+                    .size(width = 32.dp, height = 4.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(corDivisor())
+                    .align(Alignment.CenterHorizontally),
+            )
             Text(item.nome, style = MaterialTheme.typography.titleLarge)
-            OutlinedTextField(
+            Campo(
+                rotulo = rotuloMesCivil(competencia).substringBefore(" ").replaceFirstChar { it.titlecase() },
                 value = texto,
                 onValueChange = { texto = it },
-                label = { Text("Valor do mês") },
-                modifier = Modifier.fillMaxWidth().focusRequester(focus).padding(vertical = 8.dp),
+                modifier = Modifier.focusRequester(focus),
             )
             aviso?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-            Row {
-                BotaoTexto(text = Strings.cancelar, onClick = onClose)
-                BotaoPrimario(
-                    text = Strings.salvar,
+            Row(Modifier.padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                TextButton(onClick = onClose, modifier = Modifier.weight(1f).heightIn(min = 44.dp)) {
+                    Text("Cancelar", color = AzulAcao, fontWeight = FontWeight.Bold)
+                }
+                Button(
                     onClick = {
-                        val cents = reaisParaCentavos(texto, permitirZero = true)
-                        if (cents == null) {
-                            aviso = "Informe um valor em reais, como 10,50."
-                            return@BotaoPrimario
+                    val cents = reaisParaCentavos(texto, permitirZero = true)
+                    if (cents == null) {
+                        aviso = "Informe um valor em reais, como 10,50."
+                        return@Button
+                    }
+                    val next = meses.toMutableList()
+                    while (next.size < 12) next.add(0L)
+                    next[mes] = cents
+                    scope.launch {
+                        try {
+                            api.putJson(
+                                "/api/v1/plano",
+                                api.json.encodeToString(PlanoPutBody(item.id, next.take(12))),
+                            )
+                            onSaved()
+                        } catch (e: ApiException) {
+                            if (e.status == 401) onUnauthorized() else aviso = e.message
+                        } catch (e: Exception) {
+                            aviso = e.message
                         }
-                        val next = meses.toMutableList()
-                        while (next.size < 12) next.add(0L)
-                        next[mes] = cents
-                        scope.launch {
-                            try {
-                                api.putJson(
-                                    "/api/v1/plano",
-                                    api.json.encodeToString(PlanoPutBody(item.id, next.take(12))),
-                                )
-                                onSaved()
-                            } catch (e: ApiException) {
-                                if (e.status == 401) onUnauthorized() else aviso = e.message
-                            } catch (e: Exception) {
-                                aviso = e.message
-                            }
-                        }
+                    }
                     },
-                )
+                    modifier = Modifier.weight(1f).heightIn(min = 52.dp),
+                    shape = RoundedCornerShape(14.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = AzulAcao, contentColor = Color.White),
+                ) { Text("Salvar", fontWeight = FontWeight.ExtraBold) }
             }
             Box(Modifier.height(24.dp))
         }
@@ -446,32 +465,37 @@ private fun NovoItemSheet(
     LaunchedEffect(Unit) { focus.requestFocus() }
     ModalBottomSheet(onDismissRequest = onClose, shape = CantoPainel) {
         Column(Modifier.padding(16.dp)) {
-            Text("${Strings.novoItem} · ${labelTipo(tipo)}", style = MaterialTheme.typography.titleLarge)
+            Box(
+                Modifier
+                    .padding(bottom = 12.dp)
+                    .size(width = 32.dp, height = 4.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(corDivisor())
+                    .align(Alignment.CenterHorizontally),
+            )
+            Text("Novo item · ${labelTipo(tipo)}", style = MaterialTheme.typography.titleLarge)
             OutlinedTextField(
                 value = nome,
                 onValueChange = { nome = it },
-                label = { Text(Strings.nomeDoItem) },
+                label = { Text("Nome do item") },
                 modifier = Modifier.fillMaxWidth().focusRequester(focus),
             )
             OutlinedTextField(
                 value = grupo,
                 onValueChange = { grupo = it },
-                label = { Text(Strings.grupo) },
+                label = { Text("Grupo") },
                 modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
             )
             aviso?.let { Text(it, color = MaterialTheme.colorScheme.error) }
             Row {
-                BotaoTexto(text = Strings.cancelar, onClick = onClose)
-                BotaoPrimario(
-                    text = Strings.salvar,
-                    onClick = {
-                        if (nome.isBlank()) {
-                            aviso = "Informe o nome do item."
-                            return@BotaoPrimario
-                        }
-                        onSave(nome, grupo)
-                    },
-                )
+                TextButton(onClick = onClose) { Text("Cancelar") }
+                Button(onClick = {
+                    if (nome.isBlank()) {
+                        aviso = "Informe o nome do item."
+                        return@Button
+                    }
+                    onSave(nome, grupo)
+                }) { Text("Salvar") }
             }
             Box(Modifier.height(24.dp))
         }

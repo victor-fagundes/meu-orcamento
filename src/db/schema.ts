@@ -1,9 +1,12 @@
+import { sql } from "drizzle-orm";
 import {
   boolean,
+  check,
   integer,
   pgTable,
   text,
   timestamp,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 
 /**
@@ -70,6 +73,28 @@ export const orcamentos = pgTable("orcamentos", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+/** Categorias — spec 041. `itens.grupo` continua o nome que liga o item. */
+export const categorias = pgTable(
+  "categorias",
+  {
+    id: text("id").primaryKey(),
+    orcamentoId: text("orcamento_id")
+      .notNull()
+      .references(() => orcamentos.id, { onDelete: "cascade" }),
+    tipo: text("tipo").notNull(),
+    nome: text("nome").notNull(),
+    arquivada: boolean("arquivada").notNull().default(false),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    uniqueIndex("categorias_nome_ativo")
+      .on(t.orcamentoId, t.tipo, sql`lower(${t.nome})`)
+      .where(sql`${t.arquivada} = false`),
+    check("categorias_tipo_check", sql`${t.tipo} in ('R', 'F', 'V', 'E')`),
+  ],
+);
 
 /** Itens — Sprint 2; plano em centavos (integer). */
 export const itens = pgTable("itens", {

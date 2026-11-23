@@ -4,10 +4,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DropdownMenuItem
@@ -35,13 +38,13 @@ import androidx.compose.ui.unit.dp
 import app.meuorcamento.data.ApiClient
 import app.meuorcamento.data.ApiException
 import app.meuorcamento.domain.formatCentavos
+import app.meuorcamento.ui.BotaoCheio
 import app.meuorcamento.ui.CompetenciaPicker
+import app.meuorcamento.ui.LinhaValor
+import app.meuorcamento.ui.ListaCartao
 import app.meuorcamento.ui.OfflineBanner
-import app.meuorcamento.ui.components.BotaoPerigo
-import app.meuorcamento.ui.components.BotaoPrimario
-import app.meuorcamento.ui.components.BotaoTexto
-import app.meuorcamento.ui.components.EmptyState
-import app.meuorcamento.ui.copy.Strings
+import app.meuorcamento.ui.corDivisor
+import app.meuorcamento.ui.theme.AzulAcao
 import app.meuorcamento.ui.reaisParaCentavos
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -80,7 +83,12 @@ data class ItemDto(val id: String, val nome: String, val tipo: String, val grupo
 data class CartoesResponse(val cartoes: List<CartaoDto> = emptyList())
 
 @Serializable
-data class CartaoDto(val id: String, val apelido: String, val ativo: Boolean = true)
+data class CartaoDto(
+    val id: String,
+    val apelido: String,
+    val ativo: Boolean = true,
+    val diaFechamento: Int? = null,
+)
 
 @Serializable
 data class CreateLancBody(
@@ -105,10 +113,10 @@ data class PatchLancBody(
 private data class PagamentoOpcao(val id: String, val rotulo: String)
 
 private fun rotuloMeio(row: LancDto): String = when (row.meio) {
-    "deb" -> Strings.debito
-    "pix" -> Strings.pix
-    "din" -> Strings.dinheiro
-    "cartao" -> row.cartaoApelido ?: Strings.cartao
+    "deb" -> "Débito"
+    "pix" -> "PIX"
+    "din" -> "Dinheiro"
+    "cartao" -> row.cartaoApelido ?: "Cartão"
     else -> row.meio
 }
 
@@ -166,15 +174,6 @@ fun LancamentosScreen(
         CompetenciaPicker(competencia, onCompetencia)
         Column(Modifier.padding(horizontal = 16.dp)) {
             OfflineBanner(offline || error != null, error)
-            if (loaded && rows.isNotEmpty()) {
-                BotaoPrimario(
-                    text = Strings.registrar,
-                    onClick = {
-                        editing = null
-                        showForm = true
-                    },
-                )
-            }
         }
 
         if (showForm) {
@@ -188,7 +187,7 @@ fun LancamentosScreen(
                 onSave = { item, valorTexto, dataISO, descricao, pagamento, parcelas, editScope ->
                     val cents = reaisParaCentavos(valorTexto)
                     if (cents == null) {
-                        error = Strings.informeValorMaiorZero
+                        error = "Informe um valor maior que zero, como 10,50."
                         return@LancamentoForm
                     }
                     scope.launch {
@@ -238,44 +237,46 @@ fun LancamentosScreen(
             }
         }
 
-        if (loaded && rows.isEmpty() && error == null && !showForm) {
-            EmptyState(mensagem = Strings.nenhumLancamento)
-            BotaoPrimario(
-                text = Strings.registrar,
-                onClick = { editing = null; showForm = true },
-                modifier = Modifier.padding(horizontal = 16.dp),
-            )
-        }
-
-        LazyColumn(Modifier.weight(1f)) {
-            items(rows, key = { it.id }) { row ->
-                val titulo = row.descricao?.takeIf { it.isNotBlank() } ?: (row.itemNome ?: "Lançamento")
-                Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            titulo,
-                            modifier = Modifier.weight(1f),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
+        Column(
+            Modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp),
+        ) {
+            if (loaded && rows.isEmpty() && error == null && !showForm) {
+                Text("Não há lançamentos neste mês.", modifier = Modifier.padding(top = 16.dp))
+            }
+            if (rows.isNotEmpty()) {
+                ListaCartao {
+                    rows.forEachIndexed { index, row ->
+                        val titulo = row.descricao?.takeIf { it.isNotBlank() } ?: (row.itemNome ?: "Lançamento")
+                        LinhaValor(
+                            nome = titulo,
+                            valor = formatCentavos(row.valorCentavos),
+                            detalhe = "${dataVisivel(row.dataTransacao)} · ${row.itemNome ?: "item"} · ${rotuloMeio(row)}",
                         )
-                        Text(formatCentavos(row.valorCentavos), maxLines = 1, softWrap = false)
+                        RowActions(
+                            onEdit = {
+                                editing = row
+                                showForm = true
+                            },
+                            onDelete = {
+                                pendingDelete = row
+                                scopeChoice = "one"
+                            },
+                        )
+                        if (index < rows.lastIndex) {
+                            HorizontalDivider(color = corDivisor())
+                        }
                     }
-                    Text(
-                        "${dataVisivel(row.dataTransacao)} · ${row.itemNome ?: Strings.item} · ${rotuloMeio(row)}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    RowActions(
-                        onEdit = {
-                            editing = row
-                            showForm = true
-                        },
-                        onDelete = {
-                            pendingDelete = row
-                            scopeChoice = "one"
-                        },
-                    )
                 }
+            }
+            if (loaded && !showForm && error == null) {
+                BotaoCheio(
+                    "Registrar",
+                    onClick = { editing = null; showForm = true },
+                    modifier = Modifier.padding(top = 20.dp, bottom = 16.dp),
+                )
             }
         }
     }
@@ -283,13 +284,13 @@ fun LancamentosScreen(
     pendingDelete?.let { row ->
         AlertDialog(
             onDismissRequest = { pendingDelete = null },
-            title = { Text(Strings.excluirLancamento) },
+            title = { Text("Excluir lançamento") },
             text = {
                 Column {
-                    Text("Excluir ${formatCentavos(row.valorCentavos)} de ${row.itemNome ?: Strings.item}? Não há como desfazer.")
+                    Text("Excluir ${formatCentavos(row.valorCentavos)} de ${row.itemNome ?: "item"}? Não há como desfazer.")
                     if (row.grupoParcelaId != null) {
                         Text("Este lançamento faz parte de um parcelamento.", modifier = Modifier.padding(top = 8.dp))
-                        listOf("one" to Strings.soEstaParcela, "future" to Strings.estaEAsProximas, "all" to "Todas do grupo").forEach { (id, rotulo) ->
+                        listOf("one" to "Só esta parcela", "future" to "Esta e as próximas", "all" to "Todas do grupo").forEach { (id, rotulo) ->
                             TextButton(onClick = { scopeChoice = id }) {
                                 Text(if (scopeChoice == id) "● $rotulo" else rotulo)
                             }
@@ -298,26 +299,23 @@ fun LancamentosScreen(
                 }
             },
             confirmButton = {
-                BotaoPerigo(
-                    text = Strings.excluir,
-                    onClick = {
-                        val alvo = row
-                        val chosen = scopeChoice
-                        pendingDelete = null
-                        scope.launch {
-                            try {
-                                val escopo = if (alvo.grupoParcelaId != null) chosen else "one"
-                                api.delete("/api/v1/lancamentos/${alvo.id}?scope=$escopo")
-                                reload()
-                            } catch (e: Exception) {
-                                error = e.message
-                            }
+                TextButton(onClick = {
+                    val alvo = row
+                    val chosen = scopeChoice
+                    pendingDelete = null
+                    scope.launch {
+                        try {
+                            val escopo = if (alvo.grupoParcelaId != null) chosen else "one"
+                            api.delete("/api/v1/lancamentos/${alvo.id}?scope=$escopo")
+                            reload()
+                        } catch (e: Exception) {
+                            error = e.message
                         }
-                    },
-                )
+                    }
+                }) { Text("Excluir") }
             },
             dismissButton = {
-                TextButton(onClick = { pendingDelete = null }) { Text(Strings.cancelar) }
+                TextButton(onClick = { pendingDelete = null }) { Text("Cancelar") }
             },
         )
     }
@@ -325,9 +323,9 @@ fun LancamentosScreen(
 
 @Composable
 private fun RowActions(onEdit: () -> Unit, onDelete: () -> Unit) {
-    Row {
-        BotaoTexto(text = Strings.corrigir, onClick = onEdit)
-        BotaoTexto(text = Strings.excluir, onClick = onDelete, perigoso = true)
+    Row(Modifier.padding(start = 14.dp, end = 14.dp, bottom = 8.dp)) {
+        Text("Corrigir", color = AzulAcao, modifier = Modifier.clickable(onClick = onEdit))
+        Text("Excluir", color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(start = 16.dp).clickable(onClick = onDelete))
     }
 }
 
@@ -364,21 +362,21 @@ private fun LancamentoForm(
     val dateState = rememberDatePickerState()
     val focus = remember { FocusRequester() }
     val opcoes = buildList {
-        add(PagamentoOpcao("deb", Strings.debito))
-        add(PagamentoOpcao("pix", Strings.pix))
-        add(PagamentoOpcao("din", Strings.dinheiro))
+        add(PagamentoOpcao("deb", "Débito"))
+        add(PagamentoOpcao("pix", "PIX"))
+        add(PagamentoOpcao("din", "Dinheiro"))
         cartoes.forEach { add(PagamentoOpcao(it.id, it.apelido)) }
     }
-    val rotuloPagamento = opcoes.find { it.id == pagamento }?.rotulo ?: Strings.pix
+    val rotuloPagamento = opcoes.find { it.id == pagamento }?.rotulo ?: "PIX"
 
     LaunchedEffect(editing?.id) { focus.requestFocus() }
 
     ExposedDropdownMenuBox(expanded = itemExpanded, onExpandedChange = { itemExpanded = it }) {
         OutlinedTextField(
-            value = selectedItem?.nome ?: Strings.item,
+            value = selectedItem?.nome ?: "Item",
             onValueChange = {},
             readOnly = true,
-            label = { Text(Strings.item) },
+            label = { Text("Item") },
             modifier = Modifier.menuAnchor().fillMaxWidth().padding(vertical = 4.dp),
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(itemExpanded) },
         )
@@ -394,14 +392,14 @@ private fun LancamentoForm(
     OutlinedTextField(
         value = valorTexto,
         onValueChange = { valorTexto = it },
-        label = { Text(Strings.valorReais) },
+        label = { Text("Valor (R$)") },
         modifier = Modifier.fillMaxWidth().focusRequester(focus),
     )
-    TextButton(onClick = { showDate = true }) { Text("${Strings.data} ${dataVisivel(dataISO)}") }
+    TextButton(onClick = { showDate = true }) { Text("Data ${dataVisivel(dataISO)}") }
     OutlinedTextField(
         value = descricao,
         onValueChange = { descricao = it },
-        label = { Text(Strings.descricao) },
+        label = { Text("Descrição") },
         modifier = Modifier.fillMaxWidth(),
     )
     ExposedDropdownMenuBox(expanded = payExpanded, onExpandedChange = { payExpanded = it }) {
@@ -409,7 +407,7 @@ private fun LancamentoForm(
             value = rotuloPagamento,
             onValueChange = {},
             readOnly = true,
-            label = { Text(Strings.pagamento) },
+            label = { Text("Pagamento") },
             modifier = Modifier.menuAnchor().fillMaxWidth().padding(vertical = 4.dp),
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(payExpanded) },
         )
@@ -426,29 +424,28 @@ private fun LancamentoForm(
         OutlinedTextField(
             value = parcelasTexto,
             onValueChange = { parcelasTexto = it.filter(Char::isDigit) },
-            label = { Text(Strings.parcelasOpcional) },
+            label = { Text("Parcelas (opcional)") },
             modifier = Modifier.fillMaxWidth(),
         )
     }
     if (editing?.grupoParcelaId != null) {
-        Text(Strings.escopoCorrecao, modifier = Modifier.padding(top = 8.dp))
-        listOf("one" to Strings.soEstaParcela, "future" to Strings.estaEAsProximas).forEach { (id, rotulo) ->
+        Text("Escopo da correção", modifier = Modifier.padding(top = 8.dp))
+        listOf("one" to "Só esta parcela", "future" to "Esta e as próximas").forEach { (id, rotulo) ->
             TextButton(onClick = { editScope = id }) {
                 Text(if (editScope == id) "● $rotulo" else rotulo)
             }
         }
     }
-    Row {
-        BotaoTexto(text = Strings.cancelar, onClick = onCancel)
-        BotaoPrimario(
-            text = Strings.salvar,
+    androidx.compose.foundation.layout.Row {
+        TextButton(onClick = onCancel) { Text("Cancelar") }
+        Button(
             onClick = {
-                val item = selectedItem ?: return@BotaoPrimario
+                val item = selectedItem ?: return@Button
                 val parcelas = parcelasTexto.toIntOrNull()?.takeIf { it >= 2 }
                 onSave(item, valorTexto, dataISO, descricao, pagamento, parcelas, editScope)
             },
             modifier = Modifier.padding(top = 8.dp),
-        )
+        ) { Text("Salvar") }
     }
 
     if (showDate) {
@@ -469,7 +466,7 @@ private fun LancamentoForm(
                     showDate = false
                 }) { Text("Ok") }
             },
-            dismissButton = { TextButton(onClick = { showDate = false }) { Text(Strings.cancelar) } },
+            dismissButton = { TextButton(onClick = { showDate = false }) { Text("Cancelar") } },
         ) { DatePicker(state = dateState) }
     }
 }

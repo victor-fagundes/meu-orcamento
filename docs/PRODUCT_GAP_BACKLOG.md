@@ -2,7 +2,7 @@
 
 **Date**: 2026-11-16  
 **Inventory**: [SPEC_INVENTORY.md](./SPEC_INVENTORY.md)  
-**Status**: specs 001–022 `verified` — próxima fatia ainda não confirmada  
+**Status**: specs 001–022 `verified`. Em 23 nov 2026 também 041–046. Próxima fatia web: 047 e 048 (`ready`). A 049 espera essas duas.  
 **Feature**: `022-item-unico`
 
 ## Depth policy
