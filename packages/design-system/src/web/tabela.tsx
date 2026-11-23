@@ -22,8 +22,17 @@ export function Tabela({ caption, colunas, linhas, selecionadaId, onSelecionar }
           return (
             <tr
               key={linha.id}
+              id={seleciona ? `lancamento-${linha.id}` : undefined}
+              tabIndex={seleciona ? 0 : undefined}
+              aria-label={linha.nomeAcao}
               aria-selected={selecionadaId !== undefined ? selecionada : undefined}
               onClick={seleciona ? () => onSelecionar(linha.id) : undefined}
+              onKeyDown={seleciona ? (evento) => {
+                if (evento.key === 'Enter' || evento.key === ' ') {
+                  evento.preventDefault();
+                  onSelecionar(linha.id);
+                }
+              } : undefined}
             >
               {colunas.map((coluna) => (
                 <td key={coluna.id} className={coluna.tipo === 'numero' ? 'mo-tabela__numero' : undefined}>

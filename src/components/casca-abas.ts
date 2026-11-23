@@ -3,7 +3,7 @@ import { labelCompetencia, shiftCompetencia } from "@/lib/competencia-nav";
 export const AREAS = [
   { id: "resumo", rotulo: "Resumo", endereco: "/app/resumo", icone: "dashboard", pedeMes: true },
   { id: "orcamento", rotulo: "Orçamento", endereco: "/app/orcamento", icone: "assignment", pedeMes: true },
-  { id: "lancamentos", rotulo: "Lançamentos", endereco: "/app/lancamentos", icone: "list", pedeMes: false },
+  { id: "lancamentos", rotulo: "Lançamentos", endereco: "/app/lancamentos", icone: "list", pedeMes: true },
   { id: "ano", rotulo: "Ano", endereco: "/app/ano", icone: "calendar_month", pedeMes: false },
   { id: "ajustes", rotulo: "Ajustes", endereco: "/app/ajustes", icone: "settings", pedeMes: false },
 ] as const;
@@ -32,7 +32,7 @@ export function caminhoComMes(endereco: string, search: string, mes: string): st
   return `${endereco}?${params.toString()}`;
 }
 
-/** Mês no cabeçalho só quando a área pede. Resumo e Orçamento pedem. */
+/** Mês no cabeçalho só quando a área pede. Resumo, Orçamento e Lançamentos pedem. */
 export function navegacaoMesDaArea(
   area: { pedeMes: boolean },
   mes: string,

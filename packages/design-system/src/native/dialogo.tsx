@@ -3,7 +3,7 @@ import type { DialogoProps } from '../base/contratos.ts';
 import { radius, spacing, typography } from '../core/tokens.ts';
 import { useCores } from './tema.tsx';
 
-export function Dialogo({ aberto, titulo, descricao, textoCancelar = 'Cancelar', textoConfirmar, tipoConfirmar, onCancelar, onConfirmar }: DialogoProps) {
+export function Dialogo({ aberto, titulo, descricao, textoCancelar = 'Cancelar', textoConfirmar, tipoConfirmar, onCancelar, onConfirmar, children, confirmarDesabilitado = false }: DialogoProps) {
   const cores = useCores();
   const destrutivo = tipoConfirmar === 'destrutivo';
   return (
@@ -12,11 +12,17 @@ export function Dialogo({ aberto, titulo, descricao, textoCancelar = 'Cancelar',
         <View accessibilityRole="alert" style={[styles.caixa, { backgroundColor: cores.card }]}>
           <Text accessibilityRole="header" style={[styles.titulo, { color: cores.text }]}>{titulo}</Text>
           <Text style={[styles.descricao, { color: cores.textMuted }]}>{descricao}</Text>
+          {children}
           <View style={styles.acoes}>
             <Pressable onPress={onCancelar} accessibilityRole="button" style={styles.botaoTexto}>
               <Text style={[styles.textoCancelar, { color: cores.action }]}>{textoCancelar}</Text>
             </Pressable>
-            <Pressable onPress={onConfirmar} accessibilityRole="button" style={[styles.botao, { backgroundColor: destrutivo ? cores.error : cores.action }]}>
+            <Pressable
+              onPress={() => { if (!confirmarDesabilitado) onConfirmar(); }}
+              disabled={confirmarDesabilitado}
+              accessibilityRole="button"
+              style={[styles.botao, { backgroundColor: destrutivo ? cores.error : cores.action }]}
+            >
               <Text style={[styles.textoBotao, { color: destrutivo ? cores.onError : cores.onAction }]}>{textoConfirmar}</Text>
             </Pressable>
           </View>

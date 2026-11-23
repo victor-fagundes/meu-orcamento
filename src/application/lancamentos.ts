@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, inArray } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNotNull } from "drizzle-orm";
 import type { Db } from "@/db";
 import { cartoes, itens, lancamentos } from "@/db/schema";
 import { isCartaoAtivo } from "@/domain/cartoes";
@@ -95,13 +95,52 @@ export async function listLancamentosCompetencia(
       itemNome: itens.nome,
       itemGrupo: itens.grupo,
       itemTipo: itens.tipo,
+      itemArquivado: itens.arquivado,
       cartaoApelido: cartoes.apelido,
+      cartaoFechamento: cartoes.diaFechamento,
+      cartaoAtivo: cartoes.ativo,
     })
     .from(lancamentos)
     .innerJoin(itens, eq(lancamentos.itemId, itens.id))
     .leftJoin(cartoes, eq(lancamentos.cartaoId, cartoes.id))
     .where(and(eq(lancamentos.orcamentoId, orcamentoId), eq(lancamentos.competencia, competencia)))
     .orderBy(desc(lancamentos.dataTransacao), desc(lancamentos.createdAt));
+}
+
+/** Parcelas dos grupos que aparecem neste mês, inclusive as de outros meses da mesma conta. */
+export async function listParcelasIrmas(
+  db: Db,
+  orcamentoId: string,
+  competencia: string,
+): Promise<LancamentoRow[]> {
+  const grupos = await db
+    .selectDistinct({ grupo: lancamentos.grupoParcelaId })
+    .from(lancamentos)
+    .where(
+      and(
+        eq(lancamentos.orcamentoId, orcamentoId),
+        eq(lancamentos.competencia, competencia),
+        isNotNull(lancamentos.grupoParcelaId),
+      ),
+    );
+  const ids = grupos.flatMap((grupo) => (grupo.grupo ? [grupo.grupo] : []));
+  if (ids.length === 0) return [];
+  return db
+    .select({
+      id: lancamentos.id,
+      itemId: lancamentos.itemId,
+      cartaoId: lancamentos.cartaoId,
+      descricao: lancamentos.descricao,
+      valorCentavos: lancamentos.valorCentavos,
+      dataTransacao: lancamentos.dataTransacao,
+      competencia: lancamentos.competencia,
+      meio: lancamentos.meio,
+      parcelaN: lancamentos.parcelaN,
+      parcelaTotal: lancamentos.parcelaTotal,
+      grupoParcelaId: lancamentos.grupoParcelaId,
+    })
+    .from(lancamentos)
+    .where(and(eq(lancamentos.orcamentoId, orcamentoId), inArray(lancamentos.grupoParcelaId, ids)));
 }
 
 async function loadGroup(

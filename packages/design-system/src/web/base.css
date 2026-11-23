@@ -231,6 +231,8 @@ div.mo-linha { cursor: default; }
 .mo-tabela th, .mo-tabela td { padding: var(--space-2); text-align: left; border-bottom: 1px solid var(--md-line); }
 .mo-tabela__numero { text-align: right; font-variant-numeric: tabular-nums; }
 .mo-tabela tr[aria-selected="true"] { background: var(--md-selected); color: var(--md-on-selected); }
+.mo-tabela tr[tabindex="0"] { cursor: pointer; }
+.mo-tabela tr[tabindex="0"]:focus-visible { outline: var(--state-focus-width) solid var(--md-action); outline-offset: var(--state-focus-offset); }
 
 .mo-resumo { display: flex; flex-direction: column; gap: var(--space-4); }
 .mo-resumo__ferramentas { display: flex; justify-content: flex-end; }
@@ -304,3 +306,11 @@ div.mo-linha { cursor: default; }
   width: var(--space-8); height: var(--space-8); border-radius: var(--radius-full);
   background: var(--md-selected); color: var(--md-on-selected); font-weight: 700;
 }
+
+.mo-lancamentos { display: flex; flex-direction: column; gap: var(--space-4); }
+.mo-lancamentos__topo { display: flex; justify-content: flex-end; }
+.mo-lancamentos__filtros { display: flex; flex-direction: column; gap: var(--space-3); }
+.mo-lancamentos__resultado { display: flex; flex-direction: column; gap: var(--space-3); font-family: var(--font-family); color: var(--md-text); }
+.mo-lancamentos__previa { display: flex; flex-direction: column; gap: var(--space-1); font-family: var(--font-family); color: var(--md-text); }
+.mo-lancamentos__opcoes { border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-2); font-family: var(--font-family); color: var(--md-text); }
+.mo-lancamentos__opcoes label { display: flex; align-items: center; gap: var(--space-2); }

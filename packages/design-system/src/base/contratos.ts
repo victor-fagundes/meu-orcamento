@@ -91,6 +91,10 @@ export interface DialogoProps {
   readonly tipoConfirmar: 'primario' | 'destrutivo';
   readonly onCancelar: () => void;
   readonly onConfirmar: () => void;
+  /** Radios de alcance. Ficam entre a descrição e os botões. */
+  readonly children?: ReactNode;
+  /** Confirmar fica inativo até haver uma escolha. */
+  readonly confirmarDesabilitado?: boolean;
 }
 
 export interface FabProps {
@@ -295,6 +299,8 @@ export interface ColunaTabela {
 export interface LinhaTabela {
   readonly id: string;
   readonly celulas: Readonly<Record<string, string>>;
+  /** Nome acessível da linha quando ela abre a edição. */
+  readonly nomeAcao?: string;
 }
 
 export interface TabelaProps {

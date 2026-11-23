@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react';
 import type { DialogoProps } from '../base/contratos.ts';
 import { prenderFoco } from './foco.ts';
 
-export function Dialogo({ aberto, titulo, descricao, textoCancelar = 'Cancelar', textoConfirmar, tipoConfirmar, onCancelar, onConfirmar }: DialogoProps) {
+export function Dialogo({ aberto, titulo, descricao, textoCancelar = 'Cancelar', textoConfirmar, tipoConfirmar, onCancelar, onConfirmar, children, confirmarDesabilitado = false }: DialogoProps) {
   const painel = useRef<HTMLDivElement | null>(null);
   const cancelarRef = useRef(onCancelar);
   cancelarRef.current = onCancelar;
@@ -30,11 +30,12 @@ export function Dialogo({ aberto, titulo, descricao, textoCancelar = 'Cancelar',
       >
         <h2 id="mo-dialogo-titulo" className="mo-dialogo__titulo">{titulo}</h2>
         <p className="mo-dialogo__descricao">{descricao}</p>
+        {children}
         <div className="mo-dialogo__acoes">
           <button type="button" className="mo-botao mo-botao--texto" onClick={onCancelar}>
             {textoCancelar}
           </button>
-          <button type="button" className={`mo-botao mo-botao--${tipoConfirmar === 'destrutivo' ? 'destrutivo' : 'primario'}`} onClick={onConfirmar}>
+          <button type="button" className={`mo-botao mo-botao--${tipoConfirmar === 'destrutivo' ? 'destrutivo' : 'primario'}`} onClick={onConfirmar} disabled={confirmarDesabilitado}>
             {textoConfirmar}
           </button>
         </div>
