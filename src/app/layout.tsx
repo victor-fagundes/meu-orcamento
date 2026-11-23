@@ -1,13 +1,18 @@
 import type { Metadata } from "next";
-import { Roboto } from "next/font/google";
+import localFont from "next/font/local";
 import { MaterialRegistry } from "@/components/material/register";
+import "@meu-orcamento/design-system/tokens.css";
+import "@meu-orcamento/design-system/web.css";
 import "./globals.css";
 
-const roboto = Roboto({
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-  variable: "--font-roboto",
+const manrope = localFont({
+  src: "../../packages/design-system/fonts/Manrope-VariableFont_wght.ttf",
+  weight: "200 800",
+  display: "swap",
+  variable: "--font-manrope",
 });
+
+const scriptTema = `(function(){try{var t=localStorage.getItem("mo-tema");var escuro=window.matchMedia("(prefers-color-scheme: dark)").matches;var tema=(t==="dark"||(t!=="light"&&escuro))?"dark":"light";document.documentElement.setAttribute("data-theme",tema);}catch(e){}})();`;
 
 export const metadata: Metadata = {
   title: "Meu Orçamento",
@@ -20,8 +25,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR">
-      <body className={`${roboto.variable} antialiased`}>
+    <html lang="pt-BR" className={manrope.variable} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: scriptTema }} />
+      </head>
+      <body className="antialiased">
         <MaterialRegistry>{children}</MaterialRegistry>
       </body>
     </html>

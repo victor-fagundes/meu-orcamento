@@ -38,6 +38,9 @@ const tokenSyntax = [
 ];
 
 const eslintConfig = [
+  {
+    ignores: ["node_modules/**", "dist/**", "build/**", "coverage/**", "**/*.min.js"],
+  },
   ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
     files: ["src/app/**/*.{js,jsx,ts,tsx}", "src/components/**/*.{js,jsx,ts,tsx}"],

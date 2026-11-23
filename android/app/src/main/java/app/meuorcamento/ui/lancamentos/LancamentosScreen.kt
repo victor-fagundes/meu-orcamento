@@ -4,10 +4,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
@@ -36,8 +38,13 @@ import androidx.compose.ui.unit.dp
 import app.meuorcamento.data.ApiClient
 import app.meuorcamento.data.ApiException
 import app.meuorcamento.domain.formatCentavos
+import app.meuorcamento.ui.BotaoCheio
 import app.meuorcamento.ui.CompetenciaPicker
+import app.meuorcamento.ui.LinhaValor
+import app.meuorcamento.ui.ListaCartao
 import app.meuorcamento.ui.OfflineBanner
+import app.meuorcamento.ui.corDivisor
+import app.meuorcamento.ui.theme.AzulAcao
 import app.meuorcamento.ui.reaisParaCentavos
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -76,7 +83,12 @@ data class ItemDto(val id: String, val nome: String, val tipo: String, val grupo
 data class CartoesResponse(val cartoes: List<CartaoDto> = emptyList())
 
 @Serializable
-data class CartaoDto(val id: String, val apelido: String, val ativo: Boolean = true)
+data class CartaoDto(
+    val id: String,
+    val apelido: String,
+    val ativo: Boolean = true,
+    val diaFechamento: Int? = null,
+)
 
 @Serializable
 data class CreateLancBody(
@@ -162,12 +174,6 @@ fun LancamentosScreen(
         CompetenciaPicker(competencia, onCompetencia)
         Column(Modifier.padding(horizontal = 16.dp)) {
             OfflineBanner(offline || error != null, error)
-            if (loaded && rows.isNotEmpty()) {
-                Button(onClick = {
-                    editing = null
-                    showForm = true
-                }) { Text("Registrar") }
-            }
         }
 
         if (showForm) {
@@ -231,42 +237,46 @@ fun LancamentosScreen(
             }
         }
 
-        if (loaded && rows.isEmpty() && error == null && !showForm) {
-            Column(Modifier.padding(horizontal = 16.dp)) {
+        Column(
+            Modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp),
+        ) {
+            if (loaded && rows.isEmpty() && error == null && !showForm) {
                 Text("Não há lançamentos neste mês.", modifier = Modifier.padding(top = 16.dp))
-                Button(onClick = { editing = null; showForm = true }) { Text("Registrar") }
             }
-        }
-
-        LazyColumn(Modifier.weight(1f)) {
-            items(rows, key = { it.id }) { row ->
-                val titulo = row.descricao?.takeIf { it.isNotBlank() } ?: (row.itemNome ?: "Lançamento")
-                Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            titulo,
-                            modifier = Modifier.weight(1f),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
+            if (rows.isNotEmpty()) {
+                ListaCartao {
+                    rows.forEachIndexed { index, row ->
+                        val titulo = row.descricao?.takeIf { it.isNotBlank() } ?: (row.itemNome ?: "Lançamento")
+                        LinhaValor(
+                            nome = titulo,
+                            valor = formatCentavos(row.valorCentavos),
+                            detalhe = "${dataVisivel(row.dataTransacao)} · ${row.itemNome ?: "item"} · ${rotuloMeio(row)}",
                         )
-                        Text(formatCentavos(row.valorCentavos), maxLines = 1, softWrap = false)
+                        RowActions(
+                            onEdit = {
+                                editing = row
+                                showForm = true
+                            },
+                            onDelete = {
+                                pendingDelete = row
+                                scopeChoice = "one"
+                            },
+                        )
+                        if (index < rows.lastIndex) {
+                            HorizontalDivider(color = corDivisor())
+                        }
                     }
-                    Text(
-                        "${dataVisivel(row.dataTransacao)} · ${row.itemNome ?: "item"} · ${rotuloMeio(row)}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    RowActions(
-                        onEdit = {
-                            editing = row
-                            showForm = true
-                        },
-                        onDelete = {
-                            pendingDelete = row
-                            scopeChoice = "one"
-                        },
-                    )
                 }
+            }
+            if (loaded && !showForm && error == null) {
+                BotaoCheio(
+                    "Registrar",
+                    onClick = { editing = null; showForm = true },
+                    modifier = Modifier.padding(top = 20.dp, bottom = 16.dp),
+                )
             }
         }
     }
@@ -313,9 +323,9 @@ fun LancamentosScreen(
 
 @Composable
 private fun RowActions(onEdit: () -> Unit, onDelete: () -> Unit) {
-    androidx.compose.foundation.layout.Row {
-        TextButton(onClick = onEdit) { Text("Corrigir") }
-        TextButton(onClick = onDelete) { Text("Excluir") }
+    Row(Modifier.padding(start = 14.dp, end = 14.dp, bottom = 8.dp)) {
+        Text("Corrigir", color = AzulAcao, modifier = Modifier.clickable(onClick = onEdit))
+        Text("Excluir", color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(start = 16.dp).clickable(onClick = onDelete))
     }
 }
 

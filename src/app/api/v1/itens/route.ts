@@ -1,6 +1,7 @@
 import {
   archiveItem,
   createItem,
+  listItensArquivados,
   listItensAtivosParaLancamento,
 } from "@/application/itens";
 import type { TipoOrcamento } from "@/domain/catalog";
@@ -12,6 +13,18 @@ export const dynamic = "force-dynamic";
 export async function GET(request: Request) {
   const ctx = await requireApiSession(request);
   if (isApiError(ctx)) return ctx;
+  const escopo = new URL(request.url).searchParams.get("escopo");
+  if (escopo === "arquivados") {
+    const rows = await listItensArquivados(ctx.db, ctx.orcamento.id);
+    return jsonOk({
+      itens: rows.map((i) => ({
+        id: i.id,
+        tipo: i.tipo,
+        grupo: i.grupo,
+        nome: i.nome,
+      })),
+    });
+  }
   const itens = await listItensAtivosParaLancamento(ctx.db, ctx.orcamento.id);
   return jsonOk({
     itens: itens.map((i) => ({

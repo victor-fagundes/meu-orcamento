@@ -1,4 +1,5 @@
 import { and, count, eq } from "drizzle-orm";
+import { garantirCategoriaAtiva } from "@/application/categorias";
 import type { Db } from "@/db";
 import { itens } from "@/db/schema";
 import {
@@ -7,9 +8,20 @@ import {
   planoJsonFromBRL,
   zeroPlanoJson,
 } from "@/domain/catalog";
+import { validarNomeCategoria } from "@/domain/categorias";
 
 export async function seedCatalog(db: Db, orcamentoId: string): Promise<number> {
   const seeds = buildCatalogSeeds();
+  const grupos = new Map<string, { tipo: (typeof seeds)[number]["tipo"]; grupo: string }>();
+  for (const seed of seeds) {
+    grupos.set(`${seed.tipo}|${seed.grupo}`, { tipo: seed.tipo, grupo: seed.grupo });
+  }
+  for (const grupo of grupos.values()) {
+    const nome = validarNomeCategoria(grupo.grupo);
+    if (!nome.ok) throw new Error(nome.error);
+    const categoria = await garantirCategoriaAtiva(db, orcamentoId, grupo.tipo, nome.nome);
+    if (!categoria.ok) throw new Error(categoria.error);
+  }
   const rows = seeds.map((s) => ({
     id: crypto.randomUUID(),
     orcamentoId,

@@ -1,6 +1,6 @@
 # Spec: 040 — DS integrado ao Next
 
-**Status:** `ready`  
+**Status:** `implemented`  
 **Release:** rebuild-web  
 **Sprint:** —  
 **Depende de:** —  
@@ -61,19 +61,19 @@ Não muda regra de dinheiro, competência ou alerta. Medidas novas entram só em
 
 ## Acceptance criteria
 
-- [ ] AC-1 Todo arquivo em `packages/design-system/src/web/` que usa estado, efeito, evento ou `window` começa com `'use client'`. O pacote funciona no App Router.
-- [ ] AC-2 `src/app/layout.tsx` carrega Manrope com `next/font/local` a partir de `packages/design-system/fonts/Manrope-VariableFont_wght.ttf`. Se esse caminho não resolver, a fonte é copiada para `public/fonts/` e o `next/font` aponta para lá. Roboto (`next/font/google`) sai. `--font-family` usa a variável do `next/font`. Não há `@font-face` com caminho relativo.
-- [ ] AC-3 O `<head>` tem um script que lê `localStorage` (`mo-tema`) e a preferência do sistema e define `data-theme` no `<html>` antes da primeira pintura. O `<html>` tem `suppressHydrationWarning`.
-- [ ] AC-4 `ThemeProvider` lê e grava `mo-tema` e expõe `light`, `dark` e `system`.
-- [ ] AC-5 `tokens.css` gerado por `npm run gen:css` no pacote é importado uma vez no layout. `material-theme.css` e `globals.css` continuam até a spec 049.
-- [ ] AC-6 `grid` em `tokens.ts` passa a ter a altura 76 da barra inferior e a largura máxima 960. O CSS gerado reflete os dois. Nenhuma outra medida é criada.
-- [ ] AC-7 `ShellApp`, `Tabela`, `CampoBusca`, `CampoData`, `Switch`, `MenuAcoes`, `BotaoIcone` e `Avatar` têm contrato em `src/base/contratos.ts`, versão web, export em `src/web.ts` e teste.
-- [ ] AC-8 `Dialogo` e `FormularioContainer` prendem Tab e Shift+Tab dentro do painel e, ao fechar, devolvem o foco ao elemento que abriu. Os dois comportamentos têm teste em jsdom.
-- [ ] AC-9 Cada nome novo de ícone existe em `IconName`, tem caminho e aparece em `docs/design/ICONES.md`. Um teste falha se algum nome do tipo não tiver caminho.
-- [ ] AC-10 `Switch` expõe `aria-checked` e alterna. `MenuAcoes` abre, fecha com Esc e não coloca ação destrutiva fora do menu. `CampoData` liga o erro ao campo. `Tabela` exige `caption` e marca a linha selecionada.
-- [ ] AC-11 O teste visual grava cada componente novo em light e dark, a 390 px e a 1280 px, em `tests/visual/out/`. Sem baseline aprovada pelo PM, o teste não falha. `tests/visual/__snapshots__` não é criada por este trabalho.
-- [ ] AC-12 Na ordem: `npm test` na raiz, `npm test` em `packages/design-system`, `npx tsc --noEmit`. Só depois `npm run build`. Os quatro terminam sem erro.
-- [ ] AC-13 Nenhum `console.log`, `any` ou TODO novo.
+- [x] AC-1 Todo arquivo em `packages/design-system/src/web/` que usa estado, efeito, evento ou `window` começa com `'use client'`. O pacote funciona no App Router.
+- [x] AC-2 `src/app/layout.tsx` carrega Manrope com `next/font/local` a partir de `packages/design-system/fonts/Manrope-VariableFont_wght.ttf`. Se esse caminho não resolver, a fonte é copiada para `public/fonts/` e o `next/font` aponta para lá. Roboto (`next/font/google`) sai. `--font-family` usa a variável do `next/font`. Não há `@font-face` com caminho relativo.
+- [x] AC-3 O `<head>` tem um script que lê `localStorage` (`mo-tema`) e a preferência do sistema e define `data-theme` no `<html>` antes da primeira pintura. O `<html>` tem `suppressHydrationWarning`.
+- [x] AC-4 `ThemeProvider` lê e grava `mo-tema` e expõe `light`, `dark` e `system`.
+- [x] AC-5 `tokens.css` gerado por `npm run gen:css` no pacote é importado uma vez no layout. `material-theme.css` e `globals.css` continuam até a spec 049.
+- [x] AC-6 `grid` em `tokens.ts` passa a ter a altura 76 da barra inferior e a largura máxima 960. O CSS gerado reflete os dois. Nenhuma outra medida é criada.
+- [x] AC-7 `ShellApp`, `Tabela`, `CampoBusca`, `CampoData`, `Switch`, `MenuAcoes`, `BotaoIcone` e `Avatar` têm contrato em `src/base/contratos.ts`, versão web, export em `src/web.ts` e teste.
+- [x] AC-8 `Dialogo` e `FormularioContainer` prendem Tab e Shift+Tab dentro do painel e, ao fechar, devolvem o foco ao elemento que abriu. Os dois comportamentos têm teste em jsdom.
+- [x] AC-9 Cada nome novo de ícone existe em `IconName`, tem caminho e aparece em `docs/design/ICONES.md`. Um teste falha se algum nome do tipo não tiver caminho.
+- [x] AC-10 `Switch` expõe `aria-checked` e alterna. `MenuAcoes` abre, fecha com Esc e não coloca ação destrutiva fora do menu. `CampoData` liga o erro ao campo. `Tabela` exige `caption` e marca a linha selecionada.
+- [x] AC-11 O teste visual grava cada componente novo em light e dark, a 390 px e a 1280 px, em `tests/visual/out/`. Sem baseline aprovada pelo PM, o teste não falha. `tests/visual/__snapshots__` não é criada por este trabalho.
+- [x] AC-12 Na ordem: `npm test` na raiz, `npm test` em `packages/design-system`, `npx tsc --noEmit`. Só depois `npm run build`. Os quatro terminam sem erro.
+- [x] AC-13 Nenhum `console.log`, `any` ou TODO novo.
 
 ## Test plan
 

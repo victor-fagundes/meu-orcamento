@@ -16,7 +16,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 
 private val MESES_CIVIS = listOf(
@@ -68,28 +70,30 @@ fun BarraTitulo(
     rotuloProximo: String = "Próximo",
 ) {
     Row(
-        Modifier.fillMaxWidth().heightIn(min = 64.dp),
+        Modifier.fillMaxWidth().heightIn(min = 48.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (onAnterior != null) {
             IconButton(onClick = onAnterior) {
-                Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = rotuloAnterior)
+                Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = rotuloAnterior, tint = MaterialTheme.colorScheme.primary)
             }
         } else {
-            Spacer(Modifier.width(16.dp))
+            Spacer(Modifier.width(48.dp))
         }
         Text(
             titulo,
             modifier = Modifier.weight(1f),
-            style = MaterialTheme.typography.headlineSmall.copy(
-                fontWeight = FontWeight.Normal,
-                fontSize = 22.sp,
-            ),
+            textAlign = TextAlign.Center,
+            fontWeight = FontWeight.Bold,
+            fontSize = 16.sp,
+            letterSpacing = (-0.02).em,
         )
         if (onProximo != null) {
             IconButton(onClick = onProximo) {
-                Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = rotuloProximo)
+                Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = rotuloProximo, tint = MaterialTheme.colorScheme.primary)
             }
+        } else {
+            Spacer(Modifier.width(48.dp))
         }
     }
 }

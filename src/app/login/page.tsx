@@ -1,16 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { FormEvent, Suspense, useState } from "react";
 import { AuthShell } from "@/components/auth-shell";
 import { MdFilledButton, MdTextField } from "@/components/material/ui";
 import { authClient } from "@/lib/auth-client";
 
+function destinoAposLogin(next: string | null): string {
+  if (next && next.startsWith("/") && !next.startsWith("//")) return next;
+  return "/app/resumo";
+}
+
 function LoginForm() {
-  const router = useRouter();
   const params = useSearchParams();
-  const next = params.get("next") || "/app/resumo";
+  const next = destinoAposLogin(params.get("next"));
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -22,13 +26,12 @@ function LoginForm() {
     const email = String(fd.get("email") || "");
     const password = String(fd.get("password") || "");
     const { error: err } = await authClient.signIn.email({ email, password });
-    setLoading(false);
     if (err) {
+      setLoading(false);
       setError(err.message || "E-mail ou senha inválidos.");
       return;
     }
-    router.push(next);
-    router.refresh();
+    window.location.assign(next);
   }
 
   return (

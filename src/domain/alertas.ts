@@ -34,10 +34,21 @@ export function parseCatsJson(json: string): Record<string, number> {
   }
 }
 
+export const ERRO_LIMITE_PCT = "Informe um inteiro de 1 a 100.";
+
+export function validarLimitePct(
+  n: unknown,
+): { ok: true; valor: number } | { ok: false; error: string } {
+  if (typeof n !== "number" || !Number.isInteger(n) || n < 1 || n > 100) {
+    return { ok: false, error: ERRO_LIMITE_PCT };
+  }
+  return { ok: true, valor: n };
+}
+
 export function validateGlobalPct(n: number): number {
-  const v = Math.trunc(n);
-  if (!Number.isFinite(v)) return LIMITE_PREVENTIVO_PADRAO;
-  return Math.min(100, Math.max(1, v));
+  const parsed = validarLimitePct(n);
+  if (!parsed.ok) throw new Error(parsed.error);
+  return parsed.valor;
 }
 
 export function limiteDaCategoria(cfg: LimitesConfig, grupo: string): number {

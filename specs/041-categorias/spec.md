@@ -1,89 +1,208 @@
-# Spec: 041 — Categorias
+# Feature Specification: Categorias
 
-**Status:** `ready`  
-**Release:** rebuild-web  
-**Sprint:** —  
-**Depende de:** — (pode seguir em paralelo com a 040)  
-**PRD:** 5.9, 5.10, D-07  
-**Branch:** `rebuild-web`
+**Feature Branch**: `041-categorias`
 
-## Context
+**Created**: 2026-11-22
 
-Hoje a categoria é só o texto `itens.grupo`. O PRD v1.0 (5.9, D-07) deixava renomear fora desta versão. O rebuild pede categoria como entidade, com criar, renomear e arquivar. Esta spec faz essa mudança no domínio, no banco, na API e nas server actions. As telas que usam isso são a 044 e a 047.
+**Status**: ready
 
-`itens.grupo` continua texto, como chave de junção por nome. Lançamento aponta para o item, não para o grupo.
+**Input**: User description: "/speckit-specify 041"
 
-O domínio já tem `validateGlobalPct` em `src/domain/alertas.ts`, e essa função aperta o valor para o intervalo 1–100 em vez de recusar. A tela de limites (047) precisa de erro e do valor salvo intacto, então a validação passa a recusar.
+**Related**: A categoria deixa de ser só o nome do grupo do item e passa a ser algo que a pessoa cria, renomeia e arquiva, por orçamento e por tipo. O que a conta já usa vira categoria, com o mesmo nome. Lançamento continua no item. As telas de Orçamento e de Ajustes ficam nas histórias 044 e 047. D-07 do PRD v1.0 fica substituída só para categoria neste rebuild: criar, renomear e arquivar entram. Reordenar continua fora.
 
-Os rótulos visíveis do mês e do ano ainda são "Ainda pode gastar" (`src/components/resumo-dashboard.tsx`) e "Saldo final (R − despesas)" (`src/components/ano-view.tsx`). `docs/design/MICROCOPY.md` troca esses nomes por "Disponível neste mês" e "Sobra no ano", e manda não usar "Saldo" nem "ainda pode gastar". O cálculo não muda: mês = orçado − gasto; ano = receitas − despesas (`src/domain/reconciliacao.ts`). Esta spec não troca a UI. Os rótulos novos entram nas specs 043 e 046.
+## User Scenarios & Testing *(mandatory)*
 
-Na interface o agrupamento se chama categoria. `grupo` fica só no código, como chave em `itens.grupo`. O glossário não lista as quatro frases de nome; elas seguem o padrão de erro do mesmo arquivo (o que aconteceu e o que fazer) e ficam fechadas nesta spec.
+### User Story 1 - O que já existe vira categoria (Priority: P1)
 
-## Goals
+Quem já tem orçamento abre a conta e encontra uma categoria para cada grupo que os itens já usam, no mesmo tipo e com o mesmo nome. Item e lançamento não mudam de lugar. Um grupo só aparece arquivado quando todos os itens dele já estavam arquivados.
 
-1. Criar, listar, renomear e arquivar categorias por orçamento e tipo.
-2. Preencher a tabela a partir dos grupos que já existem.
-3. Exigir categoria ativa em toda escrita de `itens.grupo`.
-4. Recusar limite de alerta fora de 1–100 inteiro.
-5. Expor as duas frases de exportação pedidas pelo prompt, sem mudar o arquivo quando há movimento.
+**Why this priority**: Sem isso, criar a categoria como entidade apaga ou duplica o orçamento que a pessoa já montou.
 
-## Non-goals
+**Independent Test**: Numa conta que já tem itens em grupos, ler as categorias e os itens. Cada par de tipo e nome de grupo tem uma categoria. Nenhum lançamento mudou de item, valor ou competência.
 
-- Tela de Orçamento ou de Ajustes (044 e 047).
-- Reordenar categorias ou itens.
-- Desarquivar.
-- Mudar `src/domain/competencia.ts`, `src/lib/auth*`, `src/app/api/auth/**` ou a regra de parcelas.
-- Apagar lançamento ao arquivar categoria ou item.
+**Acceptance Scenarios**:
 
-## Domain rules
+1. **Given** itens em Moradia (Despesas fixas) e em Lazer (Despesas variáveis), **When** as categorias da conta são lidas, **Then** existem Moradia em Despesas fixas e Lazer em Despesas variáveis, e não existe uma segunda Moradia no mesmo tipo.
+2. **Given** um grupo em que todo item já está arquivado, **When** as categorias são lidas, **Then** essa categoria está arquivada.
+3. **Given** um grupo com pelo menos um item ativo, **When** as categorias são lidas, **Then** essa categoria está ativa.
+4. **Given** lançamentos já gravados nesses itens, **When** as categorias passam a existir, **Then** cada lançamento continua no mesmo item, com o mesmo valor e a mesma competência.
+5. **Given** o número do mês e o número do ano que a pessoa já via, **When** as categorias são preenchidas, **Then** os dois números continuam com a mesma conta e os nomes na tela continuam os de hoje.
+6. **Given** uma compra parcelada já gravada, **When** categorias são criadas, renomeadas ou arquivadas, **Then** as competências das parcelas continuam as mesmas.
 
-Tabela `categorias`: `id` (text, pk), `orcamento_id` (fk, cascade), `tipo` (`R|F|V|E`, check), `nome` (text, not null), `arquivada` (boolean, default false), `criado_em`, `atualizado_em`. Índice único de `(orcamento_id, tipo, lower(nome))` onde `arquivada = false`.
+---
 
-Backfill na mesma migration: para cada `(orcamento_id, tipo, grupo)` distinto em `itens`, uma linha. `arquivada` é true só quando todos os itens daquele grupo estão arquivados (`itens.arquivado` diferente de 0).
+### User Story 2 - Criar uma categoria (Priority: P1)
 
-| Caso | Entrada | Resultado |
-|---|---|---|
-| Nome vazio | `""` | erro: "Informe o nome da categoria." |
-| Só espaços | `"   "` | erro: "Informe o nome da categoria." |
-| 41 caracteres após o trim | 41 caracteres | erro: "Use no máximo 40 caracteres." |
-| Quebra de linha | `"Lazer\n"` | erro: "Use o nome em uma linha só." |
-| Nome válido | `"  Lazer  "` | `"Lazer"` |
-| Duplicado no tipo | `"Lazer"` e `"lazer"`, ou `"Ação"` e `"acao"`, ativos | erro: "Escolha outro nome. Já existe uma categoria com esse nome neste tipo." |
-| Duplicado entre tipos | `"Outros"` em F e em V | permitido |
-| Renomear para o mesmo nome | mesmo id e mesmo nome | no-op, sem erro |
-| Outro orçamento | id de categoria ou item de outra conta | não encontrado. A API responde 404, nunca 403 |
-| Renomear | nome novo único | na mesma transação: `categorias.nome` e `itens.grupo` do tipo, onde `grupo` era o nome antigo. Lançamentos não mudam |
-| Arquivar | categoria ativa | na mesma transação: `arquivada = true` e `itens.arquivado` em todos os itens do grupo. Lançamentos ficam |
-| Novo item com grupo novo | `grupo` sem categoria ativa daquele tipo | a categoria nasce na mesma transação do item |
-| Novo item com grupo ativo | categoria ativa do tipo | não duplica a categoria |
-| Limite | inteiro de 1 a 100 | aceito |
-| Limite | 0, 101, fração ou não numérico | erro. O valor salvo não muda |
-| Exportação sem movimento | orçamento sem lançamento e sem plano diferente de zero | a ação devolve "Não havia movimento para exportar." e não entrega arquivo |
-| Exportação incompleta | falha no meio da geração | "Arquivo incompleto não é compartilhado." e nenhum arquivo parcial |
-| Exportação com movimento | há lançamento ou plano | CSV e JSON como na spec 017, centavos inteiros, só a conta da sessão |
+A pessoa cria uma categoria escolhendo o tipo e o nome. O nome é guardado sem espaços nas pontas, numa linha só, com no máximo 40 caracteres. No mesmo tipo, outro nome ativo que só muda de maiúsculas ou de acento é recusado. O mesmo nome em outro tipo é aceito. A lista mostra as ativas; as arquivadas entram quando a pessoa pede.
 
-Comparação de nome: sem diferença de caixa e sem acento.
+**Why this priority**: É o gesto novo desta história. Sem ele, a categoria só existiria por causa dos grupos antigos.
 
-## Acceptance criteria
+**Independent Test**: Criar "  Lazer  " em Despesas variáveis, reler a lista e ver "Lazer". Tentar "lazer" de novo no mesmo tipo e ver a recusa, sem uma segunda categoria.
 
-- [ ] AC-1 A migration cria `categorias`, o índice único parcial e o backfill descrito na tabela. `itens.grupo` permanece texto.
-- [ ] AC-2 `src/domain/categorias.ts` cobre os casos de nome da tabela, com teste em `src/domain/categorias.test.ts`. Sem import de Next, DB ou React.
-- [ ] AC-3 `listarCategorias`, `criarCategoria`, `renomearCategoria` e `arquivarCategoria` em `src/application/categorias.ts` filtram pelo `orcamento_id` da sessão e seguem a tabela.
-- [ ] AC-4 `criarItem` cria a categoria na mesma transação quando o grupo ainda não é uma categoria ativa daquele tipo.
-- [ ] AC-5 `GET /api/v1/categorias?incluirArquivadas=0|1`, `POST /api/v1/categorias` `{ tipo, nome }`, `PATCH /api/v1/categorias/[id]` `{ nome }` e `POST /api/v1/categorias/[id]/arquivar` respondem com `jsonError` (`src/lib/api-v1.ts`). O corpo é validado com zod.
-- [ ] AC-6 Dois usuários no PGlite: um não lê nem altera a categoria do outro, e a resposta é 404.
-- [ ] AC-7 `src/app/actions/categorias.ts` repete os casos de uso e chama `revalidatePath` de `/app/orcamento` e `/app/ajustes`.
-- [ ] AC-8 `validateGlobalPct` deixa de apertar o valor. Fora de 1–100 inteiro, a função recusa e `saveLimites` não grava.
-- [ ] AC-9 As ações `exportCsvAction` e `exportJsonAction` devolvem as duas frases da tabela nos casos sem movimento e incompleto. Com movimento, o arquivo continua o da spec 017.
-- [ ] AC-10 `saldoPeriodo` e `saldoFinalAno` em `src/domain/reconciliacao.ts` não mudam de fórmula. `src/domain/competencia.ts` não muda.
-- [ ] AC-11 Nenhum `console.log`, `any` ou TODO novo. Dinheiro segue inteiro, em centavos.
+**Acceptance Scenarios**:
 
-## Test plan
+1. **Given** nenhuma categoria ativa chamada Lazer em Despesas variáveis, **When** a pessoa cria "  Lazer  " nesse tipo, **Then** a categoria guardada se chama "Lazer" e aparece na lista de ativas.
+2. **Given** um nome de 40 caracteres depois de tirar os espaços das pontas, **When** a pessoa cria a categoria, **Then** o nome é aceito.
+3. **Given** o nome vazio ou só com espaços, **When** a pessoa cria a categoria, **Then** nada é gravado e a mensagem é "Informe o nome da categoria."
+4. **Given** 41 caracteres depois de tirar os espaços das pontas, **When** a pessoa cria a categoria, **Then** nada é gravado e a mensagem é "Use no máximo 40 caracteres."
+5. **Given** um nome com quebra de linha, **When** a pessoa cria a categoria, **Then** nada é gravado e a mensagem é "Use o nome em uma linha só."
+6. **Given** uma categoria ativa "Lazer" em Despesas variáveis, **When** a pessoa cria "lazer" ou "Lazer" no mesmo tipo, **Then** nada é gravado e a mensagem é "Escolha outro nome. Já existe uma categoria com esse nome neste tipo." O mesmo vale para "Ação" e "acao".
+7. **Given** "Outros" ativo em Despesas fixas, **When** a pessoa cria "Outros" em Despesas variáveis, **Then** as duas categorias existem.
+8. **Given** "Lazer" arquivada em Despesas variáveis e nenhuma Lazer ativa nesse tipo, **When** a pessoa cria "Lazer" de novo, **Then** a nova categoria ativa é gravada.
+9. **Given** duas contas, **When** a segunda pede a lista ou tenta criar usando uma categoria da primeira, **Then** ela só vê e só altera as categorias da própria conta. A categoria da outra conta é tratada como inexistente.
 
-Unit: `src/domain/categorias.test.ts` e o teste de limite em `src/domain/alertas.test.ts`.  
-Integração: rotas `/api/v1/categorias` com PGlite e dois usuários, em arquivo `src/**/*.test.ts`.  
-`npm test` e `npx tsc --noEmit` verdes.
+---
 
-## Open questions
+### User Story 3 - Renomear sem perder o histórico (Priority: P1)
 
-Nenhuma. D-07 fica substituída para categoria neste rebuild: criar, renomear e arquivar entram; reordenar continua fora.
+A pessoa troca o nome de uma categoria ativa. Os itens daquele tipo que estavam nesse grupo passam a usar o nome novo, no mesmo passo. O lançamento continua no item. Renomear para o nome que a categoria já tem não muda nada e não é erro.
+
+**Why this priority**: O nome da categoria é o nome que a pessoa lê no Orçamento. Trocar o nome e deixar os itens para trás quebra a lista.
+
+**Independent Test**: Renomear Moradia para Casa e ver os itens que eram Moradia, nesse tipo, passarem a Casa. Um lançamento de Aluguel continua em Aluguel, com o mesmo valor.
+
+**Acceptance Scenarios**:
+
+1. **Given** Moradia ativa em Despesas fixas, com itens nesse grupo, **When** a pessoa renomeia para Casa e Casa ainda não existe ativo nesse tipo, **Then** a categoria e esses itens passam a se chamar Casa. Itens de outro tipo que também se chamavam Moradia não mudam.
+2. **Given** um lançamento num item de Moradia, **When** a categoria é renomeada, **Then** o lançamento continua no mesmo item, com o mesmo valor e a mesma competência.
+3. **Given** a categoria já se chama Lazer, **When** a pessoa renomeia para Lazer, **Then** nada muda e não há mensagem de erro.
+4. **Given** Casa já ativa no mesmo tipo, **When** a pessoa renomeia Moradia para Casa, para "casa" ou para "Cása", **Then** Moradia permanece e a mensagem é "Escolha outro nome. Já existe uma categoria com esse nome neste tipo."
+5. **Given** a categoria de outra conta, **When** a pessoa tenta renomear, **Then** nada muda na outra conta e a categoria é tratada como inexistente.
+
+---
+
+### User Story 4 - Arquivar a categoria e os itens (Priority: P1)
+
+A pessoa arquiva uma categoria ativa. A categoria e todos os itens daquele grupo saem da lista ativa e dos novos lançamentos, no mesmo passo. Os lançamentos antigos continuam. Não há como desarquivar nesta história, e arquivar não apaga lançamento.
+
+**Why this priority**: Arquivar é o jeito de tirar um grupo do Orçamento sem perder o que já foi registrado. O glossário separa arquivar de excluir.
+
+**Independent Test**: Arquivar Lazer e conferir que Lazer e os itens dela sumiram da lista ativa, e que um lançamento antigo de um desses itens continua na lista de lançamentos.
+
+**Acceptance Scenarios**:
+
+1. **Given** Lazer ativa, com itens ativos, **When** a pessoa arquiva Lazer, **Then** a categoria fica arquivada e todos os itens daquele grupo, nesse tipo, ficam arquivados.
+2. **Given** lançamentos nesses itens, **When** a categoria é arquivada, **Then** os lançamentos continuam gravados, com o mesmo item, valor e competência, e saem do seletor de novos lançamentos.
+3. **Given** a lista pedida sem arquivadas, **When** Lazer acabou de ser arquivada, **Then** Lazer não aparece. **Given** a lista com arquivadas, **Then** Lazer aparece como arquivada.
+4. **Given** uma categoria ou um item, **When** a pessoa procura desarquivar ou reordenar, **Then** essas ações não existem nesta história.
+5. **Given** a categoria de outra conta, **When** a pessoa tenta arquivar, **Then** nada muda na outra conta e a categoria é tratada como inexistente.
+
+---
+
+### User Story 5 - Item novo abre a categoria que falta (Priority: P2)
+
+Quando um item nasce com um grupo que ainda não é categoria ativa daquele tipo, a categoria nasce junto com o item. Se a categoria ativa já existe, o item entra nela e nenhuma segunda categoria é criada.
+
+**Why this priority**: O caminho "novo item" é o atalho de quem ainda não criou a categoria à parte. Sem essa regra, o item ficaria num grupo que a lista de categorias não conhece.
+
+**Independent Test**: Criar um item no grupo "Streaming" em Despesas variáveis, sem categoria Streaming ativa nesse tipo, e ver a categoria Streaming ativa no mesmo resultado. Criar outro item em Streaming e ver uma única categoria.
+
+**Acceptance Scenarios**:
+
+1. **Given** nenhuma categoria ativa "Streaming" em Despesas variáveis, **When** um item é criado com esse grupo nesse tipo, **Then** o item e a categoria ativa "Streaming" existem juntos. Se a criação não se completa, nem o item nem a categoria ficam pela metade.
+2. **Given** "Streaming" já ativa nesse tipo, **When** outro item é criado com esse grupo, **Then** o item usa a categoria existente e não nasce uma segunda Streaming.
+3. **Given** "Streaming" só arquivada nesse tipo, **When** um item é criado com esse grupo, **Then** nasce uma categoria ativa "Streaming". A arquivada permanece arquivada.
+4. **Given** qualquer gravação do grupo de um item, **When** ela termina, **Then** existe uma categoria ativa daquele tipo com aquele nome.
+
+---
+
+### User Story 6 - Limite de alerta só de 1 a 100 (Priority: P2)
+
+O limite de alerta é um inteiro de 1 a 100. Zero, acima de 100, fração ou texto são recusados, e o valor que já estava salvo permanece.
+
+**Why this priority**: A tela de limites (história 047) precisa recusar o número errado. Hoje um valor fora da faixa é apertado para dentro em vez de ser recusado, e a pessoa não vê o que gravou.
+
+**Independent Test**: Com o limite salvo em 80, tentar gravar 0, 101 e 80,5. O limite continua 80. Gravar 1 e gravar 100. Cada um desses dois fica salvo.
+
+**Acceptance Scenarios**:
+
+1. **Given** um limite já salvo, **When** a pessoa grava um inteiro de 1 a 100, **Then** esse inteiro passa a ser o limite.
+2. **Given** o limite salvo em 80, **When** a pessoa grava 0, 101, uma fração ou um texto, **Then** a gravação é recusada e o limite continua 80.
+
+---
+
+### User Story 7 - Exportar só quando há movimento e o arquivo fecha (Priority: P2)
+
+Quem exporta sem lançamento e sem plano diferente de zero recebe a frase "Não havia movimento para exportar." e nenhum arquivo. Se a geração falha no meio, a frase é "Arquivo incompleto não é compartilhado." e nenhum arquivo parcial aparece. Com movimento, a pessoa recebe o mesmo CSV e o mesmo JSON de hoje, só da própria conta, com os valores em centavos inteiros.
+
+**Why this priority**: A história 047 oferece Exportar. Sem estas duas frases, a pessoa recebe arquivo vazio ou arquivo cortado.
+
+**Independent Test**: Exportar uma conta sem lançamento e sem plano diferente de zero e confirmar a frase, sem arquivo. Exportar uma conta com um lançamento e receber o arquivo completo.
+
+**Acceptance Scenarios**:
+
+1. **Given** uma conta sem lançamento e sem plano diferente de zero, **When** a pessoa exporta, **Then** a mensagem é "Não havia movimento para exportar." e nenhum arquivo é entregue.
+2. **Given** a geração do arquivo falha no meio, **When** a exportação termina, **Then** a mensagem é "Arquivo incompleto não é compartilhado." e nenhum arquivo parcial é entregue.
+3. **Given** a conta tem lançamento ou plano diferente de zero, **When** a pessoa exporta, **Then** ela recebe o CSV e o JSON como na história 017, só com os dados da própria conta, em centavos inteiros.
+
+---
+
+### Edge Cases
+
+- Nome comparado sem diferença de maiúsculas e sem acento. "Lazer" e "lazer" são o mesmo nome. "Ação" e "acao" são o mesmo nome. Nomes parecidos que não são o mesmo ("NET" e "Internet") são categorias diferentes.
+- O mesmo nome em tipos diferentes é permitido. "Outros" existe uma vez em cada tipo.
+- Categoria arquivada não bloqueia um nome igual ativo no mesmo tipo.
+- Renomear só alcança os itens do mesmo tipo. "Outros" em Despesas fixas e "Outros" em Despesas variáveis seguem independentes.
+- Arquivar não apaga lançamento e não oferece desarquivar. Reordenar categoria ou item fica fora desta história.
+- Categoria ou item de outra conta é tratado como inexistente. A pessoa não fica sabendo que o dado existe e está proibido.
+- A regra de competência das parcelas não muda.
+- Os rótulos visíveis do mês e do ano não mudam nesta história. "Disponível neste mês" e "Sobra no ano" entram nas histórias 043 e 046. A conta dos dois números permanece a de hoje: no mês, orçado menos gasto; no ano, receitas menos despesas.
+
+## Requirements *(mandatory)*
+
+### Functional Requirements
+
+- **FR-001**: Cada orçamento MUST ter categorias. Cada categoria pertence a um tipo: Receitas, Despesas fixas, Despesas variáveis ou Anuais.
+- **FR-002**: Na entrega, cada par distinto de tipo e nome de grupo já usado pelos itens MUST existir como categoria, com esse tipo e esse nome. A categoria MUST estar arquivada somente quando todos os itens daquele grupo estão arquivados. Havendo um item ativo, a categoria MUST estar ativa.
+- **FR-003**: O lançamento MUST continuar apontando para o item. Criar as categorias MUST NOT mover lançamento de item, valor ou competência.
+- **FR-004**: A pessoa MUST poder listar só as categorias ativas do próprio orçamento e MUST poder pedir a lista incluindo as arquivadas.
+- **FR-005**: A pessoa MUST poder criar uma categoria informando tipo e nome. O nome guardado MUST ser o nome sem espaços nas pontas.
+- **FR-006**: Nome vazio ou só com espaços MUST ser recusado, sem gravar, com a mensagem "Informe o nome da categoria."
+- **FR-007**: Nome com mais de 40 caracteres depois de tirar os espaços das pontas MUST ser recusado, sem gravar, com a mensagem "Use no máximo 40 caracteres." Nome de 40 caracteres MUST ser aceito.
+- **FR-008**: Nome com quebra de linha MUST ser recusado, sem gravar, com a mensagem "Use o nome em uma linha só."
+- **FR-009**: Entre categorias ativas do mesmo tipo, nomes que só diferem por maiúsculas ou acento MUST ser o mesmo nome e MUST ser recusados com "Escolha outro nome. Já existe uma categoria com esse nome neste tipo."
+- **FR-010**: O mesmo nome em tipos diferentes MUST ser permitido.
+- **FR-011**: Uma categoria arquivada MUST NOT impedir uma categoria ativa nova com o mesmo nome no mesmo tipo.
+- **FR-012**: Renomear uma categoria para o nome que ela já tem MUST ser concluído sem mudança e sem erro.
+- **FR-013**: Renomear para um nome novo e único no tipo MUST atualizar, no mesmo passo, a categoria e os itens daquele tipo cujo grupo era o nome antigo. Itens de outro tipo MUST permanecer. Lançamentos MUST permanecer no mesmo item.
+- **FR-014**: Arquivar uma categoria ativa MUST arquivar, no mesmo passo, a categoria e todos os itens daquele grupo naquele tipo. Lançamentos MUST permanecer. Arquivar MUST NOT apagar lançamento.
+- **FR-015**: Esta história MUST NOT oferecer desarquivar nem reordenar categoria ou item.
+- **FR-016**: Ao criar um item cujo grupo ainda não é categoria ativa daquele tipo, a categoria ativa MUST nascer no mesmo passo. Se a criação não se completa, item e categoria MUST NOT ficar pela metade. Se a categoria ativa já existe, MUST NOT nascer outra.
+- **FR-017**: Toda gravação do grupo de um item MUST terminar com uma categoria ativa daquele tipo e daquele nome.
+- **FR-018**: Categoria ou item de outro orçamento MUST ser tratado como inexistente. A resposta MUST NOT informar que o dado existe e está proibido.
+- **FR-019**: O limite de alerta MUST aceitar só inteiro de 1 a 100. Fora disso, a gravação MUST ser recusada e o valor já salvo MUST permanecer.
+- **FR-020**: Exportar uma conta sem lançamento e sem plano diferente de zero MUST devolver "Não havia movimento para exportar." e MUST NOT entregar arquivo.
+- **FR-021**: Se a exportação falha no meio da geração, a pessoa MUST receber "Arquivo incompleto não é compartilhado." e MUST NOT receber arquivo parcial.
+- **FR-022**: Exportar uma conta com lançamento ou com plano diferente de zero MUST entregar o CSV e o JSON da história 017, só com os dados dessa conta, em centavos inteiros.
+- **FR-023**: A conta do número do mês (orçado menos gasto) e a conta do número do ano (receitas menos despesas) MUST permanecer. Esta história MUST NOT trocar os rótulos na tela.
+- **FR-024**: A regra de competência das parcelas MUST permanecer.
+
+### Key Entities
+
+- **Categoria**: agrupamento de itens dentro de um tipo, com nome, tipo e situação ativa ou arquivada. Pertence a um orçamento. Na interface o nome é categoria. Grupo fica só como o nome que liga o item à categoria.
+- **Item**: gasto ou receita planejada, com tipo, grupo (o nome da categoria) e situação ativa ou arquivada. O lançamento aponta para o item.
+- **Lançamento**: registro com valor, competência e item. Não aponta para a categoria.
+- **Limite de alerta**: percentual inteiro de 1 a 100, guardado por orçamento. Um valor recusado não substitui o que já estava salvo.
+
+## Success Criteria *(mandatory)*
+
+### Measurable Outcomes
+
+- **SC-001**: Numa conta que já tem itens, 100% dos pares tipo + nome de grupo aparecem como categoria, e nenhum lançamento muda de item, valor ou competência.
+- **SC-002**: A pessoa grava um nome válido, inclusive com espaços nas pontas ou com 40 caracteres, numa única tentativa. Cada um dos quatro nomes inválidos (vazio, 41 caracteres, quebra de linha, duplicado no tipo) é recusado sem gravar, com a frase desta história.
+- **SC-003**: Renomear uma categoria atualiza, na mesma ação, todos os itens daquele tipo que usavam o nome antigo. Um lançamento já gravado permanece no mesmo item.
+- **SC-004**: Arquivar tira a categoria e os itens dela da lista ativa. Os lançamentos desses itens continuam consultáveis, com o mesmo valor. Não há ação de desarquivar.
+- **SC-005**: Com o limite em 80, gravar 1 ou 100 substitui o valor. Gravar 0, 101 ou uma fração deixa 80 intacto.
+- **SC-006**: Uma conta sem lançamento e sem plano diferente de zero recebe a frase e zero arquivos. Uma conta com lançamento recebe o arquivo completo. Uma geração interrompida entrega zero arquivos parciais.
+- **SC-007**: Uma segunda conta não vê e não altera as categorias da primeira. A tentativa é tratada como categoria inexistente.
+
+## Assumptions
+
+- As telas que criam, renomeiam e arquivam categoria no Orçamento e em Ajustes são as histórias 044 e 047. Esta história entrega a capacidade e as frases. Não desenha essas telas.
+- D-07 (renomear e reordenar fora do MVP) fica substituída só para categoria: criar, renomear e arquivar entram. Reordenar categoria ou item continua fora. Desarquivar continua fora.
+- "Mesmo nome" ignora maiúsculas e acentos e não aproxima sinônimos.
+- Valores seguem em centavos inteiros. A spec fala em reais só na leitura da tela.
+- Os rótulos "Disponível neste mês" e "Sobra no ano" não entram aqui. Entram nas histórias 043 e 046.
+- Importar planilha e importar fatura não mudam aqui. Escondê-los da navegação é a história 047.
+- A pessoa só acessa o próprio orçamento. Conta de outra pessoa não aparece como proibida; aparece como inexistente.
+- O PM confirmou a spec ao pedir a implementação. O status é `ready`.

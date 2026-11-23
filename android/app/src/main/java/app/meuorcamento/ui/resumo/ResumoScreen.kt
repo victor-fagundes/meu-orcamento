@@ -1,7 +1,8 @@
 package app.meuorcamento.ui.resumo
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,16 +20,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import app.meuorcamento.ui.theme.ValorDisplay
+import app.meuorcamento.ui.theme.corMedidor
 import app.meuorcamento.data.ApiClient
 import app.meuorcamento.data.ApiException
 import app.meuorcamento.domain.formatCentavos
 import app.meuorcamento.ui.CompetenciaPicker
+import app.meuorcamento.ui.LinhaValor
 import app.meuorcamento.ui.OfflineBanner
+import app.meuorcamento.ui.Rotulo
+import app.meuorcamento.ui.corTrilha
 import kotlinx.serialization.Serializable
 import java.io.IOException
 import java.util.Calendar
@@ -155,7 +159,10 @@ fun ResumoScreen(
                     val gasto = totais.totalGastoDespesasCentavos
                     val dias = diasRestantesNoMes(competencia)
                     val estourou = ainda < 0
-                    Text(if (estourou) "Passou do orçado" else "Ainda pode gastar")
+                    Rotulo(
+                        if (estourou) "Passou do orçado" else "Ainda pode gastar",
+                        modifier = Modifier.padding(top = 8.dp),
+                    )
                     Text(
                         formatCentavos(ainda),
                         style = ValorDisplay,
@@ -174,9 +181,9 @@ fun ResumoScreen(
                         val frac = (gasto.toFloat() / orcado.toFloat()).coerceIn(0f, 1f)
                         LinearProgressIndicator(
                             progress = { frac },
-                            modifier = Modifier.fillMaxWidth().height(4.dp),
-                            color = if (estourou) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
-                            trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                            modifier = Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(99.dp)),
+                            color = corMedidor(orcado, gasto, isSystemInDarkTheme()),
+                            trackColor = corTrilha(),
                         )
                     } else if (dias != null) {
                         Text(
@@ -184,8 +191,10 @@ fun ResumoScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
-                    totais.porTipo.forEach { tipo ->
-                        LinhaTipo(tipo, onClick = { onOpenTipo(tipo.tipo) })
+                    Column(Modifier.padding(top = 18.dp)) {
+                        totais.porTipo.forEach { tipo ->
+                            LinhaTipo(tipo, onClick = { onOpenTipo(tipo.tipo) }, modifier = Modifier.padding(bottom = 8.dp))
+                        }
                     }
                 }
             }
@@ -194,28 +203,15 @@ fun ResumoScreen(
 }
 
 @Composable
-private fun LinhaTipo(tipo: TotalTipoDto, onClick: () -> Unit) {
-    Column(
-        Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(vertical = 12.dp),
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                labelTipo(tipo.tipo),
-                modifier = Modifier.weight(1f),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Text(formatCentavos(tipo.realizadoCentavos), maxLines = 1, softWrap = false)
-        }
-        Text(
-            "planejado ${formatCentavos(tipo.planoCentavos)}",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-    }
+private fun LinhaTipo(tipo: TotalTipoDto, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    LinhaValor(
+        nome = labelTipo(tipo.tipo),
+        valor = formatCentavos(tipo.realizadoCentavos),
+        detalhe = "planejado ${formatCentavos(tipo.planoCentavos)}",
+        onClick = onClick,
+        cartao = true,
+        modifier = modifier,
+    )
 }
 
 fun labelChip(tipo: String): String = when (tipo) {

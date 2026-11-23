@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Meu Orçamento — acabamento Android para aprovar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --sf: #f8f9ff;
+      --card: #fff;
+      --ink: #191c20;
+      --soft: #43474e;
+      --pr: #0058be;
+      --pc: #d7e3ff;
+      --on-pc: #001b3f;
+      --field: #eceef6;
+      --track: #e6e8f0;
+      --warn: #8a7000;
+      --danger: #ba1a1a;
+      --mark: #ffe600;
+      --mark-ink: #221b00;
+      --line: #e3e6ef;
+      --shadow: 0 1px 2px rgba(25, 28, 32, 0.06);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #e7e9f2;
+      color: var(--ink);
+      font-family: Manrope, "Segoe UI", sans-serif;
+    }
+    header.page {
+      padding: 28px 32px 8px;
+      max-width: 1280px;
+    }
+    header.page p { margin: 6px 0 0; max-width: 62ch; color: var(--soft); }
+    h1 { margin: 0; font-size: 28px; letter-spacing: -0.03em; }
+    .note { font-size: 13px; font-weight: 600; color: var(--pr); }
+    .board {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 28px 24px;
+      padding: 24px 32px 64px;
+      align-items: flex-start;
+    }
+    figure { margin: 0; }
+    figcaption {
+      margin-top: 10px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    figcaption span { display: block; font-weight: 500; color: var(--soft); }
+
+    .icons { display: flex; gap: 16px; padding-top: 28px; }
+    .tile { text-align: center; width: 108px; }
+    .tile p { margin: 8px 0 0; font-size: 12px; font-weight: 600; color: var(--soft); }
+    .squircle, .circle, .mono {
+      width: 108px; height: 108px;
+      display: grid; place-items: center;
+      background: var(--mark);
+      color: var(--mark-ink);
+      font-weight: 800;
+      font-size: 54px;
+      letter-spacing: -0.04em;
+    }
+    .squircle { border-radius: 24px; }
+    .circle { border-radius: 50%; }
+    .mono {
+      background: #1c1b1f;
+      color: #fff;
+      border-radius: 50%;
+    }
+
+    .phone {
+      width: 360px;
+      height: 760px;
+      background: var(--sf);
+      color: var(--ink);
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: 0 16px 40px rgba(25, 28, 32, 0.12);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .status {
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .bar {
+      height: 48px;
+      display: grid;
+      grid-template-columns: 40px 1fr 40px;
+      align-items: center;
+      padding: 0 8px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .bar button, .nav button, .textbtn, .filled {
+      font: inherit;
+      border: 0;
+      background: transparent;
+      color: inherit;
+    }
+    .bar button { height: 40px; border-radius: 20px; color: var(--pr); font-size: 20px; }
+    .screen { flex: 1; padding: 8px 16px 16px; overflow: hidden; }
+    .screen.scroll { overflow-y: auto; }
+    .menu-row { display: flex; align-items: center; gap: 12px; }
+    .menu-row .copy { flex: 1; min-width: 0; }
+    .menu-row .copy b { display: block; }
+    .ico { width: 24px; height: 24px; color: var(--pr); flex: none; }
+    .ico.danger, .menu b.danger { color: var(--danger); }
+    .chev { color: var(--soft); font-weight: 500; }
+    .eyebrow { margin: 8px 0 0; font-size: 13px; font-weight: 700; color: var(--soft); }
+    .display {
+      margin: 2px 0 0;
+      font-size: 40px;
+      line-height: 44px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+    }
+    .phrase { margin: 6px 0 10px; font-size: 13px; color: var(--soft); }
+    .meter { height: 8px; border-radius: 99px; background: var(--track); overflow: hidden; }
+    .meter i { display: block; height: 100%; background: var(--pr); border-radius: inherit; }
+    .meter.warn i { background: var(--warn); }
+    .meter.danger i { background: var(--danger); }
+    .stack { display: flex; flex-direction: column; gap: 8px; margin-top: 18px; }
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 12px 14px;
+    }
+    .row { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+    .row b { font-weight: 700; }
+    .row em { font-style: normal; font-weight: 800; letter-spacing: -0.03em; }
+    .sub { margin: 2px 0 0; font-size: 12px; color: var(--soft); }
+    .seg {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      background: var(--field);
+      border-radius: 14px;
+      padding: 4px;
+      gap: 4px;
+    }
+    .seg span {
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 8px 0;
+      border-radius: 10px;
+      color: var(--soft);
+    }
+    .seg .on { background: var(--pc); color: var(--on-pc); }
+    .group { margin-top: 8px; }
+    .group .meter { margin-top: 8px; }
+    .quiet { margin: 16px 0 4px; font-size: 12px; font-weight: 700; color: var(--soft); }
+    .nav {
+      height: 72px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      background: var(--card);
+      border-top: 1px solid var(--line);
+    }
+    .nav button {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--soft);
+      padding-top: 8px;
+    }
+    .nav .on { color: var(--on-pc); }
+    .nav .on i {
+      background: var(--pc);
+      border-radius: 14px;
+      min-width: 56px;
+      text-align: center;
+    }
+    .nav i { font-style: normal; font-size: 16px; line-height: 28px; }
+
+    .login { padding: 36px 24px 24px; }
+    .mark {
+      width: 56px; height: 56px; border-radius: 16px;
+      background: var(--mark); color: var(--mark-ink);
+      display: grid; place-items: center;
+      font-weight: 800; font-size: 28px;
+    }
+    .login h2 { margin: 16px 0 0; font-size: 28px; letter-spacing: -0.03em; }
+    .login .lead { margin: 6px 0 28px; color: var(--soft); }
+    label { display: block; font-size: 12px; font-weight: 700; margin: 12px 0 6px; }
+    .field {
+      height: 52px; border-radius: 14px; background: var(--field);
+      display: flex; align-items: center; padding: 0 14px; color: var(--ink);
+    }
+    .filled {
+      margin-top: 20px; width: 100%; height: 52px; border-radius: 14px;
+      background: var(--pr); color: #fff; font-weight: 800;
+    }
+    .textbtn { display: block; width: 100%; margin-top: 8px; height: 44px; color: var(--pr); font-weight: 700; }
+    .splash { background: var(--mark); color: var(--mark-ink); align-items: center; justify-content: center; }
+    .splash .big {
+      width: 96px; height: 96px; border-radius: 28px; background: transparent;
+      display: grid; place-items: center; font-size: 72px; font-weight: 800; letter-spacing: -0.05em;
+    }
+    .section { margin: 14px 0 6px; font-size: 11px; font-weight: 800; letter-spacing: 0.08em; color: var(--soft); }
+    .list .card + .card { margin-top: 0; }
+    .list .card { border-radius: 0; box-shadow: none; border-bottom: 1px solid var(--line); }
+    .list { background: var(--card); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow); }
+    .danger-text { color: var(--danger); }
+    .months { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .months .card { padding: 10px 12px; }
+    .months em { font-size: 14px; }
+    .handle { width: 32px; height: 4px; border-radius: 4px; background: var(--line); margin: 8px auto 12px; }
+    .sheet {
+      position: absolute; left: 0; right: 0; bottom: 0;
+      background: var(--card);
+      border-radius: 28px 28px 0 0;
+      padding: 0 16px 16px;
+      box-shadow: 0 -8px 24px rgba(25, 28, 32, 0.12);
+    }
+    .sheet h3 { margin: 0 0 12px; font-size: 20px; letter-spacing: -0.03em; }
+    .sheet .actions { display: flex; gap: 8px; }
+    .sheet .textbtn { width: auto; flex: 1; }
+    .scrim { position: absolute; inset: 0; background: rgba(25, 28, 32, 0.32); }
+    .dialog {
+      position: absolute; left: 24px; right: 24px; top: 240px;
+      background: var(--card); border-radius: 28px; padding: 20px 16px 8px;
+      box-shadow: 0 16px 40px rgba(25, 28, 32, 0.18);
+    }
+    .dialog h3 { margin: 0 0 8px; font-size: 20px; letter-spacing: -0.03em; }
+    .dialog p { margin: 0; color: var(--soft); font-size: 14px; }
+    .choice {
+      margin-top: 8px; padding: 10px 12px; border-radius: 12px;
+      background: var(--field); font-weight: 700; font-size: 14px; color: var(--soft);
+    }
+    .choice.on { background: var(--pc); color: var(--on-pc); }
+    .filled.off { background: #c5c6cd; }
+    .filled.danger { background: var(--danger); }
+    .help { margin: 0 0 8px; font-size: 13px; color: var(--soft); }
+  </style>
+</head>
+<body>
+  <header class="page">
+    <p class="note">Spec 039 · números de exemplo</p>
+    <h1>Acabamento para aprovar</h1>
+    <p>A ordem das telas continua a de 17 de novembro. O que muda é o peso: ícone, splash, tipo e linha. A marca segue o amarelo e o azul. O tipo proposto é Manrope.</p>
+    <p>Os quadros seguintes são os fluxos que a barra abre. O desenho é o mesmo: campo preenchido, um botão azul, lista em cartão. Números e nomes são exemplo.</p>
+  </header>
+  <div class="board">
+    <figure>
+      <div class="icons">
+        <div class="tile"><div class="squircle" aria-hidden="true">M</div><p>Quadrada</p></div>
+        <div class="tile"><div class="circle" aria-hidden="true">M</div><p>Redonda</p></div>
+        <div class="tile"><div class="mono" aria-hidden="true">M</div><p>Uma cor</p></div>
+      </div>
+      <figcaption>Ícone da gaveta<span>Letra M no amarelo. No tema escuro, a letra sozinha.</span></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone splash" role="img" aria-label="Splash com a letra M no amarelo">
+        <div class="big">M</div>
+      </div>
+      <figcaption>Splash<span>A mesma marca, no centro, antes da primeira tela.</span></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>5G</span></div>
+        <div class="screen login">
+          <div class="mark" aria-hidden="true">M</div>
+          <h2>Meu Orçamento</h2>
+          <p class="lead">O que ainda cabe neste mês.</p>
+          <label for="email">E-mail</label>
+          <div class="field" id="email">victor@email.com</div>
+          <label for="senha">Senha</label>
+          <div class="field" id="senha">••••••••</div>
+          <button class="filled" type="button">Entrar</button>
+          <button class="textbtn" type="button">Criar conta</button>
+        </div>
+      </div>
+      <figcaption>Entrar<span>Marca, uma frase, um botão preenchido.</span></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>5G</span></div>
+        <div class="bar"><button type="button" aria-label="Mês anterior">‹</button><span>novembro de 2026</span><button type="button" aria-label="Próximo mês">›</button></div>
+        <div class="screen">
+          <p class="eyebrow">Ainda pode gastar</p>
+          <p class="display">R$ 1.840</p>
+          <p class="phrase">Você usou 62% do planejado. Faltam 14 dias.</p>
+          <div class="meter" aria-hidden="true"><i style="width:62%"></i></div>
+          <div class="stack">
+            <div class="card"><div class="row"><b>Receitas</b><em>R$ 8.200</em></div><p class="sub">planejado R$ 8.200</p></div>
+            <div class="card"><div class="row"><b>Despesas fixas</b><em>R$ 4.120</em></div><p class="sub">planejado R$ 4.800</p></div>
+            <div class="card"><div class="row"><b>Despesas variáveis</b><em>R$ 1.940</em></div><p class="sub">planejado R$ 2.200</p></div>
+            <div class="card"><div class="row"><b>Anuais</b><em>R$ 300</em></div><p class="sub">planejado R$ 400</p></div>
+          </div>
+        </div>
+        <nav class="nav" aria-label="Destinos">
+          <button class="on" type="button"><i>⌂</i>Resumo</button>
+          <button type="button"><i>▤</i>Orçamento</button>
+          <button type="button"><i>≡</i>Lançamentos</button>
+          <button type="button"><i>◷</i>Ano</button>
+          <button type="button"><i>⚙</i>Ajustes</button>
+        </nav>
+      </div>
+      <figcaption>Resumo<span>O número pesa mais. As quatro linhas são destinos.</span></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>5G</span></div>
+        <div class="bar"><button type="button" aria-label="Mês anterior">‹</button><span>novembro de 2026</span><button type="button" aria-label="Próximo mês">›</button></div>
+        <div class="screen">
+          <div class="seg" aria-label="Tipo">
+            <span>Receitas</span><span class="on">Fixas</span><span>Variáveis</span><span>Anuais</span>
+          </div>
+          <p class="eyebrow">Ainda cabe em despesas fixas</p>
+          <p class="display">R$ 680</p>
+          <div class="card group">
+            <div class="row"><b>Moradia</b><em>R$ 420</em></div>
+            <div class="meter"><i style="width:70%"></i></div>
+          </div>
+          <div class="card group">
+            <div class="row"><b>Mercado</b><em>R$ 80</em></div>
+            <div class="meter warn"><i style="width:92%"></i></div>
+          </div>
+          <div class="card group">
+            <div class="row"><b>Lazer</b><em class="danger-text">− R$ 40</em></div>
+            <div class="meter danger"><i style="width:100%"></i></div>
+          </div>
+          <p class="quiet">Sem movimento neste mês</p>
+          <div class="card group">
+            <div class="row"><b>Assinaturas</b><em>R$ 0</em></div>
+            <div class="meter"><i style="width:0%"></i></div>
+          </div>
+        </div>
+        <nav class="nav" aria-label="Destinos">
+          <button type="button"><i>⌂</i>Resumo</button>
+          <button class="on" type="button"><i>▤</i>Orçamento</button>
+          <button type="button"><i>≡</i>Lançamentos</button>
+          <button type="button"><i>◷</i>Ano</button>
+          <button type="button"><i>⚙</i>Ajustes</button>
+        </nav>
+      </div>
+      <figcaption>Orçamento<span>Um controle só. Medidor azul, aviso ou erro.</span></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>5G</span></div>
+        <div class="bar"><button type="button" aria-label="Mês anterior">‹</button><span>novembro de 2026</span><button type="button" aria-label="Próximo mês">›</button></div>
+        <div class="screen">
+          <div class="seg"><span>Receitas</span><span class="on">Fixas</span><span>Variáveis</span><span>Anuais</span></div>
+          <p class="eyebrow">Ainda cabe em despesas fixas</p>
+          <p class="display">R$ 680</p>
+        </div>
+        <div class="scrim"></div>
+        <div class="sheet" role="dialog" aria-label="Plano de Aluguel">
+          <div class="handle"></div>
+          <h3>Aluguel</h3>
+          <label for="plano">Novembro</label>
+          <div class="field" id="plano">1.700,00</div>
+          <div class="actions">
+            <button class="textbtn" type="button">Cancelar</button>
+            <button class="filled" type="button">Salvar</button>
+          </div>
+          <button class="textbtn" type="button">Arquivar Aluguel</button>
+        </div>
+        <nav class="nav" aria-label="Destinos">
+          <button type="button"><i>⌂</i>Resumo</button>
+          <button class="on" type="button"><i>▤</i>Orçamento</button>
+          <button type="button"><i>≡</i>Lançamentos</button>
+          <button type="button"><i>◷</i>Ano</button>
+          <button type="button"><i>⚙</i>Ajustes</button>
+        </nav>
+      </div>
+      <figcaption>Plano do item<span>Alça, nome do item, salvar preso no pé. Arquivar diz o nome.</span></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>5G</span></div>
+        <div class="bar"><button type="button" aria-label="Mês anterior">‹</button><span>novembro de 2026</span><button type="button" aria-label="Próximo mês">›</button></div>
+        <div class="screen">
+          <div class="list">
+            <div class="card"><div class="row"><b>Supermercado</b><em>R$ 186,40</em></div><p class="sub">12 nov · Mercado · débito</p></div>
+            <div class="card"><div class="row"><b>Aluguel</b><em>R$ 1.700</em></div><p class="sub">05 nov · Moradia · transferência</p></div>
+            <div class="card"><div class="row"><b>Farmácia</b><em>R$ 42,90</em></div><p class="sub">03 nov · Saúde · crédito</p></div>
+          </div>
+          <button class="filled" type="button">Registrar</button>
+        </div>
+        <nav class="nav" aria-label="Destinos">
+          <button type="button"><i>⌂</i>Resumo</button>
+          <button type="button"><i>▤</i>Orçamento</button>
+          <button class="on" type="button"><i>≡</i>Lançamentos</button>
+          <button type="button"><i>◷</i>Ano</button>
+          <button type="button"><i>⚙</i>Ajustes</button>
+        </nav>
+      </div>
+      <figcaption>Lançamentos<span>A mesma linha. Um botão preenchido.</span></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>5G</span></div>
+        <div class="bar"><button type="button" aria-label="Ano anterior">‹</button><span>2026</span><button type="button" aria-label="Próximo ano">›</button></div>
+        <div class="screen">
+          <div class="months">
+            <div class="card"><div class="row"><b>Jan</b><em>R$ 1.200</em></div></div>
+            <div class="card"><div class="row"><b>Fev</b><em>R$ 980</em></div></div>
+            <div class="card"><div class="row"><b>Mar</b><em>R$ 1.410</em></div></div>
+            <div class="card"><div class="row"><b>Abr</b><em>R$ 860</em></div></div>
+            <div class="card"><div class="row"><b>Mai</b><em>R$ 1.020</em></div></div>
+            <div class="card"><div class="row"><b>Jun</b><em>R$ 1.330</em></div></div>
+            <div class="card"><div class="row"><b>Jul</b><em>R$ 1.180</em></div></div>
+            <div class="card"><div class="row"><b>Ago</b><em>R$ 940</em></div></div>
+            <div class="card"><div class="row"><b>Set</b><em>R$ 1.510</em></div></div>
+            <div class="card"><div class="row"><b>Out</b><em>R$ 1.270</em></div></div>
+            <div class="card"><div class="row"><b>Nov</b><em>R$ 1.840</em></div></div>
+            <div class="card"><div class="row"><b>Dez</b><em>R$ 0</em></div></div>
+          </div>
+        </div>
+        <nav class="nav" aria-label="Destinos">
+          <button type="button"><i>⌂</i>Resumo</button>
+          <button type="button"><i>▤</i>Orçamento</button>
+          <button type="button"><i>≡</i>Lançamentos</button>
+          <button class="on" type="button"><i>◷</i>Ano</button>
+          <button type="button"><i>⚙</i>Ajustes</button>
+        </nav>
+      </div>
+      <figcaption>Ano<span>O ano confirmado na barra. Doze meses, valor na mesma linha.</span></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>5G</span></div>
+        <div class="bar" style="grid-template-columns: 1fr"><span style="text-align:center">Ajustes</span></div>
+        <div class="screen scroll">
+          <div class="list menu">
+            <div class="card menu-row">
+              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+              <div class="copy"><b>victor@email.com</b><p class="sub">Esqueci a senha · Sair</p></div>
+            </div>
+            <div class="card menu-row">
+              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v4z"/></svg>
+              <div class="copy"><b>Cartões</b><p class="sub">Nubank · fecha dia 2 · vence dia 9</p></div>
+              <span class="chev">›</span>
+            </div>
+            <div class="card menu-row">
+              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 22c1.1 0 2-.9 2-2h-4a2 2 0 0 0 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+              <div class="copy"><b>Limites de alerta</b><p class="sub">Preventivo em 80% do planejado</p></div>
+              <span class="chev">›</span>
+            </div>
+            <div class="card menu-row">
+              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11zM8 15.01l1.41 1.41L11 14.84V19h2v-4.16l1.59 1.59L16 15.01 12.01 11 8 15.01z"/></svg>
+              <div class="copy"><b>Importar planilha</b><p class="sub">CSV, XLSX ou ODS, com mapeamento</p></div>
+              <span class="chev">›</span>
+            </div>
+            <div class="card menu-row">
+              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8.5 7.5c0 .83-.67 1.5-1.5 1.5H9v2H7.5V7H10c.83 0 1.5.67 1.5 1.5v1zm5 2c0 .83-.67 1.5-1.5 1.5h-2.5V7H15c.83 0 1.5.67 1.5 1.5v3zm4-3H19v1h1.5V11H19v2h-1.5V7h3v1.5zM9 9.5h1v-1H9v1zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm10 5.5h1v-3h-1v3z"/></svg>
+              <div class="copy"><b>Importar fatura</b><p class="sub">PDF com texto selecionável</p></div>
+              <span class="chev">›</span>
+            </div>
+            <div class="card menu-row">
+              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+              <div class="copy"><b>Exportar</b><p class="sub">Planilha do orçamento e dos lançamentos</p></div>
+              <span class="chev">›</span>
+            </div>
+            <div class="card menu-row">
+              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM5 8V6h14v2H5z"/></svg>
+              <div class="copy"><b>Simulador de competência</b><p class="sub">Em qual mês a compra no cartão entra</p></div>
+              <span class="chev">›</span>
+            </div>
+            <div class="card menu-row">
+              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20 2H4c-1 0-2 .9-2 2v3.01c0 .72.43 1.34 1 1.69V20c0 1.1 1.1 2 2 2h14c.9 0 2-.9 2-2V8.7c.57-.35 1-.97 1-1.69V4c0-1.1-1-2-2-2zm-5 12H9v-2h6v2zm5-7H4V4h16v3z"/></svg>
+              <div class="copy"><b>Itens arquivados</b><p class="sub">Nenhum item arquivado</p></div>
+              <span class="chev">›</span>
+            </div>
+            <div class="card menu-row">
+              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M19.8 18.4 14 10.67V6.5l1.35-1.69c.26-.33.03-.81-.39-.81H9.04c-.42 0-.65.48-.39.81L10 6.5v4.17L4.2 18.4c-.49.66-.02 1.6.8 1.6h14c.82 0 1.29-.94.8-1.6z"/></svg>
+              <div class="copy"><b>Dados de exemplo</b><p class="sub">Preenche o orçamento com um mês de demonstração</p></div>
+              <span class="chev">›</span>
+            </div>
+            <div class="card menu-row">
+              <svg class="ico danger" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+              <div class="copy"><b class="danger">Excluir conta</b><p class="sub">Apaga a conta e todos os dados</p></div>
+              <span class="chev">›</span>
+            </div>
+          </div>
+        </div>
+        <nav class="nav" aria-label="Destinos">
+          <button type="button"><i>⌂</i>Resumo</button>
+          <button type="button"><i>▤</i>Orçamento</button>
+          <button type="button"><i>≡</i>Lançamentos</button>
+          <button type="button"><i>◷</i>Ano</button>
+          <button class="on" type="button"><i>⚙</i>Ajustes</button>
+        </nav>
+      </div>
+      <figcaption>Ajustes<span>Os mesmos menus do site, com a conta no topo.</span></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>5G</span></div>
+        <div class="screen login">
+          <div class="mark" aria-hidden="true">M</div>
+          <h2>Meu Orçamento</h2>
+          <label for="nome">Nome</label>
+          <div class="field" id="nome">Victor</div>
+          <label for="email2">E-mail</label>
+          <div class="field" id="email2">victor@email.com</div>
+          <label for="senha2">Senha</label>
+          <div class="field" id="senha2">••••••••</div>
+          <button class="filled" type="button">Cadastrar</button>
+          <button class="textbtn" type="button">Já tenho conta</button>
+        </div>
+      </div>
+      <figcaption>Criar conta<span>Sem a frase da entrada. Um botão preenchido. Falha mantém os campos.</span></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>5G</span></div>
+        <div class="bar"><button type="button" aria-label="Mês anterior">‹</button><span>novembro de 2026</span><button type="button" aria-label="Próximo mês">›</button></div>
+        <div class="screen scroll">
+          <label for="item">Item</label>
+          <div class="field" id="item">Mercado · Alimentação ›</div>
+          <label for="valor">Valor (R$)</label>
+          <div class="field" id="valor">186,40</div>
+          <label for="data">Data</label>
+          <div class="field" id="data">15/11/2026</div>
+          <label for="desc">Descrição</label>
+          <div class="field" id="desc">Supermercado</div>
+          <label for="pag">Pagamento</label>
+          <div class="field" id="pag">PIX ›</div>
+          <label for="parc">Parcelas (opcional)</label>
+          <div class="field" id="parc"></div>
+          <button class="filled" type="button">Salvar</button>
+          <button class="textbtn" type="button">Cancelar</button>
+        </div>
+        <nav class="nav" aria-label="Destinos">
+          <button type="button"><i>⌂</i>Resumo</button>
+          <button type="button"><i>▤</i>Orçamento</button>
+          <button class="on" type="button"><i>≡</i>Lançamentos</button>
+          <button type="button"><i>◷</i>Ano</button>
+          <button type="button"><i>⚙</i>Ajustes</button>
+        </nav>
+      </div>
+      <figcaption>Registrar<span>O mês continua na barra. Tocar a data abre o calendário. Cancelar não grava. Sem rede, a pessoa permanece aqui.</span></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>5G</span></div>
+        <div class="bar"><button type="button" aria-label="Mês anterior">‹</button><span>novembro de 2026</span><button type="button" aria-label="Próximo mês">›</button></div>
+        <div class="screen scroll">
+          <label for="item2">Item</label>
+          <div class="field" id="item2">Aluguel · Moradia ›</div>
+          <label for="valor2">Valor (R$)</label>
+          <div class="field" id="valor2">1.700,00</div>
+          <label for="data2">Data</label>
+          <div class="field" id="data2">05/11/2026</div>
+          <p class="quiet">Escopo da correção</p>
+          <div class="choice on">Só esta parcela</div>
+          <div class="choice">Esta e as próximas</div>
+          <button class="filled" type="button">Salvar</button>
+          <button class="textbtn" type="button">Cancelar</button>
+        </div>
+        <nav class="nav" aria-label="Destinos">
+          <button type="button"><i>⌂</i>Resumo</button>
+          <button type="button"><i>▤</i>Orçamento</button>
+          <button class="on" type="button"><i>≡</i>Lançamentos</button>
+          <button type="button"><i>◷</i>Ano</button>
+          <button type="button"><i>⚙</i>Ajustes</button>
+        </nav>
+      </div>
+      <figcaption>Corrigir parcelamento<span>O escopo só aparece quando o lançamento faz parte de um grupo. O padrão é só esta parcela.</span></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>5G</span></div>
+        <div class="bar"><button type="button" aria-label="Mês anterior">‹</button><span>novembro de 2026</span><button type="button" aria-label="Próximo mês">›</button></div>
+        <div class="screen">
+          <div class="list">
+            <div class="card"><div class="row"><b>Supermercado</b><em>R$ 186,40</em></div><p class="sub">12 nov · Mercado · débito</p></div>
+          </div>
+        </div>
+        <div class="scrim"></div>
+        <div class="dialog" role="dialog" aria-label="Excluir lançamento">
+          <h3>Excluir lançamento</h3>
+          <p>Excluir R$ 186,40 de Mercado? Não há como desfazer.</p>
+          <p class="sub">Este lançamento faz parte de um parcelamento.</p>
+          <div class="choice on">Só esta parcela</div>
+          <div class="choice">Esta e as próximas</div>
+          <div class="choice">Todas do grupo</div>
+          <button class="textbtn" type="button">Cancelar</button>
+          <button class="textbtn danger-text" type="button">Excluir</button>
+        </div>
+        <nav class="nav" aria-label="Destinos">
+          <button type="button"><i>⌂</i>Resumo</button>
+          <button type="button"><i>▤</i>Orçamento</button>
+          <button class="on" type="button"><i>≡</i>Lançamentos</button>
+          <button type="button"><i>◷</i>Ano</button>
+          <button type="button"><i>⚙</i>Ajustes</button>
+        </nav>
+      </div>
+      <figcaption>Excluir lançamento<span>Sem parcelamento, o diálogo não mostra as três escolhas. Cancelar não apaga.</span></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>5G</span></div>
+        <div class="bar"><button type="button" aria-label="Mês anterior">‹</button><span>novembro de 2026</span><button type="button" aria-label="Próximo mês">›</button></div>
+        <div class="screen">
+          <div class="seg"><span>Receitas</span><span class="on">Fixas</span><span>Variáveis</span><span>Anuais</span></div>
+          <p class="eyebrow">Ainda cabe em despesas fixas</p>
+          <p class="display">R$ 680</p>
+        </div>
+        <div class="scrim"></div>
+        <div class="sheet" role="dialog" aria-label="Novo item">
+          <div class="handle"></div>
+          <h3>Novo item</h3>
+          <p class="sub">Despesas fixas</p>
+          <label for="novo">Nome do item</label>
+          <div class="field" id="novo">Academia</div>
+          <label for="grupo">Grupo</label>
+          <div class="field" id="grupo">Saúde</div>
+          <div class="actions">
+            <button class="textbtn" type="button">Cancelar</button>
+            <button class="filled" type="button">Salvar</button>
+          </div>
+        </div>
+        <nav class="nav" aria-label="Destinos">
+          <button type="button"><i>⌂</i>Resumo</button>
+          <button class="on" type="button"><i>▤</i>Orçamento</button>
+          <button type="button"><i>≡</i>Lançamentos</button>
+          <button type="button"><i>◷</i>Ano</button>
+          <button type="button"><i>⚙</i>Ajustes</button>
+        </nav>
+      </div>
+      <figcaption>Novo item<span>Nome vazio não grava. Cancelar, toque fora e voltar fecham sem criar.</span></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>5G</span></div>
+        <div class="bar"><button type="button" aria-label="Voltar">‹</button><span>Importar planilha</span><span></span></div>
+        <div class="screen scroll">
+          <p class="help">CSV, XLSX ou ODS, até 4 MB. A prévia mostra o que entra antes de gravar.</p>
+          <button class="textbtn" type="button" style="text-align:left">orcamento.xlsx</button>
+          <div class="list">
+            <div class="card"><div class="row"><b>Aluguel</b><em>Moradia</em></div><p class="sub">entra no plano</p></div>
+            <div class="card">
+              <div class="row"><b>Academia</b></div>
+              <p class="sub">escolha o grupo</p>
+              <div class="field" style="margin-top:8px">Saúde ›</div>
+            </div>
+            <div class="card"><div class="row"><b>Supermercado</b><em>R$ 186,40</em></div><p class="sub">12 nov · Mercado</p></div>
+          </div>
+          <button class="filled" type="button">Confirmar importação</button>
+          <button class="textbtn" type="button">Cancelar</button>
+        </div>
+        <nav class="nav" aria-label="Destinos">
+          <button type="button"><i>⌂</i>Resumo</button>
+          <button type="button"><i>▤</i>Orçamento</button>
+          <button type="button"><i>≡</i>Lançamentos</button>
+          <button type="button"><i>◷</i>Ano</button>
+          <button class="on" type="button"><i>⚙</i>Ajustes</button>
+        </nav>
+      </div>
+      <figcaption>Importar planilha<span>Confirmar espera a escolha do grupo. Depois abre o mês importado. Cancelar descarta a prévia.</span></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>5G</span></div>
+        <div class="bar"><button type="button" aria-label="Voltar">‹</button><span>Importar fatura</span><span></span></div>
+        <div class="screen scroll">
+          <p class="help">PDF com texto selecionável, até 4 MB. Estorno fica de fora.</p>
+          <button class="textbtn" type="button" style="text-align:left">nubank-novembro.pdf</button>
+          <label for="destino">Cartão destino</label>
+          <div class="field" id="destino">Nubank ›</div>
+          <p class="quiet">3 linhas</p>
+          <div class="list">
+            <div class="card"><div class="row"><b>Supermercado</b><em>R$ 186,40</em></div></div>
+            <div class="card"><div class="row"><b>Farmácia</b><em>R$ 42,90</em></div></div>
+            <div class="card"><div class="row"><b>Streaming</b><em>R$ 34,90</em></div></div>
+          </div>
+          <button class="filled" type="button">Confirmar PDF</button>
+          <button class="textbtn" type="button">Cancelar</button>
+        </div>
+        <nav class="nav" aria-label="Destinos">
+          <button type="button"><i>⌂</i>Resumo</button>
+          <button type="button"><i>▤</i>Orçamento</button>
+          <button type="button"><i>≡</i>Lançamentos</button>
+          <button type="button"><i>◷</i>Ano</button>
+          <button class="on" type="button"><i>⚙</i>Ajustes</button>
+        </nav>
+      </div>
+      <figcaption>Importar fatura<span>Sem cartão escolhido, Confirmar fica inativo. Cancelar descarta a prévia.</span></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>5G</span></div>
+        <div class="bar"><button type="button" aria-label="Voltar">‹</button><span>Exportar</span><span></span></div>
+        <div class="screen">
+          <p class="help">O aparelho abre o compartilhamento do sistema com o arquivo.</p>
+          <div class="list">
+            <div class="card menu-row">
+              <div class="copy"><b>Planilha CSV</b><p class="sub">meu-orcamento.csv</p></div>
+              <span class="chev">›</span>
+            </div>
+            <div class="card menu-row">
+              <div class="copy"><b>JSON</b><p class="sub">meu-orcamento.json</p></div>
+              <span class="chev">›</span>
+            </div>
+          </div>
+        </div>
+        <nav class="nav" aria-label="Destinos">
+          <button type="button"><i>⌂</i>Resumo</button>
+          <button type="button"><i>▤</i>Orçamento</button>
+          <button type="button"><i>≡</i>Lançamentos</button>
+          <button type="button"><i>◷</i>Ano</button>
+          <button class="on" type="button"><i>⚙</i>Ajustes</button>
+        </nav>
+      </div>
+      <figcaption>Exportar<span>Sem movimento, a mensagem é "Não havia movimento para exportar." Arquivo incompleto não é compartilhado.</span></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>5G</span></div>
+        <div class="bar"><button type="button" aria-label="Voltar">‹</button><span>Cartões</span><span></span></div>
+        <div class="screen scroll">
+          <div class="list">
+            <div class="card menu-row">
+              <div class="copy"><b>Nubank</b><p class="sub">fecha dia 2 · vence dia 9</p></div>
+              <span class="chev">Desativar</span>
+            </div>
+          </div>
+          <label for="apelido">Novo apelido</label>
+          <div class="field" id="apelido">Inter</div>
+          <label for="fecha">Dia fechamento</label>
+          <div class="field" id="fecha">10</div>
+          <label for="vence">Dia vencimento</label>
+          <div class="field" id="vence">17</div>
+          <button class="filled" type="button">Adicionar cartão</button>
+        </div>
+        <nav class="nav" aria-label="Destinos">
+          <button type="button"><i>⌂</i>Resumo</button>
+          <button type="button"><i>▤</i>Orçamento</button>
+          <button type="button"><i>≡</i>Lançamentos</button>
+          <button type="button"><i>◷</i>Ano</button>
+          <button class="on" type="button"><i>⚙</i>Ajustes</button>
+        </nav>
+      </div>
+      <figcaption>Cartões<span>Sem cartão ativo, a lista diz "Nenhum cartão ativo". Apelido vazio não grava.</span></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>5G</span></div>
+        <div class="bar"><button type="button" aria-label="Voltar">‹</button><span>Desativar Nubank</span><span></span></div>
+        <div class="screen"></div>
+        <div class="scrim"></div>
+        <div class="dialog" role="dialog" aria-label="Desativar Nubank">
+          <h3>Desativar Nubank</h3>
+          <p>O cartão sai dos pagamentos novos. Lançamentos antigos permanecem.</p>
+          <button class="textbtn" type="button">Cancelar</button>
+          <button class="textbtn danger-text" type="button">Desativar</button>
+        </div>
+        <nav class="nav" aria-label="Destinos">
+          <button type="button"><i>⌂</i>Resumo</button>
+          <button type="button"><i>▤</i>Orçamento</button>
+          <button type="button"><i>≡</i>Lançamentos</button>
+          <button type="button"><i>◷</i>Ano</button>
+          <button class="on" type="button"><i>⚙</i>Ajustes</button>
+        </nav>
+      </div>
+      <figcaption>Desativar cartão<span>Cancelar deixa o cartão ativo.</span></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>5G</span></div>
+        <div class="bar"><button type="button" aria-label="Voltar">‹</button><span>Limites de alerta</span><span></span></div>
+        <div class="screen">
+          <p class="help">Preventivo em 80% do planejado. O valor é um inteiro de 1 a 100.</p>
+          <label for="limite">Limite global</label>
+          <div class="field" id="limite">80</div>
+          <button class="filled" type="button">Salvar limites</button>
+        </div>
+        <nav class="nav" aria-label="Destinos">
+          <button type="button"><i>⌂</i>Resumo</button>
+          <button type="button"><i>▤</i>Orçamento</button>
+          <button type="button"><i>≡</i>Lançamentos</button>
+          <button type="button"><i>◷</i>Ano</button>
+          <button class="on" type="button"><i>⚙</i>Ajustes</button>
+        </nav>
+      </div>
+      <figcaption>Limites de alerta<span>Fora de 1 a 100, o campo volta ao valor salvo e a mensagem pede um inteiro.</span></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>5G</span></div>
+        <div class="bar"><button type="button" aria-label="Voltar">‹</button><span>Simulador de competência</span><span></span></div>
+        <div class="screen scroll">
+          <p class="help">Prévia da regra de fatura. Compra no dia do fechamento ou depois vai para a fatura seguinte. Nada é gravado.</p>
+          <label for="cartao">Cartão</label>
+          <div class="field" id="cartao">Nubank · fecha 2 ›</div>
+          <label for="compra">Data da compra</label>
+          <div class="field" id="compra">26/05/2026</div>
+          <label for="vezes">Parcelas</label>
+          <div class="field" id="vezes">3</div>
+          <button class="filled" type="button">Ver competência</button>
+          <div class="list" style="margin-top:16px">
+            <div class="card"><b>Parcela 1/3 · junho de 2026</b></div>
+            <div class="card"><b>Parcela 2/3 · julho de 2026</b></div>
+            <div class="card"><b>Parcela 3/3 · agosto de 2026</b></div>
+          </div>
+        </div>
+        <nav class="nav" aria-label="Destinos">
+          <button type="button"><i>⌂</i>Resumo</button>
+          <button type="button"><i>▤</i>Orçamento</button>
+          <button type="button"><i>≡</i>Lançamentos</button>
+          <button type="button"><i>◷</i>Ano</button>
+          <button class="on" type="button"><i>⚙</i>Ajustes</button>
+        </nav>
+      </div>
+      <figcaption>Simulador<span>Sem cartão ativo: "Cadastre um cartão ativo para simular." Data ilegível não mostra mês.</span></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>5G</span></div>
+        <div class="bar"><button type="button" aria-label="Voltar">‹</button><span>Itens arquivados</span><span></span></div>
+        <div class="screen scroll">
+          <p class="help">Arquivados não entram em novos lançamentos nem na lista ativa do Orçamento.</p>
+          <div class="list">
+            <div class="card"><div class="row"><b>Academia</b></div><p class="sub">Despesas fixas · Saúde</p></div>
+            <div class="card"><div class="row"><b>Streaming antigo</b></div><p class="sub">Despesas variáveis · Lazer</p></div>
+          </div>
+        </div>
+        <nav class="nav" aria-label="Destinos">
+          <button type="button"><i>⌂</i>Resumo</button>
+          <button type="button"><i>▤</i>Orçamento</button>
+          <button type="button"><i>≡</i>Lançamentos</button>
+          <button type="button"><i>◷</i>Ano</button>
+          <button class="on" type="button"><i>⚙</i>Ajustes</button>
+        </nav>
+      </div>
+      <figcaption>Itens arquivados<span>Somente leitura. Não há desarquivar. Vazio: "Nenhum item arquivado."</span></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>5G</span></div>
+        <div class="bar"><button type="button" aria-label="Voltar">‹</button><span>Dados de exemplo</span><span></span></div>
+        <div class="screen">
+          <p class="help">Preenche o planejamento de alguns itens com valores ilustrativos. Não cria lançamentos. Só roda se você confirmar.</p>
+          <button class="filled" type="button">Confirmar exemplo?</button>
+          <p class="phrase">Toque de novo para confirmar.</p>
+        </div>
+        <nav class="nav" aria-label="Destinos">
+          <button type="button"><i>⌂</i>Resumo</button>
+          <button type="button"><i>▤</i>Orçamento</button>
+          <button type="button"><i>≡</i>Lançamentos</button>
+          <button type="button"><i>◷</i>Ano</button>
+          <button class="on" type="button"><i>⚙</i>Ajustes</button>
+        </nav>
+      </div>
+      <figcaption>Dados de exemplo<span>O primeiro toque arma o botão. O segundo grava o plano e diz quantos itens mudaram.</span></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>5G</span></div>
+        <div class="bar"><button type="button" aria-label="Voltar">‹</button><span>Excluir conta</span><span></span></div>
+        <div class="screen">
+          <p class="help danger-text">Remove permanentemente a conta victor@email.com, o orçamento, lançamentos, cartões e limites.</p>
+          <button class="filled danger" type="button">Quero excluir minha conta…</button>
+        </div>
+        <nav class="nav" aria-label="Destinos">
+          <button type="button"><i>⌂</i>Resumo</button>
+          <button type="button"><i>▤</i>Orçamento</button>
+          <button type="button"><i>≡</i>Lançamentos</button>
+          <button type="button"><i>◷</i>Ano</button>
+          <button class="on" type="button"><i>⚙</i>Ajustes</button>
+        </nav>
+      </div>
+      <figcaption>Excluir conta, primeiro passo<span>Ainda não apaga. Abre o campo da frase.</span></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>5G</span></div>
+        <div class="bar"><button type="button" aria-label="Voltar">‹</button><span>Excluir conta</span><span></span></div>
+        <div class="screen">
+          <p class="help danger-text">Remove permanentemente a conta victor@email.com, o orçamento, lançamentos, cartões e limites.</p>
+          <label for="frase">Digite EXCLUIR para confirmar</label>
+          <div class="field" id="frase">EXCLUIR</div>
+          <button class="filled danger" type="button">Excluir definitivamente</button>
+          <button class="textbtn" type="button">Cancelar</button>
+        </div>
+        <nav class="nav" aria-label="Destinos">
+          <button type="button"><i>⌂</i>Resumo</button>
+          <button type="button"><i>▤</i>Orçamento</button>
+          <button type="button"><i>≡</i>Lançamentos</button>
+          <button type="button"><i>◷</i>Ano</button>
+          <button class="on" type="button"><i>⚙</i>Ajustes</button>
+        </nav>
+      </div>
+      <figcaption>Excluir conta, frase<span>Frase diferente não apaga e mostra "Digite EXCLUIR para confirmar." A frase certa encerra a sessão e volta à entrada.</span></figcaption>
+    </figure>
+
+    <figure>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>5G</span></div>
+        <div class="bar" style="grid-template-columns: 1fr"><span style="text-align:center">Ajustes</span></div>
+        <div class="screen">
+          <div class="list">
+            <div class="card menu-row">
+              <div class="copy"><b>victor@email.com</b><p class="sub">Esqueci a senha · Sair</p></div>
+            </div>
+          </div>
+        </div>
+        <div class="scrim"></div>
+        <div class="dialog" role="dialog" aria-label="Sair da conta">
+          <h3>Sair da conta</h3>
+          <p>A sessão desta conta será encerrada neste aparelho.</p>
+          <button class="textbtn" type="button">Cancelar</button>
+          <button class="textbtn" type="button">Sair</button>
+        </div>
+        <nav class="nav" aria-label="Destinos">
+          <button type="button"><i>⌂</i>Resumo</button>
+          <button type="button"><i>▤</i>Orçamento</button>
+          <button type="button"><i>≡</i>Lançamentos</button>
+          <button type="button"><i>◷</i>Ano</button>
+          <button class="on" type="button"><i>⚙</i>Ajustes</button>
+        </nav>
+      </div>
+      <figcaption>Sair<span>Cancelar permanece na conta. Sair volta à entrada. Esqueci a senha abre o endereço de redefinição.</span></figcaption>
+    </figure>
+  </div>
+</body>
+</html>

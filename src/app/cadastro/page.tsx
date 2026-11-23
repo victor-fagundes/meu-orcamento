@@ -1,14 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { AuthShell } from "@/components/auth-shell";
 import { MdFilledButton, MdTextField } from "@/components/material/ui";
 import { authClient } from "@/lib/auth-client";
 
 export default function CadastroPage() {
-  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -21,13 +19,12 @@ export default function CadastroPage() {
     const email = String(fd.get("email") || "");
     const password = String(fd.get("password") || "");
     const { error: err } = await authClient.signUp.email({ name, email, password });
-    setLoading(false);
     if (err) {
+      setLoading(false);
       setError(err.message || "Não foi possível criar a conta.");
       return;
     }
-    router.push("/app/resumo");
-    router.refresh();
+    window.location.assign("/app/resumo");
   }
 
   return (

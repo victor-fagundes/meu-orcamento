@@ -19,6 +19,7 @@ out/
 Thumbs.db
 playwright-report/
 test-results/
+tests/visual/out/
 
 # Android (027)
 android/.gradle/
@@ -27,6 +28,7 @@ android/local.properties
 android/*.iml
 android/**/*.iml
 android/.idea/
+.idea/
 *.jks
 *.keystore
 !android/app/debug.keystore

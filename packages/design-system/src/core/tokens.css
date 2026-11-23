@@ -1,0 +1,135 @@
+/* Gerado por scripts/gen-css.ts a partir de src/core/tokens.ts. Não editar à mão. */
+:root {
+  --font-family: var(--font-manrope), "Segoe UI", sans-serif;
+  --md-brand-yellow: #FFE600;
+  --md-action: #0058BE;
+  --md-on-action: #FFFFFF;
+  --md-text: #191C20;
+  --md-text-muted: #43474E;
+  --md-surface: #F8F9FF;
+  --md-card: #FFFFFF;
+  --md-line: #E3E6EF;
+  --md-field: #ECEEF6;
+  --md-selected: #D7E3FF;
+  --md-on-selected: #001B3F;
+  --md-success: #2E7D32;
+  --md-warn-text: #6B4B00;
+  --md-warn-bar: #9A6B00;
+  --md-warn-bg: #FFF3C4;
+  --md-error: #BA1A1A;
+  --md-on-error: #FFFFFF;
+  --md-error-text: #410002;
+  --md-error-bg: #FFDAD6;
+  --md-snackbar: #2F3033;
+  --md-snackbar-text: #F1F0F4;
+  --md-snackbar-action: #ADC6FF;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 14px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+  --radius-sheet: 28px;
+  --radius-full: 999px;
+  --elevation-0: none;
+  --elevation-1: 0 1px 2px rgba(25, 28, 32, 0.06);
+  --elevation-2: 0 8px 24px rgba(25, 28, 32, 0.16);
+  --elevation-fab: 0 4px 12px rgba(0, 88, 190, 0.3);
+  --type-display-lg-size: 56px;
+  --type-display-lg-line: 60px;
+  --type-display-md-size: 40px;
+  --type-display-md-line: 44px;
+  --type-title-lg-size: 28px;
+  --type-title-lg-line: 32px;
+  --type-title-md-size: 20px;
+  --type-title-md-line: 24px;
+  --type-body-size: 16px;
+  --type-body-line: 24px;
+  --type-label-size: 14px;
+  --type-label-line: 20px;
+  --type-caption-size: 12px;
+  --type-caption-line: 16px;
+  --motion-fast: 150ms;
+  --motion-base: 200ms;
+  --motion-slow: 300ms;
+  --motion-easing: cubic-bezier(0.2, 0, 0, 1);
+  --state-hover-filter: brightness(0.94);
+  --state-pressed-scale: 0.98;
+  --state-focus-width: 2px;
+  --state-focus-offset: 2px;
+  --state-disabled-opacity: 0.38;
+  --breakpoint-desktop: 720px;
+  --sidebar-width: 240px;
+  --bottom-bar-height: 76px;
+  --content-max-width: 960px;
+  --grid-columns-mobile: 4;
+  --grid-margin-mobile: 16px;
+  --grid-gutter-mobile: 16px;
+  --grid-columns-desktop: 12;
+  --grid-margin-desktop: 40px;
+  --grid-gutter-desktop: 24px;
+}
+
+:root[data-theme="dark"] {
+  --md-action: #ADC6FF;
+  --md-on-action: #002E6B;
+  --md-text: #E2E2E9;
+  --md-text-muted: #C4C6D0;
+  --md-surface: #111318;
+  --md-card: #1B1C20;
+  --md-line: #44474E;
+  --md-field: #282A2F;
+  --md-selected: #00458F;
+  --md-on-selected: #D8E2FF;
+  --md-success: #81C784;
+  --md-warn-text: #FFD966;
+  --md-warn-bar: #FFD966;
+  --md-warn-bg: #3D3000;
+  --md-error: #FFB4AB;
+  --md-on-error: #690005;
+  --md-error-text: #FFDAD6;
+  --md-error-bg: #93000A;
+  --md-snackbar: #E2E2E9;
+  --md-snackbar-text: #2F3033;
+  --md-snackbar-action: #0058BE;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+  --md-action: #ADC6FF;
+  --md-on-action: #002E6B;
+  --md-text: #E2E2E9;
+  --md-text-muted: #C4C6D0;
+  --md-surface: #111318;
+  --md-card: #1B1C20;
+  --md-line: #44474E;
+  --md-field: #282A2F;
+  --md-selected: #00458F;
+  --md-on-selected: #D8E2FF;
+  --md-success: #81C784;
+  --md-warn-text: #FFD966;
+  --md-warn-bar: #FFD966;
+  --md-warn-bg: #3D3000;
+  --md-error: #FFB4AB;
+  --md-on-error: #690005;
+  --md-error-text: #FFDAD6;
+  --md-error-bg: #93000A;
+  --md-snackbar: #E2E2E9;
+  --md-snackbar-text: #2F3033;
+  --md-snackbar-action: #0058BE;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-fast: 0ms;
+    --motion-base: 0ms;
+    --motion-slow: 0ms;
+  }
+}

@@ -15,7 +15,8 @@ export async function salvarLimitesAction(input: {
       if (v == null) continue;
       cats[k] = v;
     }
-    await saveLimites(db, orcamento.id, { globalPct: input.globalPct, cats });
+    const saved = await saveLimites(db, orcamento.id, { globalPct: input.globalPct, cats });
+    if (!saved.ok) return saved;
     revalidatePath("/app/ajustes");
     revalidatePath("/app/resumo");
     revalidatePath("/app/orcamento");
