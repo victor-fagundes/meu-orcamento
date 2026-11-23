@@ -101,7 +101,10 @@ test("Gerenciar abre as categorias ativas de Fixas", async ({ page }) => {
   await page.goto("/app/orcamento?tipo=F");
   await conteudo(page).getByRole("link", { name: "Gerenciar" }).click();
   await expect(page).toHaveURL(/\/app\/ajustes\/categorias\?tipo=F/);
-  await expect(page.getByRole("heading", { name: "Fixas" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Despesas fixas" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Receitas" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Despesas variáveis" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Anuais", exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Renomear" })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Arquivar categoria" })).toHaveCount(0);
 });

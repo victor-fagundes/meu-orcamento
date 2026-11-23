@@ -56,3 +56,27 @@ export async function saveLimites(
   }
   return { ok: true, limites: { globalPct, cats } };
 }
+
+/** Grava só o percentual global. Não lê nem reescreve catsJson. */
+export async function salvarLimiteGlobal(
+  db: Db,
+  orcamentoId: string,
+  globalPct: number,
+): Promise<{ ok: true; globalPct: number } | { ok: false; error: string }> {
+  const global = validarLimitePct(globalPct);
+  if (!global.ok) return { ok: false, error: global.error || ERRO_LIMITE_PCT };
+  const [existing] = await db
+    .select({ orcamentoId: limitesAlerta.orcamentoId })
+    .from(limitesAlerta)
+    .where(eq(limitesAlerta.orcamentoId, orcamentoId))
+    .limit(1);
+  if (existing) {
+    await db
+      .update(limitesAlerta)
+      .set({ globalPct: global.valor, updatedAt: new Date() })
+      .where(eq(limitesAlerta.orcamentoId, orcamentoId));
+  } else {
+    await db.insert(limitesAlerta).values({ orcamentoId, globalPct: global.valor, catsJson: "{}" });
+  }
+  return { ok: true, globalPct: global.valor };
+}

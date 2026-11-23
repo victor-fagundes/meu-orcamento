@@ -22,6 +22,19 @@ function nav(page: Page) {
   return page.getByRole("navigation", { name: "Principal" });
 }
 
+async function abrir(page: Page, endereco: string) {
+  if (endereco !== "/app/ajustes") {
+    await page.goto(endereco);
+    return;
+  }
+  try {
+    await page.goto(endereco);
+  } catch (erro) {
+    if (!(erro instanceof Error) || !erro.message.includes("ERR_ABORTED")) throw erro;
+  }
+  await page.waitForURL(/\/app\/ajustes\/categorias/);
+}
+
 test("cinco áreas e sessão anônima", async ({ page, browser }) => {
   await entrar(page);
   const barra = nav(page);
@@ -29,7 +42,8 @@ test("cinco áreas e sessão anônima", async ({ page, browser }) => {
   await expect(barra.getByRole("button")).toHaveText(AREAS.map(([nome]) => nome));
   for (const [nome, endereco] of AREAS) {
     await barra.getByRole("button", { name: nome }).click();
-    await expect(page).toHaveURL(new RegExp(`${endereco}$`), { timeout: 20_000 });
+    const destino = nome === "Ajustes" ? /\/app\/ajustes\/categorias$/ : new RegExp(`${endereco}$`);
+    await expect(page).toHaveURL(destino, { timeout: 20_000 });
     await expect(barra.getByRole("button", { name: nome })).toHaveAttribute("aria-current", "page");
     await expect(barra.locator('[aria-current="page"]')).toHaveCount(1);
   }
@@ -73,7 +87,7 @@ test("Ajustes continua a única aba marcada", async ({ page }) => {
   await entrar(page);
   for (const width of [1280, 390]) {
     await page.setViewportSize({ width, height: 800 });
-    await page.goto("/app/ajustes");
+    await abrir(page, "/app/ajustes");
     const barra = nav(page);
     await expect(barra.getByRole("button")).toHaveCount(5);
     await expect(barra.locator('[aria-current="page"]')).toHaveCount(1);
@@ -86,7 +100,7 @@ test("título sem mês, sem flutuante, e Sair", async ({ page }) => {
   for (const width of [1280, 390]) {
     await page.setViewportSize({ width, height: 800 });
     for (const [nome, endereco] of AREAS) {
-      await page.goto(endereco);
+      await abrir(page, endereco);
       if (nome === "Resumo" || nome === "Orçamento" || nome === "Lançamentos") {
         await expect(page.locator(".mo-cabecalho__titulo")).toContainText(nome);
         await expect(page.getByRole("button", { name: "Mês anterior" })).toHaveCount(1);
@@ -98,10 +112,9 @@ test("título sem mês, sem flutuante, e Sair", async ({ page }) => {
       }
       await expect(page.getByRole("button", { name: "Novo lançamento" })).toHaveCount(0);
       await expect(page.locator(".fab")).toHaveCount(0);
+      await expect(page.locator(".mo-shell__cabecalho").getByRole("button", { name: "Sair", exact: true })).toHaveCount(0);
     }
   }
-  await page.getByRole("button", { name: "Sair" }).click();
-  await page.waitForURL("**/login");
 });
 
 test("teclado, skip link e menos movimento", async ({ page }) => {

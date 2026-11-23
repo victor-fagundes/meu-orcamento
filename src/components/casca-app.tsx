@@ -1,9 +1,8 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Botao, CabecalhoTela, ShellApp } from "@meu-orcamento/design-system";
+import { CabecalhoTela, ShellApp } from "@meu-orcamento/design-system";
 import type { IconName } from "@meu-orcamento/design-system";
-import { authClient } from "@/lib/auth-client";
 import { AREAS, abaAtiva, caminhoComMes, navegacaoMesDaArea } from "@/components/casca-abas";
 
 function mesDaQuery(raw: string | null): string {
@@ -50,16 +49,6 @@ export function CascaApp({ children }: { children: React.ReactNode }) {
                   : undefined
               }
             />
-            <Botao
-              variante="texto"
-              onPress={() => {
-                void authClient.signOut().then(() => {
-                  window.location.assign("/login");
-                });
-              }}
-            >
-              Sair
-            </Botao>
           </>
         }
       >

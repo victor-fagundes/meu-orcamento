@@ -10,11 +10,10 @@ async function entrar(page: Page) {
   await page.waitForURL("**/app/resumo**");
   const saldo = page.getByRole("region", { name: "Disponível neste mês" });
   if (await saldo.count()) return;
-  await page.goto("/app/ajustes");
-  await page.getByRole("button", { name: /Dados de exemplo/ }).click();
+  await page.goto("/app/ajustes/exemplo");
   await page.getByRole("button", { name: "Carregar exemplo" }).click();
-  await page.getByRole("button", { name: "Confirmar exemplo?" }).click();
-  await expect(page.getByText(/itens atualizados/)).toBeVisible();
+  await page.getByRole("button", { name: "Confirmar exemplo", exact: true }).click();
+  await expect(page.getByText(/Exemplo aplicado:/)).toBeVisible();
   await page.goto("/app/resumo");
   await expect(saldo).toBeVisible();
 }

@@ -133,6 +133,8 @@ export interface FormularioContainerProps {
   readonly salvarDesabilitado?: boolean;
   readonly onCancelar: () => void;
   readonly onSalvar: () => void;
+  /** Abaixo de 720 px o painel encosta na base. O padrão continua o painel lateral. */
+  readonly folhaNaEstreita?: boolean;
 }
 
 export interface AbaNavegacao {
@@ -252,6 +254,7 @@ export interface LinhaAjusteProps {
   readonly apoio?: string;
   readonly onAbrir: () => void;
   readonly destrutivo?: boolean;
+  readonly atual?: boolean;
 }
 
 export interface RodapeAcoesProps {

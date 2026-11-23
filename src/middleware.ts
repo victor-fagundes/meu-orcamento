@@ -14,6 +14,12 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  if (pathname === "/app/ajustes") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/app/ajustes/categorias";
+    return NextResponse.redirect(url);
+  }
+
   return NextResponse.next();
 }
 

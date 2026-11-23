@@ -4,7 +4,7 @@ import type { FormularioContainerProps } from '../base/contratos.ts';
 import { prenderFoco } from './foco.ts';
 
 /** No web, formulários e edições abrem em painel lateral de 460 px (DECISOES_identidade_visual.md, seção 6). */
-export function FormularioContainer({ aberto, titulo, children, textoCancelar = 'Cancelar', textoSalvar, salvarDesabilitado = false, onCancelar, onSalvar }: FormularioContainerProps) {
+export function FormularioContainer({ aberto, titulo, children, textoCancelar = 'Cancelar', textoSalvar, salvarDesabilitado = false, onCancelar, onSalvar, folhaNaEstreita = false }: FormularioContainerProps) {
   const painel = useRef<HTMLElement | null>(null);
   const cancelarRef = useRef(onCancelar);
   cancelarRef.current = onCancelar;
@@ -19,13 +19,13 @@ export function FormularioContainer({ aberto, titulo, children, textoCancelar = 
   if (!aberto) return null;
 
   return (
-    <div className="mo-formulario-fundo" onClick={onCancelar}>
+    <div className={folhaNaEstreita ? "mo-formulario-fundo mo-formulario-fundo--folha" : "mo-formulario-fundo"} onClick={onCancelar}>
       <section
         ref={painel}
         role="dialog"
         aria-modal="true"
         aria-label={titulo}
-        className="mo-formulario"
+        className={folhaNaEstreita ? "mo-formulario mo-formulario--folha" : "mo-formulario"}
         tabIndex={-1}
         onClick={(evento) => evento.stopPropagation()}
       >

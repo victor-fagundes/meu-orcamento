@@ -9,9 +9,11 @@ import {
 } from "@/application/categorias";
 import { requireSessionOrcamento } from "@/lib/session";
 
+const ERRO_SALVAR = "Não foi possível salvar. Os campos continuam preenchidos.";
+
 function revalidarCategorias() {
   revalidatePath("/app/orcamento");
-  revalidatePath("/app/ajustes");
+  revalidatePath("/app/ajustes", "layout");
 }
 
 export async function listarCategoriasAction(incluirArquivadas = false) {
@@ -19,8 +21,8 @@ export async function listarCategoriasAction(incluirArquivadas = false) {
     const { db, orcamento } = await requireSessionOrcamento();
     const lista = await listarCategorias(db, orcamento.id, { incluirArquivadas });
     return { ok: true as const, categorias: lista };
-  } catch (e) {
-    return { ok: false as const, error: e instanceof Error ? e.message : "Falha ao listar" };
+  } catch {
+    return { ok: false as const, error: "Não foi possível carregar." };
   }
 }
 
@@ -30,8 +32,8 @@ export async function criarCategoriaAction(input: { tipo: string; nome: string }
     const res = await criarCategoria(db, orcamento.id, input);
     if (res.ok) revalidarCategorias();
     return res;
-  } catch (e) {
-    return { ok: false as const, code: "validacao" as const, error: e instanceof Error ? e.message : "Falha ao criar" };
+  } catch {
+    return { ok: false as const, code: "validacao" as const, error: ERRO_SALVAR };
   }
 }
 
@@ -41,12 +43,8 @@ export async function renomearCategoriaAction(categoriaId: string, nome: string)
     const res = await renomearCategoria(db, orcamento.id, categoriaId, nome);
     if (res.ok) revalidarCategorias();
     return res;
-  } catch (e) {
-    return {
-      ok: false as const,
-      code: "validacao" as const,
-      error: e instanceof Error ? e.message : "Falha ao renomear",
-    };
+  } catch {
+    return { ok: false as const, code: "validacao" as const, error: ERRO_SALVAR };
   }
 }
 
@@ -56,11 +54,7 @@ export async function arquivarCategoriaAction(categoriaId: string) {
     const res = await arquivarCategoria(db, orcamento.id, categoriaId);
     if (res.ok) revalidarCategorias();
     return res;
-  } catch (e) {
-    return {
-      ok: false as const,
-      code: "validacao" as const,
-      error: e instanceof Error ? e.message : "Falha ao arquivar",
-    };
+  } catch {
+    return { ok: false as const, code: "validacao" as const, error: ERRO_SALVAR };
   }
 }
