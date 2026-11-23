@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Sistema · Ícones</title>
+<script src="./support.js"></script>
+<style>@font-face {
+  font-family: "Manrope";
+  src: url("fonts/Manrope-VariableFont_wght.ttf") format("truetype");
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+/* Meu Orçamento · tokens v0.1 (proposta para aprovação)
+   Tema claro. Tema escuro: pendente. */
+:root {
+  /* Cor · marca */
+  --md-brand-yellow: #ffe600;
+  --md-brand-ink: #191c20;
+  --md-brand-blue: #0058be;
+
+  /* Cor · função */
+  --md-action: #0058be;
+  --md-on-action: #ffffff;
+  --md-text: #191c20;
+  --md-text-muted: #43474e;
+  --md-surface: #f8f9ff;
+  --md-card: #ffffff;
+  --md-line: #e3e6ef;
+  --md-field: #eceef6;
+  --md-selected: #d7e3ff;
+  --md-on-selected: #001b3f;
+
+  /* Cor · estado */
+  --md-success: #2e7d32;
+  --md-warn-text: #6b4b00;
+  --md-warn-bar: #9a6b00;
+  --md-warn-bg: #fff3c4;
+  --md-error: #ba1a1a;
+  --md-error-text: #410002;
+  --md-error-bg: #ffdad6;
+  --md-snackbar: #2f3033;
+  --md-snackbar-text: #f1f0f4;
+  --md-snackbar-action: #adc6ff;
+
+  /* Espaço (escala de 4) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+
+  /* Raio */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 14px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+  --radius-sheet: 28px;
+  --radius-full: 999px;
+
+  /* Elevação */
+  --elevation-0: none;
+  --elevation-1: 0 1px 2px rgba(25, 28, 32, 0.06);
+  --elevation-2: 0 8px 24px rgba(25, 28, 32, 0.16);
+  --elevation-fab: 0 4px 12px rgba(0, 88, 190, 0.3);
+
+  /* Tipo: família e escala */
+  --font-family: "Manrope", "Segoe UI", sans-serif;
+  --type-display-lg-size: 56px; --type-display-lg-line: 60px;
+  --type-display-md-size: 40px; --type-display-md-line: 44px;
+  --type-title-lg-size: 28px;   --type-title-lg-line: 32px;
+  --type-title-md-size: 20px;   --type-title-md-line: 24px;
+  --type-body-size: 16px;       --type-body-line: 24px;
+  --type-label-size: 14px;      --type-label-line: 20px;
+  --type-caption-size: 12px;    --type-caption-line: 16px;
+
+  /* Movimento */
+  --motion-fast: 150ms;
+  --motion-base: 200ms;
+  --motion-slow: 300ms;
+  --motion-easing: cubic-bezier(0.2, 0, 0, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --motion-fast: 0ms; --motion-base: 0ms; --motion-slow: 0ms; }
+}
+
+/* Estados de interação (v0.2) */
+:root {
+  --state-hover-filter: brightness(0.94);
+  --state-pressed-scale: 0.98;
+  --state-focus-width: 2px;
+  --state-focus-offset: 2px;
+  --state-disabled-opacity: 0.38;
+}
+
+/* Grid (v0.2) */
+:root {
+  --breakpoint-desktop: 720px;     /* a partir daqui: barra lateral e grid de 12 colunas */
+  --sidebar-width: 240px;
+
+  /* Celular (até 719 px): 4 colunas */
+  --grid-columns-mobile: 4;
+  --grid-margin-mobile: 16px;
+  --grid-gutter-mobile: 16px;
+
+  /* Desktop (a partir de 720 px): 12 colunas dentro da área de conteúdo */
+  --grid-columns-desktop: 12;
+  --grid-margin-desktop: 40px;
+  --grid-gutter-desktop: 24px;
+}
+</style>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width:880px;height:560px;box-sizing:border-box;padding:24px;background:var(--md-surface);color:var(--md-text);font-family:Manrope,sans-serif;overflow:hidden">
+<div style="font-size:12px;font-weight:700;color:var(--md-text-muted);letter-spacing:.08em;margin-bottom:12px">ÍCONES · MATERIAL ICONS FILLED · 24 PX</div>
+<div style="display:flex;flex-wrap:wrap;gap:12px"><div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px;background:var(--md-card);border-radius:14px;box-shadow:var(--elevation-1);width:150px"><svg viewBox="0 0 24 24" width="24" height="24" fill="var(--md-text)" aria-hidden="true"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg><div style="font-size:12px;font-weight:700;text-align:center">Resumo</div><div style="font-size:11px;color:var(--md-text-muted);text-align:center">dashboard</div></div><div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px;background:var(--md-card);border-radius:14px;box-shadow:var(--elevation-1);width:150px"><svg viewBox="0 0 24 24" width="24" height="24" fill="var(--md-text)" aria-hidden="true"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm-7 14H7v-2h5v2zm5-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg><div style="font-size:12px;font-weight:700;text-align:center">Orçamento</div><div style="font-size:11px;color:var(--md-text-muted);text-align:center">assignment</div></div><div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px;background:var(--md-card);border-radius:14px;box-shadow:var(--elevation-1);width:150px"><svg viewBox="0 0 24 24" width="24" height="24" fill="var(--md-text)" aria-hidden="true"><path d="M4 6h16v2H4V6zm0 5h16v2H4v-2zm0 5h16v2H4v-2z"/></svg><div style="font-size:12px;font-weight:700;text-align:center">Lançamentos</div><div style="font-size:11px;color:var(--md-text-muted);text-align:center">list</div></div><div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px;background:var(--md-card);border-radius:14px;box-shadow:var(--elevation-1);width:150px"><svg viewBox="0 0 24 24" width="24" height="24" fill="var(--md-text)" aria-hidden="true"><path d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 16H5V10h14v10z"/></svg><div style="font-size:12px;font-weight:700;text-align:center">Ano</div><div style="font-size:11px;color:var(--md-text-muted);text-align:center">calendar_month</div></div><div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px;background:var(--md-card);border-radius:14px;box-shadow:var(--elevation-1);width:150px"><svg viewBox="0 0 24 24" width="24" height="24" fill="var(--md-text)" aria-hidden="true"><path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.48.48 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg><div style="font-size:12px;font-weight:700;text-align:center">Ajustes</div><div style="font-size:11px;color:var(--md-text-muted);text-align:center">settings</div></div><div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px;background:var(--md-card);border-radius:14px;box-shadow:var(--elevation-1);width:150px"><svg viewBox="0 0 24 24" width="24" height="24" fill="var(--md-text)" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg><div style="font-size:12px;font-weight:700;text-align:center">Conta</div><div style="font-size:11px;color:var(--md-text-muted);text-align:center">person</div></div><div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px;background:var(--md-card);border-radius:14px;box-shadow:var(--elevation-1);width:150px"><svg viewBox="0 0 24 24" width="24" height="24" fill="var(--md-text)" aria-hidden="true"><path d="M12 2l-5.5 9h11L12 2zm0 3.84L13.93 9h-3.87L12 5.84zM17.5 13c-2.49 0-4.5 2.01-4.5 4.5s2.01 4.5 4.5 4.5 4.5-2.01 4.5-4.5-2.01-4.5-4.5-4.5zm0 7c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5zM3 13.5h8v8H3v-8zm2 2v4h4v-4H5z"/></svg><div style="font-size:12px;font-weight:700;text-align:center">Categorias</div><div style="font-size:11px;color:var(--md-text-muted);text-align:center">category</div></div><div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px;background:var(--md-card);border-radius:14px;box-shadow:var(--elevation-1);width:150px"><svg viewBox="0 0 24 24" width="24" height="24" fill="var(--md-text)" aria-hidden="true"><path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg><div style="font-size:12px;font-weight:700;text-align:center">Cartões</div><div style="font-size:11px;color:var(--md-text-muted);text-align:center">credit_card</div></div><div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px;background:var(--md-card);border-radius:14px;box-shadow:var(--elevation-1);width:150px"><svg viewBox="0 0 24 24" width="24" height="24" fill="var(--md-text)" aria-hidden="true"><path d="M12 22a2 2 0 0 0 2-2h-4a2 2 0 0 0 2 2zm6-6V11c0-3.07-1.64-5.64-4.5-6.32V4a1.5 1.5 0 0 0-3 0v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg><div style="font-size:12px;font-weight:700;text-align:center">Limites de alerta</div><div style="font-size:11px;color:var(--md-text-muted);text-align:center">notifications</div></div><div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px;background:var(--md-card);border-radius:14px;box-shadow:var(--elevation-1);width:150px"><svg viewBox="0 0 24 24" width="24" height="24" fill="var(--md-text)" aria-hidden="true"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM6.24 5h11.52l.81.97H5.44L6.24 5zM5 19V8h14v11H5zm8.45-9h-2.9v3H8l4 4 4-4h-2.55z"/></svg><div style="font-size:12px;font-weight:700;text-align:center">Itens arquivados</div><div style="font-size:11px;color:var(--md-text-muted);text-align:center">archive</div></div><div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px;background:var(--md-card);border-radius:14px;box-shadow:var(--elevation-1);width:150px"><svg viewBox="0 0 24 24" width="24" height="24" fill="var(--md-text)" aria-hidden="true"><path d="M3 3h18v18H3V3zm2 2v4h14V5H5zm0 6v3h4v-3H5zm6 0v3h8v-3h-8zm-6 5v3h4v-3H5zm6 0v3h8v-3h-8z"/></svg><div style="font-size:12px;font-weight:700;text-align:center">Importar planilha</div><div style="font-size:11px;color:var(--md-text-muted);text-align:center">table_chart</div></div><div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px;background:var(--md-card);border-radius:14px;box-shadow:var(--elevation-1);width:150px"><svg viewBox="0 0 24 24" width="24" height="24" fill="var(--md-text)" aria-hidden="true"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 7V3.5L18.5 9H13z"/></svg><div style="font-size:12px;font-weight:700;text-align:center">Importar fatura</div><div style="font-size:11px;color:var(--md-text-muted);text-align:center">description</div></div><div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px;background:var(--md-card);border-radius:14px;box-shadow:var(--elevation-1);width:150px"><svg viewBox="0 0 24 24" width="24" height="24" fill="var(--md-text)" aria-hidden="true"><path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2h14v2H5v-2z"/></svg><div style="font-size:12px;font-weight:700;text-align:center">Exportar</div><div style="font-size:11px;color:var(--md-text-muted);text-align:center">upload</div></div><div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px;background:var(--md-card);border-radius:14px;box-shadow:var(--elevation-1);width:150px"><svg viewBox="0 0 24 24" width="24" height="24" fill="var(--md-text)" aria-hidden="true"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg><div style="font-size:12px;font-weight:700;text-align:center">Simulador de competência</div><div style="font-size:11px;color:var(--md-text-muted);text-align:center">event_available</div></div><div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px;background:var(--md-card);border-radius:14px;box-shadow:var(--elevation-1);width:150px"><svg viewBox="0 0 24 24" width="24" height="24" fill="var(--md-text)" aria-hidden="true"><path d="M7 2v2h1v5.5L3 18v2h18v-2l-5-8.5V4h1V2H7zm3 2h4v6.6l.8 1.4H9.2l.8-1.4V4z"/></svg><div style="font-size:12px;font-weight:700;text-align:center">Dados de exemplo</div><div style="font-size:11px;color:var(--md-text-muted);text-align:center">science</div></div><div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px;background:var(--md-card);border-radius:14px;box-shadow:var(--elevation-1);width:150px"><svg viewBox="0 0 24 24" width="24" height="24" fill="var(--md-text)" aria-hidden="true"><path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg><div style="font-size:12px;font-weight:700;text-align:center">Excluir conta</div><div style="font-size:11px;color:var(--md-text-muted);text-align:center">delete</div></div></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":880,"height":560}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>
