@@ -10,7 +10,7 @@ import { getAuth } from "@/lib/auth";
 export async function requireSessionOrcamento() {
   const auth = await getAuth();
   const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) redirect("/login");
+  if (!session) redirect("/login?sessao=expirada");
 
   return runDb(async (db) => {
     let orc = (

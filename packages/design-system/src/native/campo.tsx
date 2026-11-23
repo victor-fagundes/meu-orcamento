@@ -5,12 +5,33 @@ import { useCores } from './tema.tsx';
 
 const teclado = { texto: 'default', decimal: 'decimal-pad', numerico: 'number-pad' } as const;
 
-export function Campo({ id, rotulo, valor, onMudar, erro, desabilitado = false, placeholder, teclado: modo = 'texto' }: CampoProps) {
+const completarNativo: Record<NonNullable<CampoProps['completar']>, 'name' | 'email' | 'current-password' | 'new-password'> = {
+  nome: 'name',
+  email: 'email',
+  'senha-atual': 'current-password',
+  'senha-nova': 'new-password',
+};
+
+export function Campo({
+  id,
+  rotulo,
+  valor,
+  onMudar,
+  erro,
+  invalido = false,
+  desabilitado = false,
+  placeholder,
+  teclado: modo = 'texto',
+  tipo = 'texto',
+  completar,
+}: CampoProps) {
   const cores = useCores();
-  const temErro = erro !== undefined && erro !== '';
+  const temFrase = erro !== undefined && erro !== '';
+  const marcado = invalido || temFrase;
+  const tecladoNativo = tipo === 'email' ? 'email-address' : tipo === 'senha' ? 'default' : teclado[modo];
   return (
     <View style={styles.bloco}>
-      <Text nativeID={`${id}-rotulo`} style={[styles.rotulo, { color: cores.text }]}>{rotulo}</Text>
+      <Text nativeID={`${id}-rotulo`} style={[styles.rotulo, { color: marcado ? cores.error : cores.text }]}>{rotulo}</Text>
       <TextInput
         nativeID={id}
         value={valor}
@@ -18,13 +39,15 @@ export function Campo({ id, rotulo, valor, onMudar, erro, desabilitado = false, 
         placeholder={placeholder}
         placeholderTextColor={cores.textMuted}
         editable={!desabilitado}
-        keyboardType={teclado[modo]}
+        keyboardType={tecladoNativo}
+        secureTextEntry={tipo === 'senha'}
+        autoComplete={completar ? completarNativo[completar] : undefined}
         accessibilityLabel={rotulo}
         accessibilityState={{ disabled: desabilitado }}
-        accessibilityHint={temErro ? erro : undefined}
-        style={[styles.entrada, { backgroundColor: cores.field, color: cores.text }, temErro ? { borderWidth: 1.5, borderColor: cores.error } : null, desabilitado ? { opacity: stateTokens.disabledOpacity } : null]}
+        accessibilityHint={temFrase ? erro : undefined}
+        style={[styles.entrada, { backgroundColor: cores.field, color: cores.text }, marcado ? { borderWidth: 1.5, borderColor: cores.error } : null, desabilitado ? { opacity: stateTokens.disabledOpacity } : null]}
       />
-      {temErro ? <Text accessibilityLiveRegion="polite" style={[styles.erro, { color: cores.error }]}>{erro}</Text> : null}
+      {temFrase ? <Text accessibilityLiveRegion="polite" style={[styles.erro, { color: cores.error }]}>{erro}</Text> : null}
     </View>
   );
 }

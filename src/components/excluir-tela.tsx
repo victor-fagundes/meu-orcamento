@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Botao, Campo } from "@meu-orcamento/design-system";
 import { excluirContaAction } from "@/app/actions/conta";
 import { confirmarFraseExclusao } from "@/domain/exclusao-conta";
+import { limparMarcaSessao } from "@/lib/marca-sessao";
 
 export function ExcluirTela() {
   const [passo, setPasso] = useState<1 | 2>(1);
@@ -22,6 +23,7 @@ export function ExcluirTela() {
       setErro("Não foi possível excluir a conta.");
       return;
     }
+    limparMarcaSessao();
     window.location.assign("/login");
   }
 

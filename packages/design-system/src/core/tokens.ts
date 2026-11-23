@@ -106,6 +106,7 @@ export const grid = {
   sidebarWidth: 240,
   bottomBarHeight: 76,
   contentMaxWidth: 960,
+  entradaLargura: 400,
   mobile: { columns: 4, margin: 16, gutter: 16 },
   desktop: { columns: 12, margin: 40, gutter: 24 },
 } as const;

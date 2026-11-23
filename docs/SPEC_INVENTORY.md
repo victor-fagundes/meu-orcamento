@@ -109,7 +109,7 @@ Status lido em `specs/*/spec.md`. A tabela de 001–022 acima não muda.
 | 045 | 045-lancamentos-web | verified | Playwright `e2e/lancamentos.spec.ts`, 23 nov 2026 |
 | 046 | 046-ano-web | verified | Playwright `e2e/ano.spec.ts`, 23 nov 2026 |
 | 047 | 047-ajustes-web | verified | Playwright `e2e/ajustes.spec.ts`, 23 nov 2026 |
-| 048 | 048-entrada-web | ready | Sem implementação |
-| 049 | 049-remocao-front-antigo | ready | Começa quando 048 também estiver `verified`. 043, 044, 045, 046 e 047 já estão |
+| 048 | 048-entrada-web | verified | PM testou, 23 nov 2026. Playwright `e2e/entrada.spec.ts` |
+| 049 | 049-remocao-front-antigo | ready | 048 está `verified`. Esta história pode começar |
 
-Contagem desta atualização: `verified` 7 (041–047), `implemented` 17, `ready` 2, `draft` 1, `Cancelled` 1.
+Contagem desta atualização: `verified` 8 (041–048), `implemented` 17, `ready` 1, `draft` 1, `Cancelled` 1.

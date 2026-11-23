@@ -23,9 +23,14 @@ export interface CampoProps {
   readonly valor: string;
   readonly onMudar: (valor: string) => void;
   readonly erro?: string;
+  /** Estado de erro sem frase própria. A frase continua em `erro`, quando houver. */
+  readonly invalido?: boolean;
   readonly desabilitado?: boolean;
   readonly placeholder?: string;
   readonly teclado?: 'texto' | 'decimal' | 'numerico';
+  /** Ausente continua texto visível. */
+  readonly tipo?: 'texto' | 'email' | 'senha';
+  readonly completar?: 'nome' | 'email' | 'senha-atual' | 'senha-nova';
 }
 
 export interface MedidorProps {

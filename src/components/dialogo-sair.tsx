@@ -2,6 +2,7 @@
 
 import { Dialogo } from "@meu-orcamento/design-system";
 import { authClient } from "@/lib/auth-client";
+import { limparMarcaSessao } from "@/lib/marca-sessao";
 
 export function DialogoSair({ aberto, onCancelar }: { aberto: boolean; onCancelar: () => void }) {
   return (
@@ -14,6 +15,7 @@ export function DialogoSair({ aberto, onCancelar }: { aberto: boolean; onCancela
       tipoConfirmar="primario"
       onCancelar={onCancelar}
       onConfirmar={() => {
+        limparMarcaSessao();
         void authClient.signOut().then(() => {
           window.location.assign("/login");
         });
