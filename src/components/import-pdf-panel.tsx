@@ -5,7 +5,7 @@ import { confirmPdfImportAction, parsePdfFaturaAction } from "@/app/actions/impo
 import type { PdfPreviewRow } from "@/domain/import-pdf";
 import { formatBRL } from "@/domain/money";
 import { FileField } from "@/components/file-field";
-import { MdFilledButton, MdOption, MdOutlinedButton, MdSelect } from "@/components/material/ui";
+import { MdFilledButton, MdOption, MdOutlinedButton, MdSelect } from "@/components/controles-ajuste";
 
 type CartaoOpt = { id: string; apelido: string };
 
@@ -33,7 +33,7 @@ export function ImportPdfPanel({ cartoes }: { cartoes: CartaoOpt[] }) {
 
   return (
     <section className="aj-block" style={{ marginTop: 16 }}>
-      <h2 className="aj-h2">Importar fatura (PDF)</h2>
+      <h2 className="aj-h2">Importar fatura</h2>
       <p className="aj-help">
         PDF com texto selecionável. Processado em memória — o arquivo não é guardado.
       </p>

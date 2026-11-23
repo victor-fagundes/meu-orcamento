@@ -22,7 +22,7 @@ import {
 import { formatBRL } from "@/domain/money";
 import { competenciaDestinoImport, textoDestinoImport } from "@/domain/navegacao-mes";
 import { FileField } from "@/components/file-field";
-import { MdFilledButton, MdOption, MdOutlinedButton, MdSelect } from "@/components/material/ui";
+import { MdFilledButton, MdOption, MdOutlinedButton, MdSelect } from "@/components/controles-ajuste";
 
 type CartaoOpt = { id: string; apelido: string };
 
