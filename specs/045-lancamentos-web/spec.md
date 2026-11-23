@@ -13,6 +13,17 @@
 
 A exclusão com desfazer de 10 segundos já existe no produto. A tela nova mostra o desfazer num `Snackbar`. A ação de excluir não fica solta na linha: ou está no fim da edição, ou dentro de `MenuAcoes`, sempre com `Dialogo`.
 
+## Referências visuais e de DS
+- Identidade: `docs/identidade-visual/decisoes/DECISOES_identidade_visual.md` (seções aplicáveis: 5 Layout, 6 Formulários e confirmações, 7 Estados e mensagens, 8 Nomes e microcopy)
+- Tela de referência: `docs/identidade-visual/telas-web/web-lanc-lista.dc.html`, `web-lanc-vazio.dc.html`, `web-lanc-busca-vazia.dc.html`, `web-lanc-registrar.dc.html`, `web-lanc-parcelado.dc.html`, `web-lanc-editar-escopo.dc.html`, `web-lanc-excluir-escopo.dc.html`
+- Componentes do DS usados: `CabecalhoTela`, `Tabela`, `CampoBusca`, `Select`, `CampoMoeda`, `CampoData`, `Campo`, `Switch`, `FormularioContainer`, `RodapeAcoes`, `Botao`, `Dialogo`, `Snackbar`, `MenuAcoes`, `CartaoVazio`, `Skeleton`, `EstadoErro`
+- Tokens: apenas os de `packages/design-system/src/core/tokens.ts`
+
+## Critérios de aceite visuais
+- AC-V1: hierarquia e textos iguais à tela de referência.
+- AC-V2: todos os componentes vêm do DS.
+- AC-V3: estados (vazio, erro, carregando) iguais aos da referência.
+
 ## Goals
 
 1. Listar o mês em tabela, com busca e filtros.

@@ -10,6 +10,17 @@
 
 **Related**: Quem entrou na conta vê uma casca só: cabeçalho, navegação e a área aberta. As cinco áreas são Resumo, Orçamento, Lançamentos, Ano e Ajustes, nesta ordem, nos endereços que a pessoa já usa. No largo, a navegação é lateral. No estreito, é inferior. O miolo de cada área fica nas histórias 043 a 048. A aparência vem da história 040.
 
+## Referências visuais e de DS
+- Identidade: `docs/identidade-visual/decisoes/DECISOES_identidade_visual.md` (seções aplicáveis: 4 Forma e espaço, 5 Layout, 9 Acessibilidade)
+- Tela de referência: `docs/identidade-visual/telas-web/web-resumo-dados.dc.html` (a casca é a mesma nas outras `web-*.dc.html`)
+- Componentes do DS usados: `ShellApp`, `NavegacaoPrincipal`, `CabecalhoTela`, `Icone`
+- Tokens: apenas os de `packages/design-system/src/core/tokens.ts`
+
+## Critérios de aceite visuais
+- AC-V1: hierarquia e textos iguais à tela de referência.
+- AC-V2: todos os componentes vêm do DS.
+- AC-V3: estados (vazio, erro, carregando) iguais aos da referência.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - A casca das cinco áreas (Priority: P1)

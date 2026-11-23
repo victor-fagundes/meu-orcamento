@@ -34,6 +34,21 @@ Cada história/card (MO-xxx) entrega **back + front juntos** na mesma entrega.
 | Decisões Q/D | `docs/DECISOES_ASSUMIDAS_v1_0.md` |
 | UX referência | `prototype/Meu_Orcamento_prototipo_v3.html` |
 
+## Identidade visual e Design System (obrigatório)
+
+Antes de qualquer tarefa que altere interface (`src/app`, `src/components`, estilos), leia:
+
+1. `docs/identidade-visual/LEIA-ME.md`: ordem de leitura e regras de aparência.
+2. `docs/identidade-visual/decisoes/`: decisões de marca, cor, layout, formulários, estados e textos.
+3. `packages/design-system/README-USO.md` e `packages/design-system/CHECKLIST.md`: como usar o DS e a checklist de revisão.
+
+Regras:
+- A **aparência** segue `docs/identidade-visual/telas-web/` (e `telas-app/` na Fase 2). Em caso de dúvida, a referência visual vence.
+- A **estrutura** (componentes, tokens, nomes) segue o DS em `packages/design-system/`. Não criar componentes de interface fora dele.
+- Nenhum valor de cor, espaço ou tipo literal em estilo. Use tokens.
+- Textos seguem `docs/identidade-visual/decisoes/MICROCOPY.md`.
+- Ao concluir uma tela, comparar com o artboard de referência correspondente (mesmo nome, prefixo `web-`) e registrar no `spec.md` qualquer diferença intencional.
+
 ## Ordem de trabalho atual
 
 Release A e Release B `verified` (PM 2026-11-16). Specs 001–022 `verified`.  

@@ -13,6 +13,17 @@ Entrar, criar conta e recuperar a senha já existem em `/login`, `/cadastro` e `
 
 A autenticação em `src/lib/auth*` e `src/app/api/auth/**` não muda. Sessão expirada é um estado da entrada, com banner, não uma regra nova de token.
 
+## Referências visuais e de DS
+- Identidade: `docs/identidade-visual/decisoes/DECISOES_identidade_visual.md` (seções aplicáveis: 1 Marca, 5 Layout, 6 Formulários e confirmações, 7 Estados e mensagens)
+- Tela de referência: `docs/identidade-visual/telas-web/web-entrar.dc.html`, `web-entrar-erro.dc.html`, `web-criar-conta.dc.html`, `web-esqueci.dc.html`, `web-esqueci-enviado.dc.html`, `web-sessao-expirada.dc.html`, `web-sair.dc.html`
+- Componentes do DS usados: `Campo`, `Botao`, `Banner`
+- Tokens: apenas os de `packages/design-system/src/core/tokens.ts`
+
+## Critérios de aceite visuais
+- AC-V1: hierarquia e textos iguais à tela de referência.
+- AC-V2: todos os componentes vêm do DS.
+- AC-V3: estados (vazio, erro, carregando) iguais aos da referência.
+
 ## Goals
 
 1. Levar login, cadastro, esqueci a senha, link enviado, sessão expirada e sair para o layout do DS.

@@ -15,6 +15,17 @@ Categorias usam a API e as actions da spec 041. Itens arquivados são só leitur
 
 O perfil no topo mostra avatar, nome, e-mail e o caminho "Esqueci a senha". Em Conta, a pessoa escolhe Claro, Escuro ou Sistema. A escolha grava `mo-tema`, como pede `docs/design/TEMA-ESCURO.md`.
 
+## Referências visuais e de DS
+- Identidade: `docs/identidade-visual/decisoes/DECISOES_identidade_visual.md` (seções aplicáveis: 5 Layout, 6 Formulários e confirmações, 7 Estados e mensagens, 8 Nomes e microcopy)
+- Tela de referência: `docs/identidade-visual/telas-web/web-ajustes-conta.dc.html`, `web-ajustes-cartoes.dc.html`, `web-ajustes-limites.dc.html`, `web-ajustes-exportar.dc.html`, `web-ajustes-exemplo.dc.html`, `web-ajustes-excluir.dc.html`, `web-ajustes-arquivados.dc.html`, `web-categorias.dc.html`, `web-sair.dc.html`
+- Componentes do DS usados: `CabecalhoTela`, `Avatar`, `LinhaAjuste`, `Icone`, `MenuAcoes`, `FormularioContainer`, `Campo`, `Botao`, `Dialogo`
+- Tokens: apenas os de `packages/design-system/src/core/tokens.ts`
+
+## Critérios de aceite visuais
+- AC-V1: hierarquia e textos iguais à tela de referência.
+- AC-V2: todos os componentes vêm do DS.
+- AC-V3: estados (vazio, erro, carregando) iguais aos da referência.
+
 ## Goals
 
 1. Organizar Ajustes em dois grupos e isolar "Excluir conta".

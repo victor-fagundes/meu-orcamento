@@ -13,6 +13,17 @@
 
 A tabela detalhada é só do web. No celular a lista mensal sem essa tabela fica para a fase mobile (spec 055) e não entra aqui.
 
+## Referências visuais e de DS
+- Identidade: `docs/identidade-visual/decisoes/DECISOES_identidade_visual.md` (seções aplicáveis: 3 Tipografia, 5 Layout, 7 Estados e mensagens, 8 Nomes e microcopy)
+- Tela de referência: `docs/identidade-visual/telas-web/web-ano-dados.dc.html`, `web-ano-vazio.dc.html`, `web-ano-planejado.dc.html`
+- Componentes do DS usados: `CabecalhoTela`, `TabelaMeses`, `CartaoVazio`, `EstadoErro`
+- Tokens: apenas os de `packages/design-system/src/core/tokens.ts`
+
+## Critérios de aceite visuais
+- AC-V1: hierarquia e textos iguais à tela de referência.
+- AC-V2: todos os componentes vêm do DS.
+- AC-V3: estados (vazio, erro, carregando) iguais aos da referência.
+
 ## Goals
 
 1. Mostrar os doze meses, o total de cada linha e a sobra do ano.

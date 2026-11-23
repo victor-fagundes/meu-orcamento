@@ -35,6 +35,17 @@ PRD: 5.7, D-01, D-04
 ## Context
 ...
 
+## Referências visuais e de DS
+- Identidade: `docs/identidade-visual/decisoes/DECISOES_identidade_visual.md` (seções aplicáveis: ...)
+- Tela de referência: `docs/identidade-visual/telas-web/web-<nome>.dc.html`
+- Componentes do DS usados: `Botao`, `Campo`, ... (liste)
+- Tokens: apenas os de `packages/design-system/src/core/tokens.ts`
+
+## Critérios de aceite visuais
+- AC-V1: hierarquia e textos iguais à tela de referência.
+- AC-V2: todos os componentes vêm do DS.
+- AC-V3: estados (vazio, erro, carregando) iguais aos da referência.
+
 ## Goals
 ...
 

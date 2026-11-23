@@ -10,6 +10,17 @@
 
 **Related**: Quem entrou na conta abre o Resumo e lê o mês de competência. O número principal passa a se chamar "Disponível neste mês": planejado das despesas menos o gasto das despesas. Os quatro cartões, os filtros, o sininho e o gráfico de gasto por semana usam essa mesma conta. A aparência vem da história 040. O lugar na casca vem da história 042.
 
+## Referências visuais e de DS
+- Identidade: `docs/identidade-visual/decisoes/DECISOES_identidade_visual.md` (seções aplicáveis: 2 Cores, 3 Tipografia, 5 Layout, 7 Estados e mensagens, 8 Nomes e microcopy)
+- Tela de referência: `docs/identidade-visual/telas-web/web-resumo-dados.dc.html`, `web-resumo-vazio.dc.html`, `web-resumo-erro.dc.html`, `web-resumo-filtro.dc.html`, `web-resumo-alertas.dc.html`, `web-resumo-tipo.dc.html`
+- Componentes do DS usados: `CabecalhoTela`, `BlocoSaldo`, `GradeTotais`, `Medidor`, `Chips`, `Icone`, `CartaoVazio`, `Skeleton`, `EstadoErro`
+- Tokens: apenas os de `packages/design-system/src/core/tokens.ts`
+
+## Critérios de aceite visuais
+- AC-V1: hierarquia e textos iguais à tela de referência.
+- AC-V2: todos os componentes vêm do DS.
+- AC-V3: estados (vazio, erro, carregando) iguais aos da referência.
+
 ## Clarifications
 
 ### Session 2026-11-22

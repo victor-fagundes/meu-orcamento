@@ -21,6 +21,17 @@ A fonte visual está em `docs/design/`: `COMPONENTES.md`, `MODULOS.md`, `MICROCO
 
 `npm test` na raiz só inclui `src/**/*.test.ts`. Os testes do DS rodam no pacote (`packages/design-system`).
 
+## Referências visuais e de DS
+- Identidade: `docs/identidade-visual/decisoes/DECISOES_identidade_visual.md` (seções aplicáveis: 1 Marca, 2 Cores, 3 Tipografia, 4 Forma e espaço, 5 Layout, 6 Formulários e confirmações, 7 Estados e mensagens, 9 Acessibilidade)
+- Tela de referência: `docs/identidade-visual/design-system-canvas/ds-web-componentes.dc.html`, `ds-tokens.dc.html`, `ds-grid.dc.html`, `ds-icones.dc.html`, `ds-modulos.dc.html`, `ds-estados-botoes-campos.dc.html`, `ds-estados-outros.dc.html`, `ds-tema-escuro.dc.html`
+- Componentes do DS usados: `ShellApp`, `Tabela`, `CampoBusca`, `CampoData`, `Switch`, `MenuAcoes`, `BotaoIcone`, `Avatar`, `Dialogo`, `FormularioContainer`
+- Tokens: apenas os de `packages/design-system/src/core/tokens.ts`
+
+## Critérios de aceite visuais
+- AC-V1: hierarquia e textos iguais à tela de referência.
+- AC-V2: todos os componentes vêm do DS.
+- AC-V3: estados (vazio, erro, carregando) iguais aos da referência.
+
 ## Goals
 
 1. O App Router carrega Manrope, os tokens e o tema sem flash, com a chave `mo-tema`.
