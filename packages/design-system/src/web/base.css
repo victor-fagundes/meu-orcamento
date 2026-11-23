@@ -170,6 +170,15 @@ div.mo-linha { cursor: default; }
 .mo-tabela-meses thead th { color: var(--md-text-muted); font-weight: 700; }
 .mo-tabela-meses__ativo { background: var(--md-selected); color: var(--md-on-selected); }
 .mo-tabela-meses__destaque td, .mo-tabela-meses__destaque th { font-weight: 800; background: var(--md-selected); color: var(--md-on-selected); }
+.mo-tabela-meses caption { caption-side: top; text-align: left; padding: var(--space-2); font-weight: 700; color: var(--md-text); }
+.mo-tabela-meses__tipo th[scope="row"] { font-weight: 800; }
+.mo-tabela-meses__categoria th[scope="row"] { padding-left: var(--space-4); }
+.mo-tabela-meses__item th[scope="row"] { padding-left: var(--space-6); }
+.mo-ano { display: flex; flex-direction: column; gap: var(--space-4); }
+.mo-ano__topo { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+.mo-ano__titulo { margin: 0; font-size: var(--type-title-md-size); line-height: var(--type-title-md-line); font-weight: 800; color: var(--md-text); }
+.mo-ano__ano { display: flex; align-items: center; gap: var(--space-2); font-weight: 800; color: var(--md-text); }
+.mo-ano__dica { margin: 0; font-size: var(--type-caption-size); color: var(--md-text-muted); }
 
 .mo-shell { display: flex; flex-direction: column; min-height: 100dvh; font-family: var(--font-family); color: var(--md-text); }
 .mo-shell__coluna { display: flex; flex-direction: column; flex: 1; min-width: 0; }

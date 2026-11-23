@@ -56,14 +56,36 @@ describe('CabecalhoSheet (web)', () => {
 });
 
 describe('TabelaMeses (web)', () => {
-  it('mostra 12 meses, total por linha e marca o mês ativo', () => {
-    const vazio = Array<number | null>(12).fill(null);
+  it('mostra 12 meses, total sem R$ e marca o mês atual', () => {
+    const vazio = Array<number>(12).fill(0);
     const fixas = [...vazio];
     fixas[10] = 359000;
-    const linhas = [{ rotulo: 'Despesas fixas', valoresPorMes: fixas }, { rotulo: 'Sobra no ano', valoresPorMes: vazio, destaque: true }];
-    render(<TabelaMeses linhas={linhas} mesAtivo={10} />);
+    const linhas = [
+      { id: 'tipo:F', nivel: 'tipo' as const, rotulo: 'Despesas fixas', valoresPorMes: fixas },
+      { id: 'sobra', nivel: 'sobra' as const, rotulo: 'Sobra no ano', valoresPorMes: vazio },
+      { id: 'outro', nivel: 'item' as const, rotulo: 'Despesas fixas', valoresPorMes: vazio },
+    ];
+    render(<TabelaMeses legenda="Realizado de 2026" linhas={linhas} mesAtivo={10} />);
     expect(screen.getAllByRole('columnheader')).toHaveLength(14);
-    expect(screen.getByRole('row', { name: /Despesas fixas/ })).toHaveTextContent('R$ 3.590');
-    expect(screen.getByRole('columnheader', { name: 'Nov' })).toHaveClass('mo-tabela-meses__ativo');
+    expect(screen.getByRole('table', { name: 'Realizado de 2026' })).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: 'Categoria · item' })).toBeInTheDocument();
+    const novembro = screen.getByRole('columnheader', { name: /Nov/ });
+    expect(novembro).toHaveTextContent('mês atual');
+    expect(novembro).toHaveClass('mo-tabela-meses__ativo');
+    expect(screen.getAllByRole('row', { name: /Despesas fixas/ })[0]).toHaveTextContent('3.590');
+    expect(screen.getAllByRole('row', { name: /Despesas fixas/ })[0]).not.toHaveTextContent('R$');
+    expect(screen.getAllByRole('row', { name: /Despesas fixas/ })).toHaveLength(2);
+  });
+
+  it('não marca mês atual quando o ano não é o corrente', () => {
+    const vazio = Array<number>(12).fill(0);
+    render(
+      <TabelaMeses
+        legenda="Realizado de 2027"
+        linhas={[{ id: 'sobra', nivel: 'sobra', rotulo: 'Sobra no ano', valoresPorMes: vazio }]}
+        mesAtivo={null}
+      />,
+    );
+    expect(screen.queryByText('mês atual')).not.toBeInTheDocument();
   });
 });

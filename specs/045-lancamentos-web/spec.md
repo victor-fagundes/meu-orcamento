@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-23
 
-**Status**: implemented
+**Status**: verified
 
 **Input**: User description: "/speckit-specify 045"
 
@@ -330,7 +330,7 @@ Lançamento de outra conta não aparece e não pode ser alterado.
 ## Assumptions
 
 - A aparência vem da história 040. A casca é a história 042. Lançamentos pede mês no cabeçalho. O botão flutuante continua de fora. O endereço continua `/app/lancamentos`. A branch de trabalho é `rebuild-web`.
-- A spec anterior, no formato SDD e com status `ready`, está no commit `42a9a04`. Esta versão guarda as mesmas regras em linguagem de produto: tabela do mês, busca que não sai do mês, painel de registro, prévia dos centavos, selo da fatura, correção por alcance, exclusão com desfazer de 10 segundos, vazio, carregando e erro. O status fica `implemented`. O PM marca `verified`.
+- A spec anterior, no formato SDD e com status `ready`, está no commit `42a9a04`. Esta versão guarda as mesmas regras em linguagem de produto: tabela do mês, busca que não sai do mês, painel de registro, prévia dos centavos, selo da fatura, correção por alcance, exclusão com desfazer de 10 segundos, vazio, carregando e erro. Verificação em 2026-11-23: o roteiro Playwright de `e2e/lancamentos.spec.ts` passou. O status fica `verified`.
 - A conta da fatura e a divisão dos centavos não mudam. Compra no dia do fechamento vai para a fatura do mês seguinte. R$ 100,00 em 3× continua R$ 33,34 + R$ 33,33 + R$ 33,33. Não há competência escolhida na mão.
 - Na criação, as parcelas compartilham a data da compra e diferem na competência. O avanço da data, mês a mês, fica na correção "Esta e as próximas".
 - O artboard de corrigir mostra "Todas do parcelamento". Esta spec não oferece essa opção na correção, porque a regra já fechada não alcança as parcelas anteriores. Na exclusão, "Todas do parcelamento" permanece, como o artboard e a regra já fechada.

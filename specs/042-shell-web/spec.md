@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-22
 
-**Status**: implemented
+**Status**: verified
 
 **Input**: User description: "/speckit-specify 042"
 
@@ -180,4 +180,4 @@ Cada controle da casca tem nome. O foco é visível. As cinco áreas funcionam p
 - A casca nativa do celular fica fora. A janela estreita do computador é esta casca, sem botão flutuante.
 - Trocar claro e escuro fica em Ajustes (história 047). Aqui a casca só precisa continuar legível nos dois.
 - A entrada na conta é a história 048. Aqui basta que quem não entrou não veja a casca.
-- A spec anterior, no formato SDD e com status `ready`, está no commit `9e4f072`. Esta versão guarda as mesmas regras em linguagem de produto. A implementação desta casca deixa o status em `implemented`. O PM marca `verified`.
+- A spec anterior, no formato SDD e com status `ready`, está no commit `9e4f072`. Esta versão guarda as mesmas regras em linguagem de produto. Verificação em 2026-11-23: o roteiro Playwright de `e2e/casca.spec.ts` passou (cinco áreas, sessão anônima, lateral e barra inferior, Ajustes, título, teclado e grade). O status fica `verified`.

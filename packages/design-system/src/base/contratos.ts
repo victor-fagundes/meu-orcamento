@@ -268,18 +268,23 @@ export interface CabecalhoSheetProps {
   readonly subtitulo?: string;
 }
 
+export type NivelLinhaAno = 'tipo' | 'categoria' | 'item' | 'sobra';
+
 export interface LinhaTabelaMeses {
+  readonly id: string;
   readonly rotulo: string;
-  /** 12 valores, Jan a Dez, em centavos. null = sem movimento. */
-  readonly valoresPorMes: ReadonlyArray<number | null>;
-  /** Destaca a linha (ex.: "Sobra no ano"). */
-  readonly destaque?: boolean;
+  readonly nivel: NivelLinhaAno;
+  /** 12 valores, Jan a Dez, em centavos. Zero é sem movimento. */
+  readonly valoresPorMes: ReadonlyArray<number>;
 }
 
 export interface TabelaMesesProps {
+  readonly legenda: string;
   readonly linhas: ReadonlyArray<LinhaTabelaMeses>;
-  /** Índice do mês ativo, 0 = janeiro. */
-  readonly mesAtivo: number;
+  /** Índice do mês de hoje, 0 = janeiro. Null quando o ano aberto não é o corrente. */
+  readonly mesAtivo: number | null;
+  /** Máscara "•••••" nos números. O traço permanece. */
+  readonly ocultado?: boolean;
 }
 
 export interface ShellAppProps {

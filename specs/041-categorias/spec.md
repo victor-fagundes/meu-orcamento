@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-22
 
-**Status**: ready
+**Status**: verified
 
 **Input**: User description: "/speckit-specify 041"
 
@@ -205,4 +205,4 @@ Quem exporta sem lançamento e sem plano diferente de zero recebe a frase "Não 
 - Os rótulos "Disponível neste mês" e "Sobra no ano" não entram aqui. Entram nas histórias 043 e 046.
 - Importar planilha e importar fatura não mudam aqui. Escondê-los da navegação é a história 047.
 - A pessoa só acessa o próprio orçamento. Conta de outra pessoa não aparece como proibida; aparece como inexistente.
-- O PM confirmou a spec ao pedir a implementação. O status é `ready`.
+- O PM marcou a spec `verified` em 23 nov 2026.

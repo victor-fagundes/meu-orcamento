@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-22
 
-**Status**: implemented
+**Status**: verified
 
 **Input**: User description: "/speckit-specify 043"
 
@@ -284,7 +284,7 @@ O Resumo pede a navegação de mês. Trocar o mês troca todos os números da te
 
 - A aparência vem da história 040. As medidas 40 px e 56 px são os tamanhos de destaque já aprovados. A máscara "R$ •••••" é a máscara de saldo já definida. Os quatro cartões seguem a grade já aprovada: duas colunas no estreito e, no largo, duas colunas dentro de seis das doze.
 - A casca é a história 042. O Resumo pede mês no cabeçalho. O botão flutuante continua de fora. O endereço continua `/app/resumo`.
-- A spec anterior, no formato SDD e com status `ready`, está no commit `9e4f072`. Esta versão guarda as mesmas regras em linguagem de produto. O status permanece `ready`. O PM marca `verified`.
+- A spec anterior, no formato SDD e com status `ready`, está no commit `9e4f072`. Esta versão guarda as mesmas regras em linguagem de produto. Verificação em 2026-11-23: o roteiro Playwright de `e2e/resumo.spec.ts` passou. O status fica `verified`.
 - O valor é exato até o centavo. O bloco principal mostra os centavos. Os quatro cartões cortam os centavos, sem arredondar.
 - A conta do disponível é a que o mês já usa: planejado das despesas menos gasto das despesas. O número do ano, receitas menos despesas, com o nome "Sobra no ano", é a história 046.
 - Os alertas são os que o mês já calcula, com o limite que a conta já guardou. Esta história não muda limite, frase nem quem entra na lista. Fica confirmado: a lista é o sininho. O banner fixo do PRD 5.10 e da história 011 não entra nesta tela.

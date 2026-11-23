@@ -76,3 +76,40 @@ Release A is inventoried with default fit rules (FR-010): `implemented` / `verif
 ## Self-reference
 
 All 22 specs (001–022) are `verified` after the PM marked verify on 2026-11-16. Em 2026-11-17 a spec 025 (`implemented`) fecha o card Total gasto e o destino do import de lançamentos. GAP-007 continua aberto. O PM ainda não marcou a 025 como `verified`.
+
+## Atualização 2026-11-23
+
+Status lido em `specs/*/spec.md`. A tabela de 001–022 acima não muda.
+
+| id | slug | status | nota |
+|----|------|--------|------|
+| 023 | 023-material-design | implemented | Casca Material anterior. A casca viva é a 042 |
+| 024 | 024-producao-nuvem | implemented | HTTPS de produção responde. Conta nova e sobrevivência a deploy não foram conferidas em 23 nov |
+| 025 | 025-chegar-no-mes | implemented | Destino da importação testado. O Resumo novo não tem o card Total gasto |
+| 026 | 026-reset-por-email | draft | Fora de implementação |
+| 027 | 027-android-native | implemented | Roteiro no aparelho em aberto |
+| 028 | 028-android-mes | implemented | Roteiro no aparelho em aberto |
+| 029 | 029-computador-revisao | implemented | O Resumo e o Orçamento novos não repetem os textos desta revisão |
+| 030 | 030-android-casca | implemented | Roteiro no aparelho em aberto |
+| 031 | 031-android-resumo | implemented | Roteiro no aparelho em aberto |
+| 032 | 032-android-orcamento | implemented | Roteiro no aparelho em aberto |
+| 033 | 033-android-lancamentos | implemented | Roteiro no aparelho em aberto |
+| 034 | 034-android-ano | implemented | Roteiro no aparelho em aberto |
+| 035 | 035-android-ajustes | implemented | Roteiro no aparelho em aberto |
+| 036 | 036-android-traz-dados | implemented | Roteiro no aparelho em aberto |
+| 037 | 037-foco-arquivar | implemented | Arquivar com o nome passou no Orçamento novo. O foco ao abrir o plano não |
+| 038 | 038-material-android | implemented | Roteiro no aparelho em aberto |
+| 039 | 039-acabamento-android | implemented | T021 pede para não marcar `verified` antes do aparelho |
+| 040 | 040-ds-integrado-next | implemented | Critérios da spec marcados. Suíte do DS e build não foram reexecutados em 23 nov |
+| — | 040-replicar-front-prototipo | Cancelled | Não é a spec 040 do rebuild |
+| 041 | 041-categorias | verified | PM, 23 nov 2026 |
+| 042 | 042-shell-web | verified | Playwright `e2e/casca.spec.ts`, 23 nov 2026 |
+| 043 | 043-resumo-web | verified | Playwright `e2e/resumo.spec.ts`, 23 nov 2026 |
+| 044 | 044-orcamento-web | verified | Playwright `e2e/orcamento.spec.ts`, 23 nov 2026 |
+| 045 | 045-lancamentos-web | verified | Playwright `e2e/lancamentos.spec.ts`, 23 nov 2026 |
+| 046 | 046-ano-web | verified | Playwright `e2e/ano.spec.ts`, 23 nov 2026 |
+| 047 | 047-ajustes-web | ready | Sem implementação |
+| 048 | 048-entrada-web | ready | Sem implementação |
+| 049 | 049-remocao-front-antigo | ready | Começa quando 047 e 048 também estiverem `verified`. 043, 044, 045 e 046 já estão |
+
+Contagem desta atualização: `verified` 6 (041–046), `implemented` 17, `ready` 3, `draft` 1, `Cancelled` 1.

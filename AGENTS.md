@@ -57,7 +57,7 @@ Specs **029–037** `implemented` (17 nov 2026). 029 revisa o computador. 030–
 Spec **040** `Cancelled` (17 nov 2026): o PM manteve a 039. Spec **039** `implemented`: acabamento do Android segundo `prototype/2026-11-17-acabamento.html` (ícone, splash, Manrope, seis telas, menus de Ajustes com os ícones do site). O roteiro no aparelho da 039 continua em aberto. Falta o PM marcar `verified` (025, 027, 028, 029–039).  
 GAP-001…006 fechados. GAP-007 no computador está implementado na spec 037 e segue aberto até o PM marcar `verified`. No Android, o foco do sheet e o nome de Arquivar estão na spec 032.
 
-Rebuild do front web (22 nov 2026), branch `rebuild-web`. A branch `legacy-front` marca o commit anterior a este rebuild. Spec **043** `implemented` (22 nov 2026): Resumo web. Specs **040–042** e **044–049** estão `ready`:
+Rebuild do front web (22 nov 2026), branch `rebuild-web`. A branch `legacy-front` marca o commit anterior a este rebuild. Specs **041**, **042**, **043**, **044**, **045** e **046** `verified` (23 nov 2026): categorias, casca, Resumo, Orçamento, Lançamentos e Ano. Spec **040** (DS no Next) continua `implemented`. Specs **047** e **048** estão `ready`. A **049** continua `ready` e só começa depois que 047 e 048 também estiverem `verified`:
 
 - `specs/040-ds-integrado-next`
 - `specs/041-categorias`
@@ -70,4 +70,4 @@ Rebuild do front web (22 nov 2026), branch `rebuild-web`. A branch `legacy-front
 - `specs/048-entrada-web`
 - `specs/049-remocao-front-antigo`
 
-A pasta `specs/040-replicar-front-prototipo` continua Cancelled (17 nov 2026) e não é a spec 040 deste rebuild. Não implementar 049 antes de 043–048 `verified` pelo PM. Specs 050–057 (mobile) não começam agora.
+A pasta `specs/040-replicar-front-prototipo` continua Cancelled (17 nov 2026) e não é a spec 040 deste rebuild. Não implementar 049 antes que 047 e 048 estejam `verified`. 043, 044, 045 e 046 já estão. Specs 050–057 (mobile) não começam agora.

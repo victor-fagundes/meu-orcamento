@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-22
 
-**Status**: implemented
+**Status**: verified
 
 **Input**: User description: "/speckit-specify 044"
 
@@ -309,7 +309,7 @@ O Orçamento pede a navegação de mês. Não há intervalo livre de datas. Não
 ## Assumptions
 
 - A aparência vem da história 040. A casca é a história 042. O Orçamento pede mês no cabeçalho. O botão flutuante continua de fora. O endereço continua `/app/orcamento`.
-- A spec anterior, no formato SDD e com status `ready`, está no commit `9e4f072`. Esta versão guarda as mesmas regras em linguagem de produto: um tipo por vez, total com "de R$ x planejados", categorias recolhíveis, frase do consumo, Gerenciar, criar no topo, plano com o interruptor e as três cópias, arquivar pelo nome, vazio, banner, carregando e erro. O status permanece `ready`. O PM marca `verified`.
+- A spec anterior, no formato SDD e com status `ready`, está no commit `9e4f072`. Esta versão guarda as mesmas regras em linguagem de produto: um tipo por vez, total com "de R$ x planejados", categorias recolhíveis, frase do consumo, Gerenciar, criar no topo, plano com o interruptor e as três cópias, arquivar pelo nome, vazio, banner, carregando e erro. Verificação em 2026-11-23: o roteiro Playwright de `e2e/orcamento.spec.ts` passou. O status fica `verified`.
 - Os nomes curtos das opções são os do seletor já definido e os mesmos dos cartões do Resumo: Receitas, Fixas, Variáveis e Anuais. O cartão do Resumo abre este mês já no tipo daquele cartão. Sem tipo pedido, Fixas começa marcada, como a tela já faz hoje.
 - O total do tipo corta centavos, no mesmo corte dos cartões do Resumo. Categoria e item mostram centavos, porque a frase de estouro também mostra centavos.
 - A frase da linha é a do consumo: "Dentro do planejado", "Perto do limite · N%", "No limite do planejado", "Estourou em R$ X" e "Sem valor planejado". Ela substitui, na linha, as frases antigas "Ainda pode gastar", "Orçamento atingido" e "Gasto sem orçamento planejado". O banner não muda: continua a frase que o mês já calcula, a mais grave, com a contagem dos demais.
