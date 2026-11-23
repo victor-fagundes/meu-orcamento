@@ -23,7 +23,7 @@ export function labelCompetencia(comp: string): string {
   if (!p) return comp;
   const d = new Date(p.y, p.m - 1, 1);
   const s = d.toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
-  return s.charAt(0).toUpperCase() + s.slice(1);
+  return s;
 }
 
 export function planoDoMes(planoJson: string, competencia: string): number {

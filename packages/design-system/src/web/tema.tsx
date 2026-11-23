@@ -20,14 +20,14 @@ function temaDoSistema(): TemaEfetivo {
 }
 
 function lerModoGuardado(): ModoTema {
-  if (typeof window === 'undefined') return 'system';
+  if (typeof window === 'undefined') return 'light';
   try {
     const valor = window.localStorage.getItem(CHAVE_TEMA);
     if (valor === 'light' || valor === 'dark' || valor === 'system') return valor;
   } catch {
     /* storage indisponível */
   }
-  return 'system';
+  return 'light';
 }
 
 function gravarModo(modo: ModoTema): void {
@@ -39,7 +39,7 @@ function gravarModo(modo: ModoTema): void {
 }
 
 /** Aplica o tema no elemento raiz via data-theme. "system" segue o aparelho. */
-export function ThemeProvider({ modoInicial = 'system', children }: { readonly modoInicial?: ModoTema; readonly children: ReactNode }) {
+export function ThemeProvider({ modoInicial = 'light', children }: { readonly modoInicial?: ModoTema; readonly children: ReactNode }) {
   const [modo, setModo] = useState<ModoTema>(modoInicial);
   const [temaSistema, setTemaSistema] = useState<TemaEfetivo>('light');
   const [pronto, setPronto] = useState(false);

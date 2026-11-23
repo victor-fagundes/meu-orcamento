@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Botao,
@@ -8,7 +8,6 @@ import {
   Chips,
   Dialogo,
   FormularioContainer,
-  MenuAcoes,
   Select,
 } from "@meu-orcamento/design-system";
 import {
@@ -67,6 +66,16 @@ export function CategoriasTela({
   const [nome, setNome] = useState("");
   const [erro, setErro] = useState<string | null>(null);
   const [aviso, setAviso] = useState<string | null>(null);
+  const [abertos, setAbertos] = useState<string[]>(() => (tipoMarcado ? [tipoMarcado] : []));
+
+  useEffect(() => {
+    if (!tipoMarcado) return;
+    setAbertos((atual) => (atual.includes(tipoMarcado) ? atual : [...atual, tipoMarcado]));
+  }, [tipoMarcado]);
+
+  function alternarTipo(tipo: string) {
+    setAbertos((atual) => (atual.includes(tipo) ? atual.filter((item) => item !== tipo) : [...atual, tipo]));
+  }
 
   function fecharFormulario() {
     setCriar(false);
@@ -85,6 +94,8 @@ export function CategoriasTela({
       return;
     }
     const id = res.id;
+    const tipoAberto = renomear?.tipo ?? tipoNovo;
+    setAbertos((atual) => (atual.includes(tipoAberto) ? atual : [...atual, tipoAberto]));
     fecharFormulario();
     router.refresh();
     focarLinha(`categoria:${id}`);
@@ -124,44 +135,54 @@ export function CategoriasTela({
             lançamentos antigos continuam.
           </p>
           {aviso ? <p role="status">{aviso}</p> : null}
-          {TIPOS.map((tipo) => (
-            <section key={tipo.valor}>
-              <h3 aria-current={tipoMarcado === tipo.valor ? "true" : undefined}>{tipo.rotulo}</h3>
-              <ul className="mo-ajustes__lista">
-                {categorias
-                  .filter((categoria) => categoria.tipo === tipo.valor)
-                  .map((categoria) => (
-                    <li key={categoria.id} className="mo-ajustes__linha">
-                      <div id={`categoria:${categoria.id}`} className="mo-ajustes__linha-texto" tabIndex={-1}>
-                        <strong>{categoria.nome}</strong>
-                        <span>
-                          {tipo.rotulo} · {textoItens(categoria.itens)}
-                        </span>
-                      </div>
-                      <MenuAcoes
-                        rotulo={`Ações de ${categoria.nome}`}
-                        acoes={[
-                          {
-                            id: "renomear",
-                            rotulo: "Renomear",
-                            onEscolher: () => {
+          {TIPOS.map((tipo) => {
+            const aberto = abertos.includes(tipo.valor);
+            const linhas = categorias.filter((categoria) => categoria.tipo === tipo.valor);
+            return (
+              <section key={tipo.valor}>
+                <h3 className="mo-categorias__tipo" aria-current={tipoMarcado === tipo.valor ? "true" : undefined}>
+                  <button
+                    type="button"
+                    aria-expanded={aberto}
+                    aria-controls={`tipo-${tipo.valor}`}
+                    onClick={() => alternarTipo(tipo.valor)}
+                  >
+                    {tipo.rotulo}
+                  </button>
+                </h3>
+                {aberto ? (
+                  <ul id={`tipo-${tipo.valor}`} className="mo-ajustes__lista">
+                    {linhas.map((categoria) => (
+                      <li key={categoria.id} className="mo-ajustes__linha">
+                        <div id={`categoria:${categoria.id}`} className="mo-ajustes__linha-texto" tabIndex={-1}>
+                          <strong>{categoria.nome}</strong>
+                          <span>
+                            {tipo.rotulo} · {textoItens(categoria.itens)}
+                          </span>
+                        </div>
+                        <div className="mo-categorias__acoes">
+                          <button
+                            type="button"
+                            className="mo-botao mo-botao--texto"
+                            onClick={() => {
                               setNome(categoria.nome);
                               setErro(null);
                               setRenomear(categoria);
-                            },
-                          },
-                          {
-                            id: "arquivar",
-                            rotulo: "Arquivar",
-                            onEscolher: () => setArquivar(categoria),
-                          },
-                        ]}
-                      />
-                    </li>
-                  ))}
-              </ul>
-            </section>
-          ))}
+                            }}
+                          >
+                            Renomear
+                          </button>
+                          <button type="button" className="mo-botao mo-botao--texto" onClick={() => setArquivar(categoria)}>
+                            Arquivar
+                          </button>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+              </section>
+            );
+          })}
           <Botao
             variante="secundario"
             onPress={() => {

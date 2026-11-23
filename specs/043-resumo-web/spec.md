@@ -28,7 +28,7 @@
 - Q: Como o gráfico do Resumo deve agrupar o gasto do mês em semanas? → A: Semanas fixas do mês: dias 1–7, 8–14, 15–21, 22–28 e, se houver, 29 até o último dia.
 - Q: Quando a pessoa escolhe um tipo, o que deve mudar no Resumo? → A: O chip muda o gráfico, o detalhe da semana e a média. O disponível e os quatro cartões continuam os do mês inteiro.
 - Q: O toque em um dos quatro cartões deve abrir outra tela? → A: O cartão abre o Orçamento do mesmo mês, já no tipo daquele cartão.
-- Q: O Resumo deve mostrar um banner fixo com o alerta mais grave do mês? → A: Só o sininho. O Resumo não mostra banner.
+- Q: O Resumo deve mostrar um banner fixo com o alerta mais grave do mês? → A: Sim. A identidade vale por cima (PM, 2026-11-23). O banner fica acima dos cartões e o sininho continua.
 - Q: A média diária deve aparecer quando o mês aberto não é o mês de hoje? → A: Aparece em todo mês. Fora do mês de hoje, é o gasto dividido pela quantidade de dias daquele mês.
 
 ## User Scenarios & Testing *(mandatory)*
@@ -170,7 +170,7 @@ Zero alertas: o sininho não mostra quantidade. Aberto, o painel diz "Nenhum ale
 
 ### User Story 7 - Vazio, carregando e erro (Priority: P1)
 
-Sem receita planejada e sem lançamento no mês, o Resumo mostra um cartão vazio: título "Nenhuma receita neste mês", a frase "Defina as receitas para acompanhar o disponível." e a ação "Definir receitas". A ação abre o Orçamento do mesmo mês, em Receitas. Um filtro que esconde movimento existente não troca a tela por esse cartão.
+Sem receita planejada e sem lançamento no mês, o Resumo mostra o disponível em R$ 0,00, a frase "Ainda não há planejamento para este mês.", o cartão "Comece pelas receitas" e a frase "Sem lançamentos neste mês. O gráfico aparece com o primeiro gasto." A ação "Definir receitas" abre o Orçamento do mesmo mês, em Receitas.
 
 Enquanto o mês carrega, a pessoa vê o lugar dos números, sem um valor que pareça verdadeiro. Se o carregamento falha, a pessoa lê "Não foi possível carregar o mês." e pode acionar "Tentar de novo". Os números não aparecem como se tivessem carregado.
 
@@ -180,7 +180,7 @@ Enquanto o mês carrega, a pessoa vê o lugar dos números, sem um valor que par
 
 **Acceptance Scenarios**:
 
-1. **Given** o mês não tem receita planejada e não tem lançamento, **When** a pessoa abre o Resumo, **Then** vê o título "Nenhuma receita neste mês", a frase "Defina as receitas para acompanhar o disponível." e a ação "Definir receitas". O bloco do disponível, os quatro cartões e o gráfico não aparecem.
+1. **Given** o mês não tem receita planejada e não tem lançamento, **When** a pessoa abre o Resumo, **Then** vê "Disponível neste mês", "R$ 0,00", "Ainda não há planejamento para este mês.", "Comece pelas receitas" e "Definir receitas".
 2. **Given** esse cartão está visível, **When** a pessoa aciona "Definir receitas", **Then** abre o Orçamento do mesmo mês, em Receitas.
 3. **Given** o mês tem lançamento e o filtro não encontra nada, **When** a pessoa lê a tela, **Then** o cartão "Nenhuma receita neste mês" não aparece.
 4. **Given** o mês ainda está carregando, **When** a pessoa olha o disponível e os cartões, **Then** não vê R$ 0,00 no lugar dos números.
@@ -227,7 +227,7 @@ O Resumo pede a navegação de mês. Trocar o mês troca todos os números da te
 - Abaixo de 720 px o valor principal tem 40 px. A partir de 720 px tem 56 px. Em 719 px vale 40 px. Em 720 px vale 56 px.
 - "Limpar filtros" não troca o mês.
 - Filtrar não grava e não apaga lançamento nem plano.
-- O gráfico desta tela é o de semanas. A rosca, as barras de planejado × realizado, a seção Insights, o indicador de dívida e o banner fixo não aparecem.
+- O gráfico desta tela é o de semanas. A rosca, as barras de planejado × realizado, a seção Insights e o indicador de dívida não aparecem. O banner do alerta mais grave aparece, como no artboard.
 - Com menos movimento, gráfico e painéis não animam.
 - O painel do sininho e o painel da semana devolvem o foco a quem os abriu.
 
@@ -252,11 +252,11 @@ O Resumo pede a navegação de mês. Trocar o mês troca todos os números da te
 - **FR-015**: No mês civil de hoje, a média diária MUST ser o gasto de despesas do mês dividido pelo dia de hoje, no centavo mais próximo. Em outro mês, MUST ser o gasto de despesas daquele mês dividido pela quantidade de dias dele, no centavo mais próximo.
 - **FR-016**: "Ver detalhes" MUST abrir os lançamentos de gasto daquela semana, com data, descrição e valor. Sem lançamento, MUST dizer "Nenhum lançamento nesta semana." O foco MUST permanecer no painel até fechar e MUST voltar ao controle que abriu.
 - **FR-017**: O sininho MUST mostrar a quantidade de alertas que o mês já calcula. Atenção, estouro, planejado atingido e gasto sem planejado entram quando a regra já existente do mês os inclui. Abaixo do limite preventivo, o item MUST NOT entrar. Esta história MUST NOT criar outra regra de alerta. Zero alertas: o sininho MUST NOT mostrar quantidade e o painel MUST dizer "Nenhum alerta neste mês." Cada alerta MUST abrir o Orçamento do mesmo mês.
-- **FR-018**: Sem receita planejada e sem lançamento no mês, o Resumo MUST mostrar o título "Nenhuma receita neste mês", a frase "Defina as receitas para acompanhar o disponível." e a ação "Definir receitas". Nesse estado o bloco do disponível, os quatro cartões e o gráfico MUST NOT aparecer. A ação MUST abrir o Orçamento do mesmo mês, em Receitas. Um filtro sobre um mês que tem movimento MUST NOT mostrar esse cartão.
+- **FR-018**: Sem receita planejada e sem lançamento no mês, o Resumo MUST mostrar "Disponível neste mês" em zero, "Ainda não há planejamento para este mês.", o cartão "Comece pelas receitas" com "Elas são a base do que você planeja no mês." e a ação "Definir receitas", e a frase "Sem lançamentos neste mês. O gráfico aparece com o primeiro gasto." A ação MUST abrir o Orçamento do mesmo mês, em Receitas.
 - **FR-019**: Enquanto o mês carrega, o Resumo MUST NOT mostrar R$ 0,00 no lugar dos números. Se o carregamento falha, a pessoa MUST ver "Não foi possível carregar o mês." e "Tentar de novo", e MUST NOT ver totais como se o mês tivesse carregado.
 - **FR-020**: Cada controle MUST ter nome. O foco MUST ser visível. Os quatro cartões, filtros, "Limpar filtros", ocultar, sininho, "Ver detalhes" e "Definir receitas" MUST ser alcançáveis pelo teclado. Ativar um cartão pelo teclado MUST abrir o Orçamento daquele tipo. O Resumo MUST permanecer legível no claro e no escuro. Com menos movimento, o gráfico e os painéis MUST aparecer sem animação.
 - **FR-021**: O Resumo MUST pedir a navegação de mês. Trocar o mês MUST atualizar o disponível, os cartões, o gráfico, a média e os alertas. O Resumo MUST NOT oferecer intervalo livre de datas nem botão flutuante de criar.
-- **FR-022**: O gráfico do Resumo MUST ser o de gasto por semana. A rosca, as barras de planejado × realizado, a seção Insights, o indicador de dívida e o banner fixo MUST NOT aparecer nesta tela.
+- **FR-022**: O gráfico do Resumo MUST ser o de gasto por semana. A rosca, as barras de planejado × realizado, a seção Insights e o indicador de dívida MUST NOT aparecer nesta tela. Quando o mês tem alerta, o banner do alerta mais grave MUST aparecer acima dos cartões. Sem alerta, o banner MUST NOT aparecer.
 
 ### Key Entities
 
@@ -287,7 +287,7 @@ O Resumo pede a navegação de mês. Trocar o mês troca todos os números da te
 - A spec anterior, no formato SDD e com status `ready`, está no commit `9e4f072`. Esta versão guarda as mesmas regras em linguagem de produto. Verificação em 2026-11-23: o roteiro Playwright de `e2e/resumo.spec.ts` passou. O status fica `verified`.
 - O valor é exato até o centavo. O bloco principal mostra os centavos. Os quatro cartões cortam os centavos, sem arredondar.
 - A conta do disponível é a que o mês já usa: planejado das despesas menos gasto das despesas. O número do ano, receitas menos despesas, com o nome "Sobra no ano", é a história 046.
-- Os alertas são os que o mês já calcula, com o limite que a conta já guardou. Esta história não muda limite, frase nem quem entra na lista. Fica confirmado: a lista é o sininho. O banner fixo do PRD 5.10 e da história 011 não entra nesta tela.
+- Os alertas são os que o mês já calcula, com o limite que a conta já guardou. Esta história não muda limite, frase nem quem entra na lista. O sininho lista os alertas. O banner acima dos cartões mostra o mais grave, como no artboard (PM, 2026-11-23).
 - A rosca, as barras de planejado × realizado, a seção Insights e o indicador de dívida ficam de fora. O gráfico desta reconstrução é o de gasto por semana.
 - As semanas do gráfico ficam confirmadas: dias 1–7, 8–14, 15–21, 22–28 e, se houver, 29 até o último dia. A média diária fica confirmada em todo mês: no mês de hoje, gasto dividido pelo dia de hoje; nos outros, gasto dividido pelos dias daquele mês.
 - D-09 manda "Limpar filtros" zerar pagamento e categoria, e manter o mês. O chip de tipo entra no mesmo gesto, para a tela não continuar filtrada. O efeito do tipo fica confirmado: o chip restringe o gráfico, o detalhe da semana e a média; o disponível e os quatro cartões continuam os do mês. Pagamento tira o planejado. Categoria restringe os números.

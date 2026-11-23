@@ -15,7 +15,7 @@ function conteudo(page: Page) {
 }
 
 async function registrarVista(page: Page, descricao: string) {
-  await conteudo(page).locator("#registrar").click();
+  await page.locator("#registrar").click();
   const painel = page.getByRole("dialog", { name: "Registrar lançamento" });
   await painel.getByLabel("Item").selectOption({ label: "Supermercado · Alimentação" });
   await painel.getByLabel("Valor (R$)").fill("186,40");
@@ -29,7 +29,7 @@ async function registrarVista(page: Page, descricao: string) {
 test("mês na casca e tabela com linha Editar", async ({ page }) => {
   await entrar(page);
   await page.goto("/app/lancamentos?mes=2026-11");
-  await expect(page.getByRole("button", { name: "Mês anterior" })).toHaveCount(1);
+  await expect(page.getByRole("button", { name: "Mês anterior" })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Próximo mês" })).toHaveCount(1);
   await expect(conteudo(page).getByRole("button", { name: "Mês anterior" })).toHaveCount(0);
   await registrarVista(page, "Cafe lista 045");
@@ -55,7 +55,7 @@ test("busca vazia não muda o mês e o valor vazio não grava", async ({ page })
   await expect(page).toHaveURL(/mes=2026-11/);
   await expect(page).not.toHaveURL(/q=/);
 
-  await conteudo(page).locator("#registrar").click();
+  await page.locator("#registrar").click();
   const painel = page.getByRole("dialog", { name: "Registrar lançamento" });
   await painel.getByLabel("Pagamento").selectOption({ label: "Pix" });
   await expect(painel.getByRole("switch", { name: "Parcelar" })).toHaveCount(0);
@@ -65,7 +65,7 @@ test("busca vazia não muda o mês e o valor vazio não grava", async ({ page })
   await expect(painel.getByText("Informe um valor maior que zero.")).toBeVisible();
   await expect(conteudo(page).getByRole("row")).toHaveCount(antes);
   await painel.getByRole("button", { name: "Cancelar" }).click();
-  await expect(conteudo(page).locator("#registrar")).toBeFocused();
+  await expect(page.locator("#registrar")).toBeFocused();
 });
 
 test("descrição vazia grava o nome do item e o aviso não desfaz", async ({ page }) => {
@@ -73,7 +73,7 @@ test("descrição vazia grava o nome do item e o aviso não desfaz", async ({ pa
   await page.goto("/app/lancamentos?mes=2026-11");
   const nome = conteudo(page).getByRole("row", { name: "Editar Supermercado" });
   const antes = await nome.count();
-  await conteudo(page).locator("#registrar").click();
+  await page.locator("#registrar").click();
   const painel = page.getByRole("dialog", { name: "Registrar lançamento" });
   await painel.getByLabel("Item").selectOption({ label: "Supermercado · Alimentação" });
   await painel.getByLabel("Valor (R$)").fill("186,40");
@@ -81,7 +81,7 @@ test("descrição vazia grava o nome do item e o aviso não desfaz", async ({ pa
   await painel.getByLabel("Pagamento").selectOption({ label: "Débito" });
   await painel.getByRole("button", { name: "Salvar" }).click();
   await expect(painel).toHaveCount(0);
-  await expect(conteudo(page).locator("#registrar")).toBeFocused();
+  await expect(page.locator("#registrar")).toBeFocused();
   await expect(conteudo(page).getByText("Lançamento salvo.")).toBeVisible();
   await expect(conteudo(page).getByRole("button", { name: "Desfazer" })).toHaveCount(0);
   await expect(nome).toHaveCount(antes + 1);
@@ -96,7 +96,7 @@ test("parcela no cartão pede alcance e cancelar não grava", async ({ page }) =
   expect(criado.ok()).toBeTruthy();
 
   await page.goto("/app/lancamentos?mes=2026-11");
-  await conteudo(page).locator("#registrar").click();
+  await page.locator("#registrar").click();
   const painel = page.getByRole("dialog", { name: "Registrar lançamento" });
   await painel.getByLabel("Item").selectOption({ label: "Supermercado · Alimentação" });
   await painel.getByLabel("Valor (R$)").fill("100,00");
@@ -156,7 +156,7 @@ test("editar à vista fecha o painel e excluir desfaz sem reabrir", async ({ pag
   await expect(exclusao.getByText("Você pode desfazer por 10 segundos.")).toBeVisible();
   await exclusao.getByRole("button", { name: "Excluir lançamento" }).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
-  await expect(conteudo(page).locator("#registrar")).toBeFocused();
+  await expect(page.locator("#registrar")).toBeFocused();
   await expect(conteudo(page).getByRole("button", { name: "Desfazer" })).toBeVisible();
   await conteudo(page).getByRole("button", { name: "Desfazer" }).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
@@ -185,6 +185,6 @@ test("mês vazio, claro e escuro, sem botão flutuante", async ({ page }) => {
   await page.emulateMedia({ colorScheme: "dark" });
   await page.evaluate(() => window.localStorage.setItem("mo-tema", "dark"));
   await page.reload();
-  await expect(conteudo(page).locator("#registrar")).toBeVisible();
+  await expect(page.locator("#registrar")).toBeVisible();
   await page.screenshot({ path: "tests/visual/out/lancamentos-escuro.png", fullPage: true });
 });

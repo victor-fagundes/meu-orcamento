@@ -140,6 +140,8 @@ export interface FormularioContainerProps {
   readonly onSalvar: () => void;
   /** Abaixo de 720 px o painel encosta na base. O padrão continua o painel lateral. */
   readonly folhaNaEstreita?: boolean;
+  /** O plano do item fica ao lado da lista, como no artboard do Orçamento. */
+  readonly encaixado?: boolean;
 }
 
 export interface AbaNavegacao {
@@ -179,6 +181,8 @@ export interface CabecalhoTelaProps {
   readonly titulo: string;
   /** Mostra ‹ e ›, para navegar por mês. */
   readonly navegacaoMes?: { readonly rotulo: string; readonly onAnterior: () => void; readonly onProximo: () => void };
+  /** O Resumo desenha as setas. Orçamento e Lançamentos mostram o mês no título. */
+  readonly mostrarSetas?: boolean;
   /** Mostra ‹ para voltar, em subtelas. */
   readonly onVoltar?: () => void;
 }
@@ -192,6 +196,8 @@ export interface BlocoSaldoProps {
   readonly fraseApoio: string;
   readonly ocultado: boolean;
   readonly onAlternarOcultar: () => void;
+  /** O artboard do Resumo coloca o olho no cabeçalho. */
+  readonly exibirOcultar?: boolean;
 }
 
 export interface ItemTotal {

@@ -15,16 +15,16 @@ type Entrada = {
 
 const DIA_A_DIA: Entrada[] = [
   {
-    rotulo: "Categorias e itens",
-    href: "/app/ajustes/categorias",
-    icone: "category",
-    atual: (caminho, aba) => caminho.startsWith("/app/ajustes/categorias") && aba !== "arquivados",
-  },
-  {
     rotulo: "Conta",
     href: "/app/ajustes/conta",
     icone: "person",
     atual: (caminho) => caminho.startsWith("/app/ajustes/conta"),
+  },
+  {
+    rotulo: "Categorias e itens",
+    href: "/app/ajustes/categorias",
+    icone: "category",
+    atual: (caminho, aba) => caminho.startsWith("/app/ajustes/categorias") && aba !== "arquivados",
   },
   {
     rotulo: "Cartões",
@@ -48,10 +48,28 @@ const DIA_A_DIA: Entrada[] = [
 
 const DADOS: Entrada[] = [
   {
+    rotulo: "Importar planilha",
+    href: "/app/ajustes/importar-planilha",
+    icone: "table_chart",
+    atual: (caminho) => caminho.startsWith("/app/ajustes/importar-planilha"),
+  },
+  {
+    rotulo: "Importar fatura",
+    href: "/app/ajustes/importar-fatura",
+    icone: "description",
+    atual: (caminho) => caminho.startsWith("/app/ajustes/importar-fatura"),
+  },
+  {
     rotulo: "Exportar",
     href: "/app/ajustes/exportar",
     icone: "upload",
     atual: (caminho) => caminho.startsWith("/app/ajustes/exportar"),
+  },
+  {
+    rotulo: "Simulador de competência",
+    href: "/app/ajustes/simulador",
+    icone: "event_available",
+    atual: (caminho) => caminho.startsWith("/app/ajustes/simulador"),
   },
   {
     rotulo: "Dados de exemplo",
@@ -78,6 +96,7 @@ export function AjustesMoldura({ children }: { children: React.ReactNode }) {
   return (
     <div className={classe}>
       <nav className="mo-ajustes__menu" aria-label="Ajustes">
+        <p className="mo-ajustes__titulo">Ajustes</p>
         <Grupo titulo="Dia a dia" entradas={DIA_A_DIA} caminho={pathname} aba={aba} onAbrir={abrir} />
         <Grupo titulo="Dados e arquivos" entradas={DADOS} caminho={pathname} aba={aba} onAbrir={abrir} />
         <LinhaAjuste

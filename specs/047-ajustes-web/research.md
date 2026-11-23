@@ -38,7 +38,7 @@ Os rótulos desta tela são Receitas, Despesas fixas, Despesas variáveis e Anua
 
 ## 5. Tema
 
-**Decision**: O `ThemeProvider` de `packages/design-system/src/web/tema.tsx` passa a envolver o `body` em `src/app/layout.tsx`. O script de `mo-tema` permanece, para a primeira pintura não piscar. Conta oferece Claro, Escuro e Sistema com `Chips`, uma só marcada. Claro grava `light`, Escuro grava `dark`, Sistema grava `system`. A troca vale na hora. Sistema escuta o aparelho e não grava `light` nem `dark` no lugar. Chave ausente ou valor desconhecido continua Sistema. Esqueci a senha é um link para `/esqueci-senha` e não chama `signOut`.
+**Decision**: O `ThemeProvider` de `packages/design-system/src/web/tema.tsx` passa a envolver o `body` em `src/app/layout.tsx`. O script de `mo-tema` permanece, para a primeira pintura não piscar. Conta oferece Claro, Escuro e Sistema com `Chips`, uma só marcada. Claro grava `light`, Escuro grava `dark`, Sistema grava `system`. A troca vale na hora. Sistema escuta o aparelho e não grava `light` nem `dark` no lugar. Chave ausente ou valor desconhecido continua Claro. Esqueci a senha é um link para `/esqueci-senha` e não chama `signOut`.
 
 **Rationale**: O provider já faz a leitura, a gravação e o acompanhamento do aparelho. A app ainda não o monta. O script atual trata qualquer valor que não seja `light` como acompanhamento do aparelho, então `system` e a ausência já batem com a spec antes do provider hidratar.
 

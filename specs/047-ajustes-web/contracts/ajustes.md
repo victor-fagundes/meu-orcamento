@@ -6,7 +6,7 @@ A pessoa entrou na própria conta. Outro orçamento não aparece e não muda. A 
 
 `/app/ajustes` abre `/app/ajustes/categorias`.
 
-Dia a dia, nesta ordem: Categorias e itens, Conta, Cartões, Limites de alerta, Itens arquivados. Dados e arquivos, nesta ordem: Exportar, Dados de exemplo. Excluir conta fica fora dos grupos, em destaque destrutivo. Sair da conta vem em seguida e abre diálogo. Importar planilha, Importar fatura e Simulador de competência não aparecem.
+Dia a dia, nesta ordem: Conta, Categorias e itens, Cartões, Limites de alerta, Itens arquivados. Dados e arquivos, nesta ordem: Importar planilha, Importar fatura, Exportar, Simulador de competência, Dados de exemplo. Excluir conta fica fora dos grupos, em destaque destrutivo. Sair da conta vem em seguida e abre diálogo.
 
 A partir de 720 px o menu e a página ficam juntos. Abaixo de 720 px a página fica sozinha. Voltar mostra o menu. Escolher uma entrada abre a página. Abrir a aba mostra Categorias e itens, também abaixo de 720 px.
 
@@ -14,7 +14,7 @@ A partir de 720 px o menu e a página ficam juntos. Abaixo de 720 px a página f
 
 `/app/ajustes/conta` mostra as iniciais, o nome, o e-mail, Esqueci a senha, "Dados da sua conta neste aparelho." e "Esta conta está ativa neste navegador." Esqueci a senha abre `/esqueci-senha` com a sessão de pé.
 
-Claro, Escuro e Sistema: uma só marcada. A escolha vale na hora e continua depois de recarregar. Sistema acompanha o aparelho. Sem escolha anterior, Sistema está marcado.
+Claro, Escuro e Sistema: uma só marcada. A escolha vale na hora e continua depois de recarregar. Sistema acompanha o aparelho. Sem escolha anterior, Claro está marcado.
 
 Sair da conta, aqui ou no menu, abre o mesmo diálogo: "Sair da conta", "A sessão desta conta será encerrada neste navegador.", Cancelar e Sair. Cancelar mantém a sessão e devolve o foco. Sair encerra a sessão e abre `/login`.
 

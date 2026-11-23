@@ -15,7 +15,6 @@ import {
   Switch,
 } from "@meu-orcamento/design-system";
 import { arquivarItemAction, criarItemAction } from "@/app/actions/itens";
-import { criarCategoriaAction } from "@/app/actions/categorias";
 import { salvarPlanoAction } from "@/app/actions/plano";
 import {
   ROTULO_TIPO,
@@ -26,6 +25,7 @@ import {
 } from "@/components/orcamento-query";
 import { indiceMesAberto } from "@/components/arquivar-rotulo";
 import { bannerFromAlertas, limiteDaCategoria, type AlertaMes, type LimitesConfig } from "@/domain/alertas";
+import { AcoesNoCabecalho } from "@/components/slot-cabecalho";
 import { validarNomeCategoria } from "@/domain/categorias";
 import { categoriasDoTipo, textoDemaisAlertas, totalDoTipo } from "@/domain/orcamento-lista";
 import {
@@ -57,7 +57,7 @@ export type ItemTela = {
   plano: number[];
 };
 
-type Painel = "categoria" | "item" | "plano" | null;
+type Painel = "item" | "plano" | null;
 
 function textoDeErro(error: string): string {
   return ERROS_CONHECIDOS.has(error) ? error : FALHA;
@@ -103,7 +103,6 @@ export function OrcamentoTela({
   const [painel, setPainel] = useState<Painel>(null);
   const [erro, setErro] = useState("");
   const [gravando, setGravando] = useState(false);
-  const [nomeCategoria, setNomeCategoria] = useState("");
   const [nomeItem, setNomeItem] = useState("");
   const [categoriaItem, setCategoriaItem] = useState("");
   const [planoId, setPlanoId] = useState<string | null>(null);
@@ -143,18 +142,6 @@ export function OrcamentoTela({
     setPainel(null);
     setErro("");
     setGravando(false);
-  }
-
-  async function salvarCategoria() {
-    setGravando(true);
-    const res = await criarCategoriaAction({ tipo, nome: nomeCategoria });
-    setGravando(false);
-    if (!res.ok) {
-      setErro(textoDeErro(res.error));
-      return;
-    }
-    fecharPainel();
-    router.refresh();
   }
 
   async function salvarItem() {
@@ -254,13 +241,23 @@ export function OrcamentoTela({
     router.refresh();
   }
 
+  function abrirNovoItem() {
+    setNomeItem("");
+    setCategoriaItem("");
+    setErro("");
+    setPainel("item");
+  }
+
   const realizadoVisivel = ocultado ? "R$ •••••" : total.realizado;
   const planejadoVisivel = ocultado ? "de R$ ••••• planejados" : total.planejado;
 
   return (
     <main id="conteudo">
-      {banner ? <Banner tipo={banner.nivel === "er" ? "erro" : "atencao"}>{banner.msg}</Banner> : null}
-      {demais ? <p>{demais}</p> : null}
+      <AcoesNoCabecalho>
+        <Botao variante="primario" onPress={abrirNovoItem}>
+          {`Novo item em ${ROTULO_TIPO[tipo]}`}
+        </Botao>
+      </AcoesNoCabecalho>
       <Chips
         rotuloGrupo="Tipo"
         opcoes={TIPOS_ORCAMENTO.map((valor) => ({ valor, rotulo: ROTULO_TIPO[valor] }))}
@@ -269,112 +266,108 @@ export function OrcamentoTela({
           if (valor !== tipo) router.push(hrefDoTipo(competencia, valor));
         }}
       />
-      <p>
-        {realizadoVisivel} {planejadoVisivel}
-      </p>
-      <div>
-        <a className="mo-botao mo-botao--texto" href={`/app/ajustes/categorias?tipo=${tipo}`}>
-          Gerenciar
-        </a>
-        <Botao
-          variante="secundario"
-          onPress={() => {
-            setNomeCategoria("");
-            setErro("");
-            setPainel("categoria");
+      {banner ? <Banner tipo={banner.nivel === "er" ? "erro" : "atencao"}>{banner.msg}</Banner> : null}
+      {demais ? <p>{demais}</p> : null}
+      <div className={painel === "plano" ? "mo-orcamento__corpo mo-orcamento__corpo--painel" : "mo-orcamento__corpo"}>
+        <div className="mo-orcamento__lista">
+          <p>
+            {realizadoVisivel} {planejadoVisivel}
+          </p>
+          {doTipo.length === 0 ? (
+            <CartaoVazio
+              titulo="Nenhum item neste tipo"
+              frase="Crie um item para planejar o mês."
+              acao={{
+                rotulo: "Criar primeiro item",
+                onPress: abrirNovoItem,
+              }}
+            />
+          ) : (
+            categorias.map((categoria) => {
+              const limite = limiteDaCategoria(limites, categoria.nome);
+              return (
+                <GrupoComMedidor
+                  key={categoria.nome}
+                  rotulo={categoria.nome}
+                  realizadoCentavos={categoria.realizadoCentavos}
+                  planejadoCentavos={categoria.planejadoCentavos}
+                  aberto={abertas.includes(categoria.nome)}
+                  limiteAtencao={limite}
+                  ocultado={ocultado}
+                  onAlternar={() => router.push(hrefAlternarCategoria(competencia, tipo, abertas, categoria.nome))}
+                >
+                  {categoria.itens.map((linha) => {
+                    const item = doTipo.find((atual) => atual.nome === linha.nome && atual.grupo === categoria.nome);
+                    if (!item) return null;
+                    return (
+                      <div key={item.id}>
+                        <LinhaItem
+                          nome={item.nome}
+                          realizadoCentavos={item.realizadoMes}
+                          planejadoCentavos={item.planoMes}
+                          limiteAtencao={limite}
+                          ocultado={ocultado}
+                          onAbrir={() => {
+                            setPlanoId(item.id);
+                            setValorPlano(item.plano[indice] ?? 0);
+                            setAplicarSeguintes(false);
+                            setErro("");
+                            setRevisaoPlano((atual) => atual + 1);
+                            setPainel("plano");
+                          }}
+                        />
+                        <button
+                          type="button"
+                          className="mo-botao mo-botao--texto"
+                          aria-label={`Arquivar ${item.nome}`}
+                          onClick={() => setArquivar(item)}
+                        >
+                          Arquivar
+                        </button>
+                      </div>
+                    );
+                  })}
+                </GrupoComMedidor>
+              );
+            })
+          )}
+        </div>
+        <FormularioContainer
+          encaixado
+          aberto={painel === "plano" && itemPlano !== null}
+          titulo={itemPlano?.nome ?? "Plano"}
+          textoSalvar="Salvar plano"
+          salvarDesabilitado={gravando}
+          onCancelar={fecharPainel}
+          onSalvar={() => {
+            void salvarPlano();
           }}
         >
-          Nova categoria
-        </Botao>
-        <Botao
-          variante="primario"
-          onPress={() => {
-            setNomeItem("");
-            setCategoriaItem("");
-            setErro("");
-            setPainel("item");
-          }}
-        >
-          Novo item
-        </Botao>
+          <CampoMoeda
+            key={`${planoId ?? ""}-${revisaoPlano}`}
+            id="plano-valor"
+            rotulo="Valor do mês"
+            valor={valorPlano}
+            onMudar={setValorPlano}
+            erro={erro || undefined}
+          />
+          <Switch
+            id="aplicar-seguintes"
+            rotulo="Aplicar também aos próximos meses"
+            marcado={aplicarSeguintes}
+            onMudar={setAplicarSeguintes}
+          />
+          <button type="button" className="mo-botao mo-botao--texto" onClick={() => void copiarMes()}>
+            Copiar mês anterior
+          </button>
+          <button type="button" className="mo-botao mo-botao--texto" onClick={() => void aplicarTodos()}>
+            Aplicar a todos os meses
+          </button>
+          <button type="button" className="mo-botao mo-botao--texto" onClick={copiarAno}>
+            Copiar ano anterior
+          </button>
+        </FormularioContainer>
       </div>
-      {doTipo.length === 0 ? (
-        <CartaoVazio
-          titulo="Nenhum item neste tipo"
-          frase="Crie um item para planejar o mês."
-          acao={{
-            rotulo: "Novo item",
-            onPress: () => {
-              setNomeItem("");
-              setCategoriaItem("");
-              setErro("");
-              setPainel("item");
-            },
-          }}
-        />
-      ) : (
-        categorias.map((categoria) => {
-          const limite = limiteDaCategoria(limites, categoria.nome);
-          return (
-            <GrupoComMedidor
-              key={categoria.nome}
-              rotulo={categoria.nome}
-              realizadoCentavos={categoria.realizadoCentavos}
-              planejadoCentavos={categoria.planejadoCentavos}
-              aberto={abertas.includes(categoria.nome)}
-              limiteAtencao={limite}
-              ocultado={ocultado}
-              onAlternar={() => router.push(hrefAlternarCategoria(competencia, tipo, abertas, categoria.nome))}
-            >
-              {categoria.itens.map((linha) => {
-                const item = doTipo.find((atual) => atual.nome === linha.nome && atual.grupo === categoria.nome);
-                if (!item) return null;
-                return (
-                  <div key={item.id}>
-                    <LinhaItem
-                      nome={item.nome}
-                      realizadoCentavos={item.realizadoMes}
-                      planejadoCentavos={item.planoMes}
-                      limiteAtencao={limite}
-                      ocultado={ocultado}
-                      onAbrir={() => {
-                        setPlanoId(item.id);
-                        setValorPlano(item.plano[indice] ?? 0);
-                        setAplicarSeguintes(false);
-                        setErro("");
-                        setRevisaoPlano((atual) => atual + 1);
-                        setPainel("plano");
-                      }}
-                    />
-                    <button
-                      type="button"
-                      className="mo-botao mo-botao--texto"
-                      aria-label={`Arquivar ${item.nome}`}
-                      onClick={() => setArquivar(item)}
-                    >
-                      Arquivar
-                    </button>
-                  </div>
-                );
-              })}
-            </GrupoComMedidor>
-          );
-        })
-      )}
-
-      <FormularioContainer
-        aberto={painel === "categoria"}
-        titulo="Nova categoria"
-        textoSalvar="Salvar"
-        salvarDesabilitado={gravando}
-        onCancelar={fecharPainel}
-        onSalvar={() => {
-          void salvarCategoria();
-        }}
-      >
-        <CampoNome id="nome-categoria" valor={nomeCategoria} onMudar={setNomeCategoria} />
-        {erro ? <p role="alert">{erro}</p> : null}
-      </FormularioContainer>
 
       <FormularioContainer
         aberto={painel === "item"}
@@ -405,41 +398,6 @@ export function OrcamentoTela({
           </datalist>
         </div>
         {erro ? <p role="alert">{erro}</p> : null}
-      </FormularioContainer>
-
-      <FormularioContainer
-        aberto={painel === "plano" && itemPlano !== null}
-        titulo={itemPlano?.nome ?? "Plano"}
-        textoSalvar="Salvar plano"
-        salvarDesabilitado={gravando}
-        onCancelar={fecharPainel}
-        onSalvar={() => {
-          void salvarPlano();
-        }}
-      >
-        <CampoMoeda
-          key={`${planoId ?? ""}-${revisaoPlano}`}
-          id="plano-valor"
-          rotulo="Valor do mês"
-          valor={valorPlano}
-          onMudar={setValorPlano}
-          erro={erro || undefined}
-        />
-        <Switch
-          id="aplicar-seguintes"
-          rotulo="Aplicar também aos próximos meses"
-          marcado={aplicarSeguintes}
-          onMudar={setAplicarSeguintes}
-        />
-        <button type="button" className="mo-botao mo-botao--texto" onClick={() => void copiarMes()}>
-          Copiar mês anterior
-        </button>
-        <button type="button" className="mo-botao mo-botao--texto" onClick={() => void aplicarTodos()}>
-          Aplicar a todos os meses
-        </button>
-        <button type="button" className="mo-botao mo-botao--texto" onClick={copiarAno}>
-          Copiar ano anterior
-        </button>
       </FormularioContainer>
 
       <Dialogo

@@ -3,12 +3,15 @@ import { expect, test, type Page } from "@playwright/test";
 test.describe.configure({ mode: "serial", timeout: 90_000 });
 
 const MENU = [
-  "Categorias e itens",
   "Conta",
+  "Categorias e itens",
   "Cartões",
   "Limites de alerta",
   "Itens arquivados",
+  "Importar planilha",
+  "Importar fatura",
   "Exportar",
+  "Simulador de competência",
   "Dados de exemplo",
   "Excluir conta",
   "Sair da conta",
@@ -39,9 +42,9 @@ test("menu, aba e saída só no diálogo", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Categorias e itens" })).toBeVisible();
   const menu = page.getByRole("navigation", { name: "Ajustes" });
   await expect(menu.getByRole("button")).toHaveText(MENU.map((nome) => new RegExp(`^${nome}`)));
-  await expect(page.getByText("Importar planilha")).toHaveCount(0);
-  await expect(page.getByText("Importar fatura")).toHaveCount(0);
-  await expect(page.getByText("Simulador de competência")).toHaveCount(0);
+  await expect(menu.getByRole("button", { name: "Importar planilha" })).toBeVisible();
+  await expect(menu.getByRole("button", { name: "Importar fatura" })).toBeVisible();
+  await expect(menu.getByRole("button", { name: "Simulador de competência" })).toBeVisible();
   const principal = page.getByRole("navigation", { name: "Principal" });
   await expect(principal.locator('[aria-current="page"]')).toHaveCount(1);
   await expect(principal.getByRole("button", { name: "Ajustes" })).toHaveAttribute("aria-current", "page");

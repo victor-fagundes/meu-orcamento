@@ -70,7 +70,7 @@ Status: **adotadas** salvo onde indicado como pendente.
 - Contraste mínimo de 4,5:1 para texto.
 
 ## 10. Pendências
-- **Tema escuro:** não definido. Só depois da aprovação do claro.
+- **Tema escuro:** não definido. No web, sem escolha anterior, vale o claro (PM, 2026-11-23). Escuro e Sistema continuam em Conta só quando a pessoa marca.
 - **Fonte:** Manrope adotada, mas o produto ainda não confirmou (Roboto é o padrão Android).
 - **Verificação visual:** ainda não feita em navegador real, em celular e desktop.
 - **Categoria vazia no Orçamento:** não definido se aparece com "Nenhum item".

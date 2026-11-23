@@ -101,12 +101,22 @@ test("título sem mês, sem flutuante, e Sair", async ({ page }) => {
     await page.setViewportSize({ width, height: 800 });
     for (const [nome, endereco] of AREAS) {
       await abrir(page, endereco);
-      if (nome === "Resumo" || nome === "Orçamento" || nome === "Lançamentos") {
+      if (nome === "Resumo") {
         await expect(page.locator(".mo-cabecalho__titulo")).toContainText(nome);
         await expect(page.getByRole("button", { name: "Mês anterior" })).toHaveCount(1);
         await expect(page.getByRole("button", { name: "Próximo mês" })).toHaveCount(1);
+      } else if (nome === "Orçamento" || nome === "Lançamentos") {
+        await expect(page.locator(".mo-cabecalho__titulo")).toContainText(nome);
+        await expect(page.getByRole("button", { name: "Mês anterior" })).toHaveCount(0);
+        await expect(page.getByRole("button", { name: "Próximo mês" })).toHaveCount(0);
+      } else if (nome === "Ano") {
+        await expect(page.locator(".mo-cabecalho__titulo")).toHaveCount(0);
+        await expect(page.getByRole("heading", { name: /^Ano/ })).toBeVisible();
+        await expect(page.getByRole("button", { name: "Mês anterior" })).toHaveCount(0);
+        await expect(page.getByRole("button", { name: "Próximo mês" })).toHaveCount(0);
       } else {
-        await expect(page.locator(".mo-cabecalho__titulo")).toHaveText(nome);
+        await expect(page.locator(".mo-cabecalho__titulo")).toHaveCount(0);
+        if (width >= 720) await expect(page.getByRole("navigation", { name: "Ajustes" })).toBeVisible();
         await expect(page.getByRole("button", { name: "Mês anterior" })).toHaveCount(0);
         await expect(page.getByRole("button", { name: "Próximo mês" })).toHaveCount(0);
       }

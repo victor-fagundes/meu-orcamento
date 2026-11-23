@@ -8,7 +8,7 @@
 
 **Input**: User description: "/speckit-specify 047"
 
-**Related**: Quem entrou na conta abre Ajustes e encontra o menu em dois grupos, a conta, as categorias, os cartões, o limite, os arquivados, a exportação, o exemplo e a exclusão. Importar planilha e importar fatura continuam existindo e não aparecem neste menu. A aparência vem da história 040. O lugar na casca vem da história 042. O nome da categoria, o limite de 1 a 100 e as duas frases de exportar vêm da história 041. O arquivo com movimento continua o da exportação já entregue. A entrada e o envio de "Esqueci a senha" são a história 048.
+**Related**: Quem entrou na conta abre Ajustes e encontra o menu em dois grupos, a conta, as categorias, os cartões, o limite, os arquivados, a importação de planilha, a importação de fatura, a exportação, o simulador, o exemplo e a exclusão. A aparência vem da identidade visual. O lugar na casca vem da história 042. O nome da categoria, o limite de 1 a 100 e as duas frases de exportar vêm da história 041. O arquivo com movimento continua o da exportação já entregue. A entrada e o envio de "Esqueci a senha" são a história 048.
 
 ## Referências visuais e de DS
 - Identidade: `docs/identidade-visual/decisoes/DECISOES_identidade_visual.md` (seções aplicáveis: 5 Layout, 6 Formulários e confirmações, 7 Estados e mensagens, 8 Nomes e microcopy)
@@ -31,23 +31,23 @@
 
 ### User Story 1 - Menu, conta, tema e saída (Priority: P1)
 
-A pessoa abre Ajustes e vê dois grupos. **Dia a dia**: Categorias e itens, Conta, Cartões, Limites de alerta, Itens arquivados. **Dados e arquivos**: Exportar, Dados de exemplo. Importar planilha, Importar fatura e Simulador de competência não aparecem. Excluir conta fica fora dos grupos, no fim, em destaque destrutivo. Em seguida vem Sair da conta.
+A pessoa abre Ajustes e vê dois grupos. **Dia a dia**: Conta, Categorias e itens, Cartões, Limites de alerta, Itens arquivados. **Dados e arquivos**: Importar planilha, Importar fatura, Exportar, Simulador de competência, Dados de exemplo. Excluir conta fica fora dos grupos, no fim, em destaque destrutivo. Em seguida vem Sair da conta. A identidade vale por cima da omissão anterior (PM, 2026-11-23).
 
 A aba Ajustes continua a única marcada em qualquer uma dessas páginas. A casca não oferece outro Sair. Em 1280 px o menu e a página aberta aparecem juntos. Em 390 px a pessoa vê o menu, escolhe uma entrada e a página abre; Voltar devolve ao menu. Não há botão flutuante em 390 px nem em 1280 px.
 
 Abrir Ajustes pela aba mostra Categorias e itens. Conta mostra, no topo, o avatar com as iniciais, o nome, o e-mail e Esqueci a senha. Esqueci a senha abre a recuperação sem encerrar a sessão. A frase da página é "Dados da sua conta neste aparelho." A sessão diz "Esta conta está ativa neste navegador." e oferece Sair da conta.
 
-Na mesma página a pessoa escolhe uma opção: Claro, Escuro ou Sistema. A escolha vale na hora e continua neste navegador depois de recarregar. Sistema acompanha o aparelho e muda se o aparelho mudar, sem gravar Claro ou Escuro no lugar. Sem escolha anterior, vale Sistema.
+Na mesma página a pessoa escolhe uma opção: Claro, Escuro ou Sistema. A escolha vale na hora e continua neste navegador depois de recarregar. Sistema acompanha o aparelho e muda se o aparelho mudar, sem gravar Claro ou Escuro no lugar. Sem escolha anterior, vale Claro, mesmo com o aparelho em escuro.
 
 Sair da conta, no menu ou na sessão, abre o mesmo diálogo: "Sair da conta", "A sessão desta conta será encerrada neste navegador.", Cancelar e Sair. Cancelar mantém a sessão. Sair encerra a sessão neste navegador e a casca deixa de aparecer.
 
 **Why this priority**: Sem o menu a pessoa não chega nas outras páginas. Sem a saída confirmada, a sessão acaba por engano.
 
-**Independent Test**: Abrir Ajustes e ler os dois grupos, sem Importar e sem Simulador. Em Conta, escolher Escuro e recarregar: a página continua escura. Cancelar o diálogo de sair e continuar na conta.
+**Independent Test**: Abrir Ajustes e ler os dois grupos, com Importar planilha, Importar fatura e Simulador de competência. Em Conta, escolher Escuro e recarregar: a página continua escura. Cancelar o diálogo de sair e continuar na conta.
 
 **Acceptance Scenarios**:
 
-1. **Given** a pessoa entrou na conta, **When** ela abre Ajustes, **Then** vê Dia a dia com Categorias e itens, Conta, Cartões, Limites de alerta e Itens arquivados, e Dados e arquivos com Exportar e Dados de exemplo. Excluir conta está fora dos grupos, no fim, em destaque destrutivo, e Sair da conta vem depois. Importar planilha, Importar fatura e Simulador de competência não estão.
+1. **Given** a pessoa entrou na conta, **When** ela abre Ajustes, **Then** vê Dia a dia com Conta, Categorias e itens, Cartões, Limites de alerta e Itens arquivados, e Dados e arquivos com Importar planilha, Importar fatura, Exportar, Simulador de competência e Dados de exemplo. Excluir conta está fora dos grupos, no fim, em destaque destrutivo, e Sair da conta vem depois.
 2. **Given** qualquer página deste menu está aberta, **When** a pessoa lê a navegação da casca, **Then** só Ajustes está marcada. A casca não tem outro Sair.
 3. **Given** a largura é 1280 px, **When** a pessoa abre Conta, **Then** o menu e a página aparecem juntos. **Given** a largura é 390 px, **When** ela escolhe Conta e depois Voltar, **Then** volta ao menu. Em 390 px e em 1280 px não há botão flutuante.
 4. **Given** a conta se chama Victor Fagundes e o e-mail é o da conta, **When** a pessoa abre Conta, **Then** vê as iniciais VF, o nome, o e-mail, Esqueci a senha, "Dados da sua conta neste aparelho." e "Esta conta está ativa neste navegador."
@@ -58,7 +58,7 @@ Sair da conta, no menu ou na sessão, abre o mesmo diálogo: "Sair da conta", "A
 
 ### User Story 2 - Criar, renomear e arquivar categoria (Priority: P1)
 
-Categorias e itens tem duas abas: Categorias e Itens arquivados. Em Categorias, a frase é "Renomear atualiza o nome em todos os itens da categoria. Arquivar tira a categoria do Orçamento; os lançamentos antigos continuam." Os tipos aparecem nesta ordem: Receitas, Despesas fixas, Despesas variáveis e Anuais. Dentro do tipo, as categorias ativas ficam em ordem alfabética do português. Cada uma mostra o tipo e a contagem de itens ativos: "1 item" ou "2 itens". Categoria ativa sem item aparece com "0 itens". Categoria arquivada não aparece nesta aba.
+Categorias e itens tem duas abas: Categorias e Itens arquivados. Em Categorias, a frase é "Renomear atualiza o nome em todos os itens da categoria. Arquivar tira a categoria do Orçamento; os lançamentos antigos continuam." Os tipos aparecem nesta ordem: Receitas, Despesas fixas, Despesas variáveis e Anuais. Cada tipo começa fechado. Abrir um tipo mostra as categorias ativas dele, em ordem alfabética do português. Cada uma mostra o tipo e a contagem de itens ativos: "1 item" ou "2 itens". Categoria ativa sem item aparece com "0 itens". Categoria arquivada não aparece nesta aba.
 
 Renomear e Arquivar ficam no menu de ações da categoria, não como dois botões soltos na linha. Nova categoria fica no conteúdo, com o nome "+ Nova categoria". No largo, o formulário é um painel de 460 px. Em 390 px, é a folha de baixo. Os campos são Tipo e Nome. Criar categoria não cria item. Gravar com sucesso fecha o formulário, no painel ou na folha, e leva o foco para a linha criada. Um nome recusado deixa o formulário aberto.
 
@@ -233,8 +233,8 @@ Cada controle tem nome. O foco é visível. Pelo teclado a pessoa alcança o men
 
 ### Edge Cases
 
-- Importar planilha e Importar fatura não ganham entrada, atalho nem convite. O que já existia delas não é refeito aqui.
-- Simulador de competência não entra no menu.
+- Importar planilha e Importar fatura entram no menu Dados e arquivos e abrem o fluxo que já existia, na aparência do design system.
+- Simulador de competência entra no menu e só mostra a prévia. Nada é gravado.
 - A casca não encerra a sessão por um Sair sem diálogo.
 - Categoria ativa com zero itens aparece. Categoria arquivada sai da aba Categorias. Não há desarquivar nem reordenar, nem de categoria nem de item.
 - Gravar categoria ou cartão com sucesso fecha o formulário e leva o foco para a linha criada ou editada. Nome ou dado recusado, e falha ao salvar, deixam o formulário aberto com o que foi digitado.
@@ -250,19 +250,19 @@ Cada controle tem nome. O foco é visível. Pelo teclado a pessoa alcança o men
 - EXCLUIR com espaços só nas pontas confirma. "excluir", "Excluir", "EXCLUIR agora" e campo vazio não confirmam. Não há prazo de 30 dias.
 - Falha ao excluir, ao aplicar o exemplo ou ao salvar não grava pela metade.
 - Lista, cartão, limite e arquivo de outra conta são tratados como inexistentes.
-- Tema ausente vale Sistema. Claro e Escuro não seguem o aparelho depois de escolhidos.
+- Tema ausente vale Claro. Claro e Escuro não seguem o aparelho depois de escolhidos. Sistema só vale quando a pessoa marca Sistema.
 - Em 390 px e em 1280 px não há botão flutuante. A aba Ajustes não perde a marca ao abrir uma subtela.
 
 ## Requirements *(mandatory)*
 
 ### Functional Requirements
 
-- **FR-001**: Ajustes MUST mostrar Dia a dia, nesta ordem: Categorias e itens, Conta, Cartões, Limites de alerta, Itens arquivados. MUST mostrar Dados e arquivos, nesta ordem: Exportar, Dados de exemplo. Excluir conta MUST ficar fora dos grupos, no fim, em destaque destrutivo, seguido de Sair da conta. Importar planilha, Importar fatura e Simulador de competência MUST NOT aparecer.
+- **FR-001**: Ajustes MUST mostrar Dia a dia, nesta ordem: Conta, Categorias e itens, Cartões, Limites de alerta, Itens arquivados. MUST mostrar Dados e arquivos, nesta ordem: Importar planilha, Importar fatura, Exportar, Simulador de competência, Dados de exemplo. Excluir conta MUST ficar fora dos grupos, no fim, em destaque destrutivo, seguido de Sair da conta.
 - **FR-002**: Em qualquer página deste menu, a aba Ajustes MUST permanecer a única marcada. A casca MUST NOT oferecer um Sair que encerre a sessão sem o diálogo. Em 1280 px o menu e a página MUST aparecer juntos. Em 390 px a página MUST abrir a partir do menu e Voltar MUST devolver ao menu. Em 390 px e em 1280 px MUST NOT haver botão flutuante. Abrir Ajustes pela aba MUST mostrar Categorias e itens.
 - **FR-003**: Conta MUST mostrar as iniciais do nome, o nome, o e-mail, Esqueci a senha, "Dados da sua conta neste aparelho." e "Esta conta está ativa neste navegador." Esqueci a senha MUST abrir a recuperação sem encerrar a sessão.
-- **FR-004**: Conta MUST oferecer Claro, Escuro e Sistema, uma só marcada. A escolha MUST valer na hora e MUST continuar neste navegador depois de recarregar. Sistema MUST acompanhar o aparelho. Sem escolha anterior, MUST valer Sistema.
+- **FR-004**: Conta MUST oferecer Claro, Escuro e Sistema, uma só marcada. A escolha MUST valer na hora e MUST continuar neste navegador depois de recarregar. Sistema MUST acompanhar o aparelho. Sem escolha anterior, MUST valer Claro.
 - **FR-005**: Sair da conta, no menu ou na sessão, MUST abrir o diálogo "Sair da conta" com "A sessão desta conta será encerrada neste navegador.", Cancelar e Sair. Cancelar MUST manter a sessão. Sair MUST encerrar a sessão deste navegador.
-- **FR-006**: Categorias MUST listar só categorias ativas, pelos tipos Receitas, Despesas fixas, Despesas variáveis e Anuais, nessa ordem, e em ordem alfabética do português dentro do tipo. A linha MUST mostrar o tipo e a contagem de itens ativos, com "1 item" no singular. Categoria sem item MUST aparecer com "0 itens". A frase de renomear e arquivar MUST estar visível. Renomear e Arquivar MUST estar no menu de ações da linha.
+- **FR-006**: Categorias MUST listar só categorias ativas, pelos tipos Receitas, Despesas fixas, Despesas variáveis e Anuais, nessa ordem, e em ordem alfabética do português dentro do tipo. Cada tipo MUST começar fechado. Abrir o tipo MUST mostrar as categorias dele. A linha MUST mostrar o tipo e a contagem de itens ativos, com "1 item" no singular. Categoria sem item MUST aparecer com "0 itens". A frase de renomear e arquivar MUST estar visível. Renomear e Arquivar MUST estar no menu de ações da linha.
 - **FR-007**: Nova categoria MUST pedir tipo e nome e MUST NOT criar item. O nome MUST seguir a história 041, inclusive as mensagens "Informe o nome da categoria.", "Use no máximo 40 caracteres.", "Use o nome em uma linha só." e "Escolha outro nome. Já existe uma categoria com esse nome neste tipo." Nome recusado MUST NOT gravar e MUST deixar o formulário aberto. O mesmo nome em outro tipo MUST ser aceito. Categoria arquivada MUST NOT bloquear o nome. No largo, o formulário MUST ser um painel de 460 px. Gravar com sucesso MUST fechar o formulário e MUST levar o foco para a linha criada.
 - **FR-008**: Renomear MUST manter o tipo. Renomear para o nome atual MUST concluir sem erro e sem mudança. Um nome novo e único no tipo MUST atualizar a categoria e os itens daquele tipo que usavam o nome antigo. Outro tipo e os lançamentos MUST permanecer. Nome aceito MUST fechar o formulário e MUST levar o foco para a linha dessa categoria. Nome recusado MUST deixar o formulário aberto.
 - **FR-009**: Arquivar MUST perguntar "Arquivar {nome}?" e MUST explicar "Os itens saem do Orçamento. Os lançamentos antigos continuam." Cancelar MUST NOT arquivar. Confirmar MUST arquivar a categoria e os itens daquele grupo naquele tipo, MUST mostrar "Categoria arquivada." e MUST manter os lançamentos. Desarquivar e reordenar MUST NOT existir. Gerenciar MUST abrir esta página no tipo que estava no Orçamento, com os outros tipos alcançáveis.
@@ -291,7 +291,7 @@ Cada controle tem nome. O foco é visível. Pelo teclado a pessoa alcança o men
 
 ### Measurable Outcomes
 
-- **SC-001**: A pessoa encontra os dois grupos, Excluir conta isolado e Sair da conta em um olhar. Importar planilha, Importar fatura e Simulador de competência não estão no menu. A aba Ajustes continua marcada. Em 390 px e em 1280 px não há botão flutuante.
+- **SC-001**: A pessoa encontra os dois grupos, com Importar planilha, Importar fatura e Simulador de competência, Excluir conta isolado e Sair da conta em um olhar. A aba Ajustes continua marcada. Em 390 px e em 1280 px não há botão flutuante.
 - **SC-002**: Escolher Escuro deixa a tela escura na hora e depois de recarregar. Cancelar "Sair da conta" mantém a sessão. Confirmar encerra a sessão neste navegador. A casca não tem um segundo Sair sem diálogo.
 - **SC-003**: Criar "  Lazer  " grava Lazer com "0 itens" e sem item novo, fecha o formulário e deixa o foco na linha de Lazer. Criar "lazer" de novo não grava, mostra "Escolha outro nome. Já existe uma categoria com esse nome neste tipo." e mantém o formulário aberto. Arquivar Lazer mostra "Categoria arquivada.", tira os itens do Orçamento e deixa os lançamentos na lista.
 - **SC-004**: Itens arquivados não oferece desarquivar. Item com lançamento mostra "Histórico mantido". Item sem lançamento mostra "Nenhum lançamento".
@@ -305,9 +305,9 @@ Cada controle tem nome. O foco é visível. Pelo teclado a pessoa alcança o men
 - A aparência vem da história 040. A casca é a história 042. A branch de trabalho é `rebuild-web`. O app do celular fica para a história 056 e não desenha estas páginas.
 - A spec curta anterior, com status `ready`, já fechava os dois grupos, a ordem com Categorias e itens primeiro, o tema em Conta, as frases de categoria da história 041, o limite de 1 a 100, os dois toques do exemplo, as duas frases de exportar e a exclusão imediata com a frase EXCLUIR. Esta versão guarda essas decisões e descreve o que a pessoa vê em cada página.
 - O artboard lista Conta antes de Categorias e itens. Esta história mantém Categorias e itens primeiro, como a spec curta e o pedido desta rebuild já fecharam.
-- O artboard mostra Importar planilha, Importar fatura e Simulador de competência no menu. Nesta versão as duas importações ficam fora da navegação, e o simulador também. O que já existia delas não é refeito e não é apagado aqui. A remoção do front antigo continua na história 049.
+- O artboard mostra Importar planilha, Importar fatura e Simulador de competência no menu. A identidade vale por cima (PM, 2026-11-23): os três entram no menu, na ordem do artboard.
 - O artboard desenha Renomear e Arquivar escritos na linha. Esta história coloca as mesmas duas ações no menu de ações da categoria, como o pedido da rebuild já fechou. As palavras continuam Renomear e Arquivar.
-- O artboard de Conta não desenha Claro, Escuro e Sistema. Esta história coloca a escolha em Conta. A preferência continua a desta história 040, neste navegador, com os três modos. Tema ausente vale Sistema.
+- O artboard de Conta não desenha Claro, Escuro e Sistema. Esta história coloca a escolha em Conta. A preferência continua neste navegador, com os três modos. Em 2026-11-23 o PM fixou o tema ausente como Claro. O escuro da identidade continua pendente. Sistema só entra quando a pessoa marca Sistema.
 - A casca da história 042 manteve Sair sem diálogo para a pessoa não ficar presa. Aqui a saída confirmada fica em Ajustes, no menu e em Conta, e a casca deixa de encerrar a sessão por conta própria.
 - O artboard de Inter junta numa frase o aviso de cartão sem fechamento e o aviso de bancos que tratam o dia do fechamento de outro jeito. Esta história separa os dois. Sem fechamento: "Sem dia de fechamento, a competência é o mês da compra." Com fechamento, o formulário avisa que a compra no dia do fechamento entra na fatura do mês seguinte e que alguns bancos tratam esse dia de outro jeito. Lançamento já gravado não muda de mês.
 - A spec curta pedia vencimento de 1 a 31. O artboard só mostra "vence dia 9". Esta história aceita 1 a 31 e recusa o que estiver fora. Fechamento continua de 1 a 28.

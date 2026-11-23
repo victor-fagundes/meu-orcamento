@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { carregarAnoAction } from "@/app/actions/ano";
 import type { GradeAno, LinhaGrade } from "@/domain/ano-grade";
-import { Banner, Botao, Chips, EstadoErro, TabelaMeses } from "@meu-orcamento/design-system";
+import { Banner, Chips, EstadoErro, TabelaMeses } from "@meu-orcamento/design-system";
 
 const CHAVE_OCULTAR = "mo-ocultar-valores";
 const AVISO_SOBRA =
@@ -66,13 +66,13 @@ export function AnoTela({ grade }: { grade: GradeAno }) {
       <div className="mo-ano__topo">
         <h2 className="mo-ano__titulo">{titulo}</h2>
         <div className="mo-ano__ano">
-          <Botao variante="texto" acessibilidade="Ano anterior" onPress={() => void pedir(String(anoNumero - 1))}>
+          <button type="button" className="mo-cabecalho__seta" aria-label="Ano anterior" onClick={() => void pedir(String(anoNumero - 1))}>
             ‹
-          </Botao>
+          </button>
           <span>{confirmado.ano}</span>
-          <Botao variante="texto" acessibilidade="Próximo ano" onPress={() => void pedir(String(anoNumero + 1))}>
+          <button type="button" className="mo-cabecalho__seta" aria-label="Próximo ano" onClick={() => void pedir(String(anoNumero + 1))}>
             ›
-          </Botao>
+          </button>
         </div>
       </div>
       <Chips

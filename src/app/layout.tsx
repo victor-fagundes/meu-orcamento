@@ -12,7 +12,7 @@ const manrope = localFont({
   variable: "--font-manrope",
 });
 
-const scriptTema = `(function(){try{var t=localStorage.getItem("mo-tema");var escuro=window.matchMedia("(prefers-color-scheme: dark)").matches;var tema=(t==="dark"||(t!=="light"&&escuro))?"dark":"light";document.documentElement.setAttribute("data-theme",tema);}catch(e){}})();`;
+const scriptTema = `(function(){var tema="light";try{var t=localStorage.getItem("mo-tema");var escuro=window.matchMedia("(prefers-color-scheme: dark)").matches;if(t==="dark"||(t==="system"&&escuro))tema="dark";}catch(e){}document.documentElement.setAttribute("data-theme",tema);})();`;
 
 export const metadata: Metadata = {
   title: "Meu Orçamento",

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
+  Banner,
   BlocoSaldo,
   Botao,
   CartaoVazio,
@@ -15,7 +16,9 @@ import {
   Select,
 } from "@meu-orcamento/design-system";
 import type { AlertaMes } from "@/domain/alertas";
+import { bannerFromAlertas } from "@/domain/alertas";
 import type { ItemDoMes } from "@/domain/resumo-mes";
+import { AcoesNoCabecalho } from "@/components/slot-cabecalho";
 import {
   hrefOrcamentoMes,
   hrefResumo,
@@ -69,7 +72,9 @@ export function ResumoTela({
   const router = useRouter();
   const [ocultado, setOcultado] = useState(false);
   const [painel, setPainel] = useState<PainelAberto>(null);
+  const [filtrosAbertos, setFiltrosAbertos] = useState(false);
   const modelo = montarResumo({ competencia, hoje, itens, lancamentos, filtros });
+  const filtroAtivo = filtros.tipo !== "todas" || filtros.pagamento !== "todas" || filtros.categoria !== "todas";
 
   useEffect(() => {
     setOcultado(window.localStorage.getItem(CHAVE_OCULTAR) === "1");
@@ -86,13 +91,50 @@ export function ResumoTela({
     router.push(hrefResumo(competencia, { ...filtros, ...parcial }));
   }
 
+  const banner = bannerFromAlertas(alertas);
+  const ferramentas = (
+    <>
+      <button
+        type="button"
+        className="mo-cabecalho__olho"
+        aria-pressed={ocultado}
+        aria-label={ocultado ? "Mostrar valores" : "Ocultar valores"}
+        onClick={alternarOcultar}
+      >
+        <Icone nome={ocultado ? "visibility_off" : "visibility"} tamanho={20} />
+      </button>
+      <button
+        type="button"
+        className="mo-resumo__sino"
+        aria-label={alertas.length > 0 ? `Alertas, ${alertas.length}` : "Alertas"}
+        onClick={() => setPainel({ tipo: "alertas" })}
+      >
+        <Icone nome="notifications" tamanho={20} />
+        {alertas.length > 0 ? <span>{alertas.length}</span> : null}
+      </button>
+    </>
+  );
+
   if (modelo.vazio) {
     return (
-      <CartaoVazio
-        titulo="Nenhuma receita neste mês"
-        frase="Defina as receitas para acompanhar o disponível."
-        acao={{ rotulo: "Definir receitas", onPress: () => router.push(hrefOrcamentoMes(competencia, "R")) }}
-      />
+      <div className="mo-resumo">
+        <AcoesNoCabecalho>{ferramentas}</AcoesNoCabecalho>
+        <BlocoSaldo
+          rotulo="Disponível neste mês"
+          valorCentavos={0}
+          percentualUsado={null}
+          fraseApoio="Ainda não há planejamento para este mês."
+          ocultado={ocultado}
+          onAlternarOcultar={alternarOcultar}
+          exibirOcultar={false}
+        />
+        <CartaoVazio
+          titulo="Comece pelas receitas"
+          frase="Elas são a base do que você planeja no mês."
+          acao={{ rotulo: "Definir receitas", onPress: () => router.push(hrefOrcamentoMes(competencia, "R")) }}
+        />
+        <p className="mo-resumo__nota">Sem lançamentos neste mês. O gráfico aparece com o primeiro gasto.</p>
+      </div>
     );
   }
 
@@ -105,19 +147,47 @@ export function ResumoTela({
   ];
   const semana = painel?.tipo === "semana" ? modelo.semanas[painel.indice] : undefined;
 
+  const mostrarFiltros = filtroAtivo || filtrosAbertos;
+
   return (
     <div className="mo-resumo">
-      <div className="mo-resumo__ferramentas">
-        <button
-          type="button"
-          className="mo-resumo__sino"
-          aria-label={alertas.length > 0 ? `Alertas, ${alertas.length}` : "Alertas"}
-          onClick={() => setPainel({ tipo: "alertas" })}
-        >
-          <Icone nome="notifications" tamanho={20} />
-          {alertas.length > 0 ? <span>{alertas.length}</span> : null}
-        </button>
-      </div>
+      <AcoesNoCabecalho>{ferramentas}</AcoesNoCabecalho>
+      {mostrarFiltros ? (
+        <div className="mo-resumo__filtros">
+          <Chips rotuloGrupo="Tipo" opcoes={TIPOS} selecionado={filtros.tipo} onSelecionar={(valor) => ir({ tipo: valor })} />
+          <Chips
+            rotuloGrupo="Pagamento"
+            opcoes={pagamentos}
+            selecionado={filtros.pagamento}
+            onSelecionar={(valor) => ir({ pagamento: valor })}
+          />
+          <Select
+            id="resumo-categoria"
+            rotulo="Categoria"
+            valor={filtros.categoria}
+            grupos={[
+              {
+                rotulo: "Categorias",
+                opcoes: [{ valor: "todas", rotulo: "Todas" }, ...grupos.map((grupo) => ({ valor: grupo, rotulo: grupo }))],
+              },
+            ]}
+            onMudar={(valor) => ir({ categoria: valor })}
+          />
+          <div className="mo-resumo__limpar">
+            <Botao variante="texto" onPress={() => router.push(hrefResumo(competencia, filtros, true))}>
+              Limpar filtros
+            </Botao>
+          </div>
+        </div>
+      ) : (
+        <div className="mo-resumo__filtros">
+          <Botao variante="secundario" onPress={() => setFiltrosAbertos(true)}>
+            Filtros
+          </Botao>
+        </div>
+      )}
+      {banner ? <Banner tipo={banner.nivel === "er" ? "erro" : "atencao"}>{banner.msg}</Banner> : null}
+      <div className="mo-resumo__topo">
       <BlocoSaldo
         rotulo="Disponível neste mês"
         valorCentavos={modelo.disponivelCentavos}
@@ -125,6 +195,7 @@ export function ResumoTela({
         fraseApoio={modelo.frase}
         ocultado={ocultado}
         onAlternarOcultar={alternarOcultar}
+        exibirOcultar={false}
       />
       <GradeTotais
         ocultado={ocultado}
@@ -138,31 +209,6 @@ export function ResumoTela({
           if (cartao) router.push(hrefOrcamentoMes(competencia, cartao.tipo));
         }}
       />
-      <div className="mo-resumo__filtros">
-        <Chips rotuloGrupo="Tipo" opcoes={TIPOS} selecionado={filtros.tipo} onSelecionar={(valor) => ir({ tipo: valor })} />
-        <Chips
-          rotuloGrupo="Pagamento"
-          opcoes={pagamentos}
-          selecionado={filtros.pagamento}
-          onSelecionar={(valor) => ir({ pagamento: valor })}
-        />
-        <Select
-          id="resumo-categoria"
-          rotulo="Categoria"
-          valor={filtros.categoria}
-          grupos={[
-            {
-              rotulo: "Categorias",
-              opcoes: [{ valor: "todas", rotulo: "Todas" }, ...grupos.map((grupo) => ({ valor: grupo, rotulo: grupo }))],
-            },
-          ]}
-          onMudar={(valor) => ir({ categoria: valor })}
-        />
-        <div className="mo-resumo__limpar">
-          <Botao variante="secundario" onPress={() => router.push(hrefResumo(competencia, filtros, true))}>
-            Limpar filtros
-          </Botao>
-        </div>
       </div>
       <GraficoSemanas
         semanas={modelo.semanas}

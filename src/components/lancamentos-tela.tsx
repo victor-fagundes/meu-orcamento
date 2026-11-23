@@ -15,6 +15,7 @@ import {
   Switch,
   Tabela,
 } from "@meu-orcamento/design-system";
+import { AcoesNoCabecalho } from "@/components/slot-cabecalho";
 import {
   criarLancamentoAction,
   desfazerExclusaoAction,
@@ -528,11 +529,11 @@ export function LancamentosTela({ competencia, linhas, irmas, itens, cartoes }: 
 
   return (
     <main id="conteudo" className="mo-lancamentos">
-      <div className="mo-lancamentos__topo">
+      <AcoesNoCabecalho>
         <button id="registrar" type="button" className="mo-botao mo-botao--primario" onClick={() => abrirNovo("registrar")}>
           Registrar
         </button>
-      </div>
+      </AcoesNoCabecalho>
 
       {mesVazio ? (
         <CartaoVazio

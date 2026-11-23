@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { FormularioContainer } from '../../src/web/formulario-container.tsx';
 import { NavegacaoPrincipal } from '../../src/web/navegacao-principal.tsx';
@@ -84,6 +84,26 @@ describe('ThemeProvider (web)', () => {
     fireEvent.click(screen.getByRole('button', { name: 'escuro' }));
     expect(screen.getByTestId('tema')).toHaveTextContent('dark');
     expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
+  });
+  it('sem escolha anterior permanece claro com o aparelho em escuro', async () => {
+    const guardado = new Map<string, string>();
+    vi.stubGlobal('localStorage', {
+      getItem: (chave: string) => guardado.get(chave) ?? null,
+      setItem: (chave: string, valor: string) => { guardado.set(chave, valor); },
+      removeItem: (chave: string) => { guardado.delete(chave); },
+    });
+    window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+      matches: query === '(prefers-color-scheme: dark)',
+      media: query,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    }));
+    render(<ThemeProvider><Mostra /></ThemeProvider>);
+    await waitFor(() => {
+      expect(screen.getByTestId('modo')).toHaveTextContent('light');
+      expect(document.documentElement.getAttribute('data-theme')).toBe('light');
+    });
+    vi.unstubAllGlobals();
   });
   it('useTema fora do provider lança erro', () => {
     const erro = vi.spyOn(console, 'error').mockImplementation(() => undefined);

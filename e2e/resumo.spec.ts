@@ -33,6 +33,7 @@ test("quatro cartões e Fixas abre o orçamento do mês", async ({ page }) => {
 
 test("pagamento diferente de Todas mostra traço e limpar volta às Todas", async ({ page }) => {
   await entrar(page);
+  await page.getByRole("button", { name: "Filtros" }).click();
   await page.getByRole("button", { name: "PIX", exact: true }).click();
   await expect(page).toHaveURL(/pagamento=pix/);
   const saldo = page.getByRole("region", { name: "Disponível neste mês" });
@@ -81,15 +82,16 @@ test("semana, média e foco ao fechar o detalhe", async ({ page }) => {
   await expect(ver).toBeFocused();
 });
 
-test("sininho sem faixa e alerta do mês sem forçar tipo", async ({ page }) => {
+test("sininho, faixa e alerta do mês sem forçar tipo", async ({ page }) => {
   await entrar(page);
-  await expect(page.locator(".alert-banner")).toHaveCount(0);
   await page.getByRole("button", { name: /^Alertas/ }).click();
   const dialogo = page.getByRole("dialog");
   const vazio = dialogo.getByText("Nenhum alerta neste mês.");
   if (await vazio.count()) {
+    await expect(page.locator(".mo-banner")).toHaveCount(0);
     await expect(page.getByRole("button", { name: "Alertas", exact: true })).toBeVisible();
   } else {
+    await expect(page.locator(".mo-banner")).toBeVisible();
     const href = await dialogo.getByRole("link").first().getAttribute("href");
     expect(href).toMatch(/\/app\/orcamento\?mes=\d{4}-\d{2}$/);
     await dialogo.getByRole("link").first().click();
@@ -107,6 +109,9 @@ test("mês no cabeçalho, teclado e sem intervalo nem flutuante", async ({ page 
     await expect(page.locator('input[type="date"]')).toHaveCount(0);
     await expect(page.getByRole("button", { name: "Novo lançamento" })).toHaveCount(0);
     await expect(page.locator(".fab")).toHaveCount(0);
+    if (await page.getByRole("button", { name: "Filtros" }).count()) {
+      await page.getByRole("button", { name: "Filtros" }).click();
+    }
 
     const alvos = [
       page.getByRole("button", { name: /Receitas/ }).filter({ hasText: "planejados" }),
