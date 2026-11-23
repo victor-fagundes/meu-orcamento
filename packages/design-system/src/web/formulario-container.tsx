@@ -19,8 +19,16 @@ export function FormularioContainer({ aberto, titulo, children, textoCancelar = 
   if (!aberto) return null;
 
   return (
-    <div className="mo-formulario-fundo">
-      <section ref={painel} role="dialog" aria-modal="true" aria-label={titulo} className="mo-formulario" tabIndex={-1}>
+    <div className="mo-formulario-fundo" onClick={onCancelar}>
+      <section
+        ref={painel}
+        role="dialog"
+        aria-modal="true"
+        aria-label={titulo}
+        className="mo-formulario"
+        tabIndex={-1}
+        onClick={(evento) => evento.stopPropagation()}
+      >
         <h2 className="mo-dialogo__titulo">{titulo}</h2>
         {children}
         <div className="mo-formulario__acoes">

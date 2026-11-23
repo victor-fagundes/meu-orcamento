@@ -11,15 +11,19 @@ const corDoEstado: Record<ReturnType<typeof estadoConsumo>, string> = {
   'sem-plano': 'var(--md-text-muted)',
 };
 
-export function LinhaItem({ nome, realizadoCentavos, planejadoCentavos, onAbrir }: LinhaItemProps) {
-  const estado = estadoConsumo(realizadoCentavos, planejadoCentavos);
+function cifra(centavos: number, ocultado: boolean): string {
+  return ocultado ? 'R$ •••••' : formatarBRL(centavos);
+}
+
+export function LinhaItem({ nome, realizadoCentavos, planejadoCentavos, onAbrir, limiteAtencao = 80, ocultado = false }: LinhaItemProps) {
+  const estado = estadoConsumo(realizadoCentavos, planejadoCentavos, limiteAtencao);
   return (
     <button type="button" className="mo-linha-item" onClick={onAbrir}>
       <span className="mo-linha-item__topo">
         <span className="mo-linha-item__nome">{nome}</span>
-        <span className="mo-linha-item__valores">{formatarBRL(realizadoCentavos)} <span className="mo-grupo__plano">/ {formatarBRL(planejadoCentavos)}</span></span>
+        <span className="mo-linha-item__valores">{cifra(realizadoCentavos, ocultado)} <span className="mo-grupo__plano">/ {cifra(planejadoCentavos, ocultado)}</span></span>
       </span>
-      <span className="mo-linha-item__frase" style={{ color: corDoEstado[estado] }}>{fraseDoEstado(realizadoCentavos, planejadoCentavos)}</span>
+      <span className="mo-linha-item__frase" style={{ color: corDoEstado[estado] }}>{fraseDoEstado(realizadoCentavos, planejadoCentavos, limiteAtencao)}</span>
     </button>
   );
 }

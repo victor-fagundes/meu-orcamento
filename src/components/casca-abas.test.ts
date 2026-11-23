@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { labelCompetencia } from "@/lib/competencia-nav";
-import { AREAS, abaAtiva, navegacaoMesDaArea } from "@/components/casca-abas";
+import { AREAS, abaAtiva, caminhoComMes, navegacaoMesDaArea } from "@/components/casca-abas";
 
 describe("áreas da casca", () => {
-  it("lista as cinco áreas nesta ordem e só o Resumo pede mês", () => {
+  it("lista as cinco áreas nesta ordem e Resumo e Orçamento pedem mês", () => {
     expect(AREAS.map((area) => [area.id, area.rotulo, area.endereco, area.icone, area.pedeMes])).toEqual([
       ["resumo", "Resumo", "/app/resumo", "dashboard", true],
-      ["orcamento", "Orçamento", "/app/orcamento", "assignment", false],
+      ["orcamento", "Orçamento", "/app/orcamento", "assignment", true],
       ["lancamentos", "Lançamentos", "/app/lancamentos", "list", false],
       ["ano", "Ano", "/app/ano", "calendar_month", false],
       ["ajustes", "Ajustes", "/app/ajustes", "settings", false],
@@ -21,9 +21,9 @@ describe("áreas da casca", () => {
     expect(abaAtiva("/app/foo")).toBe("");
   });
 
-  it("não mostra mês nas outras áreas e desloca no Resumo", () => {
+  it("não mostra mês nas outras áreas e desloca no Resumo e no Orçamento", () => {
     for (const area of AREAS) {
-      if (area.id !== "resumo") {
+      if (area.id !== "resumo" && area.id !== "orcamento") {
         expect(navegacaoMesDaArea(area, "2026-11")).toBeNull();
       }
     }
@@ -34,5 +34,16 @@ describe("áreas da casca", () => {
       anterior: "2026-10",
       proximo: "2026-12",
     });
+    const orcamento = AREAS.find((area) => area.id === "orcamento");
+    if (!orcamento) throw new Error("Orçamento ausente");
+    expect(navegacaoMesDaArea(orcamento, "2026-11")?.anterior).toBe("2026-10");
+  });
+
+  it("troca só o mês e conserva tipo e aberta", () => {
+    const caminho = caminhoComMes("/app/orcamento", "tipo=F&aberta=Moradia&aberta=Sa%C3%BAde", "2026-12");
+    const params = new URL(caminho, "http://local").searchParams;
+    expect(params.get("mes")).toBe("2026-12");
+    expect(params.get("tipo")).toBe("F");
+    expect(params.getAll("aberta")).toEqual(["Moradia", "Saúde"]);
   });
 });

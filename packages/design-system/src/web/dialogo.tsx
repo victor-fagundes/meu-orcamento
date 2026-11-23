@@ -18,8 +18,16 @@ export function Dialogo({ aberto, titulo, descricao, textoCancelar = 'Cancelar',
   if (!aberto) return null;
 
   return (
-    <div className="mo-dialogo-fundo">
-      <div ref={painel} role="dialog" aria-modal="true" aria-labelledby="mo-dialogo-titulo" className="mo-dialogo" tabIndex={-1}>
+    <div className="mo-dialogo-fundo" onClick={onCancelar}>
+      <div
+        ref={painel}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="mo-dialogo-titulo"
+        className="mo-dialogo"
+        tabIndex={-1}
+        onClick={(evento) => evento.stopPropagation()}
+      >
         <h2 id="mo-dialogo-titulo" className="mo-dialogo__titulo">{titulo}</h2>
         <p className="mo-dialogo__descricao">{descricao}</p>
         <div className="mo-dialogo__acoes">

@@ -87,8 +87,8 @@ test("título sem mês, sem flutuante, e Sair", async ({ page }) => {
     await page.setViewportSize({ width, height: 800 });
     for (const [nome, endereco] of AREAS) {
       await page.goto(endereco);
-      if (nome === "Resumo") {
-        await expect(page.locator(".mo-cabecalho__titulo")).toContainText("Resumo");
+      if (nome === "Resumo" || nome === "Orçamento") {
+        await expect(page.locator(".mo-cabecalho__titulo")).toContainText(nome);
         await expect(page.getByRole("button", { name: "Mês anterior" })).toHaveCount(1);
         await expect(page.getByRole("button", { name: "Próximo mês" })).toHaveCount(1);
       } else {

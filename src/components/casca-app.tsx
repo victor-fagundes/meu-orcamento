@@ -4,7 +4,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Botao, CabecalhoTela, ShellApp } from "@meu-orcamento/design-system";
 import type { IconName } from "@meu-orcamento/design-system";
 import { authClient } from "@/lib/auth-client";
-import { AREAS, abaAtiva, navegacaoMesDaArea } from "@/components/casca-abas";
+import { AREAS, abaAtiva, caminhoComMes, navegacaoMesDaArea } from "@/components/casca-abas";
 
 function mesDaQuery(raw: string | null): string {
   if (raw && /^\d{4}-\d{2}$/.test(raw)) return raw;
@@ -44,8 +44,8 @@ export function CascaApp({ children }: { children: React.ReactNode }) {
                 mes && area
                   ? {
                       rotulo: mes.rotulo,
-                      onAnterior: () => router.push(`${area.endereco}?mes=${mes.anterior}`),
-                      onProximo: () => router.push(`${area.endereco}?mes=${mes.proximo}`),
+                      onAnterior: () => router.push(caminhoComMes(area.endereco, params.toString(), mes.anterior)),
+                      onProximo: () => router.push(caminhoComMes(area.endereco, params.toString(), mes.proximo)),
                     }
                   : undefined
               }

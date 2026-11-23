@@ -2,7 +2,7 @@ import { labelCompetencia, shiftCompetencia } from "@/lib/competencia-nav";
 
 export const AREAS = [
   { id: "resumo", rotulo: "Resumo", endereco: "/app/resumo", icone: "dashboard", pedeMes: true },
-  { id: "orcamento", rotulo: "Orçamento", endereco: "/app/orcamento", icone: "assignment", pedeMes: false },
+  { id: "orcamento", rotulo: "Orçamento", endereco: "/app/orcamento", icone: "assignment", pedeMes: true },
   { id: "lancamentos", rotulo: "Lançamentos", endereco: "/app/lancamentos", icone: "list", pedeMes: false },
   { id: "ano", rotulo: "Ano", endereco: "/app/ano", icone: "calendar_month", pedeMes: false },
   { id: "ajustes", rotulo: "Ajustes", endereco: "/app/ajustes", icone: "settings", pedeMes: false },
@@ -25,7 +25,14 @@ export function abaAtiva(pathname: string): AreaId | "" {
   return area?.id ?? "";
 }
 
-/** Mês no cabeçalho só quando a área pede. Só o Resumo pede. */
+/** Troca o mês e conserva as outras chaves da query, inclusive `aberta` repetida. */
+export function caminhoComMes(endereco: string, search: string, mes: string): string {
+  const params = new URLSearchParams(search);
+  params.set("mes", mes);
+  return `${endereco}?${params.toString()}`;
+}
+
+/** Mês no cabeçalho só quando a área pede. Resumo e Orçamento pedem. */
 export function navegacaoMesDaArea(
   area: { pedeMes: boolean },
   mes: string,

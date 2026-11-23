@@ -204,6 +204,10 @@ export interface GrupoComMedidorProps {
   readonly aberto: boolean;
   readonly onAlternar: () => void;
   readonly children?: ReactNode;
+  /** Limite de atenção em percentual. Padrão 80. */
+  readonly limiteAtencao?: number;
+  /** Máscara das cifras. A frase e o medidor continuam. */
+  readonly ocultado?: boolean;
 }
 
 export interface LinhaLancamentoProps {
@@ -232,6 +236,10 @@ export interface LinhaItemProps {
   readonly realizadoCentavos: number;
   readonly planejadoCentavos: number;
   readonly onAbrir: () => void;
+  /** Limite de atenção em percentual. Padrão 80. */
+  readonly limiteAtencao?: number;
+  /** Máscara das cifras. A frase continua. */
+  readonly ocultado?: boolean;
 }
 
 export interface LinhaAjusteProps {
