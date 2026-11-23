@@ -42,7 +42,7 @@ Specs **029–037** `implemented` (17 nov 2026). 029 revisa o computador. 030–
 Spec **040** `Cancelled` (17 nov 2026): o PM manteve a 039. Spec **039** `implemented`: acabamento do Android segundo `prototype/2026-11-17-acabamento.html` (ícone, splash, Manrope, seis telas, menus de Ajustes com os ícones do site). O roteiro no aparelho da 039 continua em aberto. Falta o PM marcar `verified` (025, 027, 028, 029–039).  
 GAP-001…006 fechados. GAP-007 no computador está implementado na spec 037 e segue aberto até o PM marcar `verified`. No Android, o foco do sheet e o nome de Arquivar estão na spec 032.
 
-Rebuild do front web (22 nov 2026), branch `rebuild-web`. A branch `legacy-front` marca o commit anterior a este rebuild. Specs **040–049** estão `ready`:
+Rebuild do front web (22 nov 2026), branch `rebuild-web`. A branch `legacy-front` marca o commit anterior a este rebuild. Spec **043** `implemented` (22 nov 2026): Resumo web. Specs **040–042** e **044–049** estão `ready`:
 
 - `specs/040-ds-integrado-next`
 - `specs/041-categorias`

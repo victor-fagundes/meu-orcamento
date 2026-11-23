@@ -1,7 +1,7 @@
 import { labelCompetencia, shiftCompetencia } from "@/lib/competencia-nav";
 
 export const AREAS = [
-  { id: "resumo", rotulo: "Resumo", endereco: "/app/resumo", icone: "dashboard", pedeMes: false },
+  { id: "resumo", rotulo: "Resumo", endereco: "/app/resumo", icone: "dashboard", pedeMes: true },
   { id: "orcamento", rotulo: "Orçamento", endereco: "/app/orcamento", icone: "assignment", pedeMes: false },
   { id: "lancamentos", rotulo: "Lançamentos", endereco: "/app/lancamentos", icone: "list", pedeMes: false },
   { id: "ano", rotulo: "Ano", endereco: "/app/ano", icone: "calendar_month", pedeMes: false },
@@ -25,7 +25,7 @@ export function abaAtiva(pathname: string): AreaId | "" {
   return area?.id ?? "";
 }
 
-/** Mês no cabeçalho só quando a área pede. As cinco nascem com pedeMes falso. */
+/** Mês no cabeçalho só quando a área pede. Só o Resumo pede. */
 export function navegacaoMesDaArea(
   area: { pedeMes: boolean },
   mes: string,

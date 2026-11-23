@@ -174,10 +174,10 @@ export interface CabecalhoTelaProps {
 
 export interface BlocoSaldoProps {
   readonly rotulo: string;
-  /** Valor principal em centavos. */
-  readonly valorCentavos: number;
-  /** Percentual usado do planejado (inteiro). */
-  readonly percentualUsado: number;
+  /** Valor principal em centavos. Ausente quando o filtro não tem plano. */
+  readonly valorCentavos: number | null;
+  /** Percentual usado do planejado (inteiro). Ausente quando não há plano ou o pagamento não é Todas. */
+  readonly percentualUsado: number | null;
   readonly fraseApoio: string;
   readonly ocultado: boolean;
   readonly onAlternarOcultar: () => void;
@@ -186,11 +186,15 @@ export interface BlocoSaldoProps {
 export interface ItemTotal {
   readonly rotulo: string;
   readonly realizadoCentavos: number;
-  readonly planejadoCentavos: number;
+  readonly planejadoCentavos: number | null;
 }
 
 export interface GradeTotaisProps {
   readonly itens: ReadonlyArray<ItemTotal>;
+  /** Presente: cada cartão é um botão e devolve o rótulo. */
+  readonly onAbrir?: (rotulo: string) => void;
+  /** Máscara dos dois valores. A frase de apoio some junto. */
+  readonly ocultado?: boolean;
 }
 
 export interface GrupoComMedidorProps {
@@ -211,7 +215,10 @@ export interface LinhaLancamentoProps {
   readonly meio: string;
   /** Ex.: "Fatura 12/2026", quando a compra cai numa fatura de cartão. */
   readonly badgeFatura?: string;
-  readonly onAbrir: () => void;
+  /** Ausente: a linha não é botão (detalhe da semana não abre edição). */
+  readonly onAbrir?: () => void;
+  /** Máscara do valor. Data, descrição e meio continuam visíveis. */
+  readonly ocultado?: boolean;
 }
 
 export interface CartaoVazioProps {

@@ -3,9 +3,9 @@ import { labelCompetencia } from "@/lib/competencia-nav";
 import { AREAS, abaAtiva, navegacaoMesDaArea } from "@/components/casca-abas";
 
 describe("áreas da casca", () => {
-  it("lista as cinco áreas nesta ordem, com pedeMes falso", () => {
+  it("lista as cinco áreas nesta ordem e só o Resumo pede mês", () => {
     expect(AREAS.map((area) => [area.id, area.rotulo, area.endereco, area.icone, area.pedeMes])).toEqual([
-      ["resumo", "Resumo", "/app/resumo", "dashboard", false],
+      ["resumo", "Resumo", "/app/resumo", "dashboard", true],
       ["orcamento", "Orçamento", "/app/orcamento", "assignment", false],
       ["lancamentos", "Lançamentos", "/app/lancamentos", "list", false],
       ["ano", "Ano", "/app/ano", "calendar_month", false],
@@ -21,14 +21,15 @@ describe("áreas da casca", () => {
     expect(abaAtiva("/app/foo")).toBe("");
   });
 
-  it("não mostra mês enquanto a área não pede, e desloca quando pede", () => {
+  it("não mostra mês nas outras áreas e desloca no Resumo", () => {
     for (const area of AREAS) {
-      expect(navegacaoMesDaArea(area, "2026-11")).toBeNull();
+      if (area.id !== "resumo") {
+        expect(navegacaoMesDaArea(area, "2026-11")).toBeNull();
+      }
     }
     const resumo = AREAS[0];
     if (!resumo) throw new Error("Resumo ausente");
-    const pedido = navegacaoMesDaArea({ ...resumo, pedeMes: true }, "2026-11");
-    expect(pedido).toEqual({
+    expect(navegacaoMesDaArea(resumo, "2026-11")).toEqual({
       rotulo: labelCompetencia("2026-11"),
       anterior: "2026-10",
       proximo: "2026-12",

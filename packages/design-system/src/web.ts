@@ -21,6 +21,8 @@ export { BlocoSaldo } from './web/modulos/bloco-saldo.tsx';
 export { GradeTotais } from './web/modulos/grade-totais.tsx';
 export { GrupoComMedidor } from './web/modulos/grupo-com-medidor.tsx';
 export { LinhaLancamento } from './web/modulos/linha-lancamento.tsx';
+export { Painel } from './web/painel.tsx';
+export { GraficoSemanas } from './web/modulos/grafico-semanas.tsx';
 export { LinhaItem } from './web/modulos/linha-item.tsx';
 export { LinhaAjuste } from './web/modulos/linha-ajuste.tsx';
 export { RodapeAcoes } from './web/modulos/rodape-acoes.tsx';

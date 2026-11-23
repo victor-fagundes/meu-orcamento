@@ -8,6 +8,7 @@ import { useCores } from '../tema.tsx';
 
 export function BlocoSaldo({ rotulo, valorCentavos, percentualUsado, fraseApoio, ocultado, onAlternarOcultar }: BlocoSaldoProps) {
   const cores = useCores();
+  const valor = ocultado ? 'R$ •••••' : valorCentavos === null ? '—' : textoDoSaldo(valorCentavos, false);
   return (
     <View accessibilityRole="summary" style={{ backgroundColor: cores.card, borderRadius: radius['2xl'], padding: spacing[6], gap: spacing[2] }}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -17,9 +18,13 @@ export function BlocoSaldo({ rotulo, valorCentavos, percentualUsado, fraseApoio,
         </Pressable>
       </View>
       <Text style={{ fontFamily: typography.family, fontSize: typography.displayMd.size, lineHeight: typography.displayMd.line, fontWeight: '800', color: cores.text }}>
-        {textoDoSaldo(valorCentavos, ocultado)}
+        {valor}
       </Text>
-      <Medidor rotulo={rotulo} valor={percentualUsado} estado={estadoDoSaldo(percentualUsado)} frase={fraseApoio} />
+      {percentualUsado === null ? (
+        fraseApoio ? <Text style={{ fontFamily: typography.family, fontSize: typography.caption.size, color: cores.textMuted }}>{fraseApoio}</Text> : null
+      ) : (
+        <Medidor rotulo={rotulo} valor={percentualUsado} estado={estadoDoSaldo(percentualUsado)} frase={fraseApoio} />
+      )}
     </View>
   );
 }
