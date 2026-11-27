@@ -28,7 +28,7 @@ object Strings {
     const val useContaProducao = "Use sua conta de produção."
 
     // ========== Resumo ==========
-    const val aindaPodeGastar = "Ainda pode gastar"
+    const val disponivelNesteMes = "Disponível neste mês"
     const val passouDoOrcado = "Passou do orçado"
     const val receitas = "Receitas"
     const val despesasFixas = "Despesas fixas"
