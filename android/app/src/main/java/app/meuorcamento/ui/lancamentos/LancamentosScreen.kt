@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DropdownMenuItem
@@ -139,6 +141,7 @@ fun LancamentosScreen(
     var pendingDelete by remember { mutableStateOf<LancDto?>(null) }
     var scopeChoice by remember { mutableStateOf("one") }
     val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     fun reload() {
         scope.launch {
@@ -165,6 +168,7 @@ fun LancamentosScreen(
     LaunchedEffect(competencia) { reload() }
 
     Box(Modifier.fillMaxSize()) {
+        SnackbarHost(snackbarHostState, modifier = Modifier.align(Alignment.BottomCenter))
         Column(Modifier.fillMaxSize()) {
             CompetenciaPicker(competencia, onCompetencia)
             Column(Modifier.padding(horizontal = 16.dp)) {
@@ -311,6 +315,7 @@ fun LancamentosScreen(
                                 val escopo = if (alvo.grupoParcelaId != null) chosen else "one"
                                 api.delete("/api/v1/lancamentos/${alvo.id}?scope=$escopo")
                                 reload()
+                                snackbarHostState.showSnackbar("Lançamento excluído")
                             } catch (e: Exception) {
                                 error = e.message
                             }
