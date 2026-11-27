@@ -98,61 +98,76 @@ fun PdfImportScreen(api: ApiClient, onUnauthorized: () -> Unit) {
                 .padding(horizontal = 16.dp)
                 .verticalScroll(rememberScrollState()),
         ) {
-        OfflineBanner(offline, status)
-        BotaoPrimario(text = Strings.escolherPdf, onClick = { picker.launch("application/pdf") })
-        val apelido = cartoes.find { it.id == cartaoId }?.apelido ?: Strings.cartaoDestino
-        ExposedDropdownMenuBox(expanded = cartaoAberto, onExpandedChange = { cartaoAberto = it }) {
-            OutlinedTextField(
-                value = apelido,
-                onValueChange = {},
-                readOnly = true,
-                label = { Text(Strings.cartaoDestino) },
-                modifier = Modifier.menuAnchor().fillMaxWidth().padding(vertical = 8.dp),
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(cartaoAberto) },
+            OfflineBanner(offline, status)
+            BotaoPrimario(
+                text = Strings.escolherPdf,
+                onClick = { picker.launch("application/pdf") },
+                modifier = Modifier.padding(top = 8.dp),
             )
-            ExposedDropdownMenu(expanded = cartaoAberto, onDismissRequest = { cartaoAberto = false }) {
-                cartoes.forEach { card ->
-                    DropdownMenuItem(text = { Text(card.apelido) }, onClick = {
-                        cartaoId = card.id
-                        cartaoAberto = false
-                    })
-                }
-            }
-        }
-        status?.let { Text(it) }
-        (preview as? JsonArray)?.forEach { linha ->
-            val obj = linha.jsonObject
-            val desc = obj["desc"]?.jsonPrimitive?.contentOrNull ?: "Linha"
-            val cents = obj["valCents"]?.jsonPrimitive?.longOrNull ?: 0L
-            Text("$desc · ${formatCentavos(cents)}", modifier = Modifier.padding(top = 4.dp))
-        }
-        if (preview != null) {
-            BotaoTexto(text = Strings.cancelar, onClick = { preview = null; status = "Prévia descartada" })
-        }
-        BotaoPrimario(
-            text = Strings.confirmarPdf,
-            enabled = preview != null && cartaoId.isNotBlank(),
-            onClick = {
-                scope.launch {
-                    try {
-                        @Serializable
-                        data class Confirm(
-                            val cartaoId: String,
-                            val preview: JsonElement,
-                            val estornoMode: String = "ignore",
-                        )
-                        val result = api.postJson(
-                            "/api/v1/import/pdf/confirm",
-                            api.json.encodeToString(Confirm(cartaoId, preview!!)),
-                        )
-                        status = "Confirmado: $result"
-                    } catch (e: Exception) {
-                        status = e.message
-                        offline = e is IOException
+            val apelido = cartoes.find { it.id == cartaoId }?.apelido ?: Strings.cartaoDestino
+            ExposedDropdownMenuBox(expanded = cartaoAberto, onExpandedChange = { cartaoAberto = it }) {
+                OutlinedTextField(
+                    value = apelido,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text(Strings.cartaoDestino) },
+                    modifier = Modifier.menuAnchor().fillMaxWidth().padding(vertical = 8.dp),
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(cartaoAberto) },
+                )
+                ExposedDropdownMenu(expanded = cartaoAberto, onDismissRequest = { cartaoAberto = false }) {
+                    cartoes.forEach { card ->
+                        DropdownMenuItem(text = { Text(card.apelido) }, onClick = {
+                            cartaoId = card.id
+                            cartaoAberto = false
+                        })
                     }
                 }
-            },
-        )
+            }
+            status?.let {
+                Text(
+                    it,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(top = 8.dp),
+                )
+            }
+            (preview as? JsonArray)?.forEach { linha ->
+                val obj = linha.jsonObject
+                val desc = obj["desc"]?.jsonPrimitive?.contentOrNull ?: "Linha"
+                val cents = obj["valCents"]?.jsonPrimitive?.longOrNull ?: 0L
+                Text(
+                    "$desc · ${formatCentavos(cents)}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(top = 4.dp),
+                )
+            }
+            if (preview != null) {
+                BotaoTexto(text = Strings.cancelar, onClick = { preview = null; status = "Prévia descartada" })
+            }
+            BotaoPrimario(
+                text = Strings.confirmarPdf,
+                enabled = preview != null && cartaoId.isNotBlank(),
+                onClick = {
+                    scope.launch {
+                        try {
+                            @Serializable
+                            data class Confirm(
+                                val cartaoId: String,
+                                val preview: JsonElement,
+                                val estornoMode: String = "ignore",
+                            )
+                            val result = api.postJson(
+                                "/api/v1/import/pdf/confirm",
+                                api.json.encodeToString(Confirm(cartaoId, preview!!)),
+                            )
+                            status = "Confirmado: $result"
+                        } catch (e: Exception) {
+                            status = e.message
+                            offline = e is IOException
+                        }
+                    }
+                },
+                modifier = Modifier.padding(top = 8.dp),
+            )
         }
     }
 }
