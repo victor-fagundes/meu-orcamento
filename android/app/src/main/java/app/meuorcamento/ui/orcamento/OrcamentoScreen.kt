@@ -325,7 +325,7 @@ private fun GrupoBloco(
             else (grupo.realizadoCentavos.toFloat() / grupo.planoCentavos.toFloat()).coerceIn(0f, 1f)
             LinearProgressIndicator(
                 progress = { frac },
-                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp).height(4.dp),
+                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp).height(8.dp).clip(RoundedCornerShape(99.dp)),
                 color = cor,
                 trackColor = MaterialTheme.colorScheme.surfaceVariant,
             )
