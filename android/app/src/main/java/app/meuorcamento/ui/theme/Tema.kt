@@ -2,6 +2,9 @@ package app.meuorcamento.ui.theme
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -114,7 +117,6 @@ fun MeuOrcamentoTheme(content: @Composable () -> Unit) {
     )
 }
 
-/** Dentro do plano, abaixo de 80%: azul. De 80% até 100%, inclusive chegou: aviso. Acima de 100%: erro. Plano zero: aviso. */
 fun corMedidor(plano: Long, realizado: Long, escuro: Boolean): Color {
     if (plano <= 0) return aviso(escuro)
     val pct = realizado.toDouble() / plano.toDouble()
@@ -125,11 +127,14 @@ fun corMedidor(plano: Long, realizado: Long, escuro: Boolean): Color {
     }
 }
 
-/** Marca amarela com a inicial. Não colore barra, chip, pílula nem aviso. */
+/**
+ * Marca: carteira em quadrado amarelo (DS: DECISOES_identidade_visual.md).
+ * Representação aproximada com formas. Idealmente usar um VectorDrawable.
+ */
 @Composable
 fun Marca(modifier: Modifier = Modifier, tamanho: Dp = 32.dp) {
-    val letra = if (tamanho >= 48.dp) 28.sp else 16.sp
     val canto = if (tamanho >= 48.dp) 16.dp else 10.dp
+    val escala = tamanho / 32.dp
     Box(
         modifier
             .size(tamanho)
@@ -137,12 +142,37 @@ fun Marca(modifier: Modifier = Modifier, tamanho: Dp = 32.dp) {
             .background(MarcaAmarela),
         contentAlignment = Alignment.Center,
     ) {
-        Text(
-            "M",
-            color = Color(0xFF221B00),
-            fontFamily = Manrope,
-            fontWeight = FontWeight.ExtraBold,
-            fontSize = letra,
+        // Corpo da carteira (preto arredondado)
+        Box(
+            Modifier
+                .size(width = 18.dp * escala, height = 14.dp * escala)
+                .clip(RoundedCornerShape(4.dp * escala))
+                .background(Color.Black)
+                .offset(y = 2.dp * escala),
+        )
+        // Cartão saindo do topo (branco/cinza)
+        Box(
+            Modifier
+                .size(width = 14.dp * escala, height = 8.dp * escala)
+                .clip(RoundedCornerShape(2.dp * escala))
+                .background(Color.White)
+                .offset(y = (-4).dp * escala),
+        )
+        // Aba azul
+        Box(
+            Modifier
+                .size(width = 10.dp * escala, height = 4.dp * escala)
+                .clip(RoundedCornerShape(1.dp * escala))
+                .background(AzulAcao)
+                .offset(y = 0.dp),
+        )
+        // Fecho amarelo
+        Box(
+            Modifier
+                .size(4.dp * escala)
+                .clip(RoundedCornerShape(99.dp))
+                .background(MarcaAmarela)
+                .offset(y = 4.dp * escala),
         )
     }
 }
