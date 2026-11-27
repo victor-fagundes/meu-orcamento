@@ -2,11 +2,11 @@ package app.meuorcamento.ui.navigation
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Assessment
-import androidx.compose.material.icons.outlined.CalendarMonth
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.List
-import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.filled.Assessment
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -51,11 +51,11 @@ fun AppNav(
     var competencia by rememberSaveable { mutableStateOf(currentCompetencia()) }
     var tipo by rememberSaveable { mutableStateOf("F") }
     val tabs = listOf(
-        Tab("resumo", R.string.nav_resumo, Icons.Outlined.Home),
-        Tab("orcamento", R.string.nav_orcamento, Icons.Outlined.Assessment),
-        Tab("lancamentos", R.string.nav_lancamentos, Icons.Outlined.List),
-        Tab("ano", R.string.nav_ano, Icons.Outlined.CalendarMonth),
-        Tab("ajustes", R.string.nav_ajustes, Icons.Outlined.Settings),
+        Tab("resumo", R.string.nav_resumo, Icons.Filled.Home),
+        Tab("orcamento", R.string.nav_orcamento, Icons.Filled.Assessment),
+        Tab("lancamentos", R.string.nav_lancamentos, Icons.Filled.List),
+        Tab("ano", R.string.nav_ano, Icons.Filled.CalendarMonth),
+        Tab("ajustes", R.string.nav_ajustes, Icons.Filled.Settings),
     )
     val backStack by nav.currentBackStackEntryAsState()
     val current = backStack?.destination?.route
