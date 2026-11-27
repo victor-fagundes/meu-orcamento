@@ -1,6 +1,5 @@
 package app.meuorcamento.ui.resumo
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,7 +13,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -36,6 +34,7 @@ import app.meuorcamento.data.ApiException
 import app.meuorcamento.domain.formatCentavos
 import app.meuorcamento.ui.CompetenciaPicker
 import app.meuorcamento.ui.OfflineBanner
+import app.meuorcamento.ui.components.BotaoOlho
 import app.meuorcamento.ui.copy.Strings
 import androidx.compose.foundation.isSystemInDarkTheme
 import kotlinx.serialization.Serializable
@@ -176,9 +175,10 @@ fun ResumoScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.weight(1f),
                         )
-                        IconButton(onClick = { valoresOcultos = !valoresOcultos }) {
-                            Text(if (valoresOcultos) "👁" else "👁‍🗨", style = MaterialTheme.typography.bodyLarge)
-                        }
+                        BotaoOlho(
+                            oculto = valoresOcultos,
+                            onToggle = { valoresOcultos = !valoresOcultos },
+                        )
                     }
                     Text(
                         formatar(ainda),
