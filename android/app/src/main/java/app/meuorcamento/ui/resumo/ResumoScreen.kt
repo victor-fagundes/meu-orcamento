@@ -18,13 +18,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import app.meuorcamento.ui.theme.ValorDisplay
@@ -34,9 +37,11 @@ import app.meuorcamento.data.ApiException
 import app.meuorcamento.domain.formatCentavos
 import app.meuorcamento.ui.CompetenciaPicker
 import app.meuorcamento.ui.OfflineBanner
+import app.meuorcamento.ui.Preferencias
 import app.meuorcamento.ui.components.BotaoOlho
 import app.meuorcamento.ui.copy.Strings
 import androidx.compose.foundation.isSystemInDarkTheme
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import java.io.IOException
 import java.util.Calendar
@@ -117,11 +122,15 @@ fun ResumoScreen(
     onOpenTipo: (String) -> Unit,
     onUnauthorized: () -> Unit,
 ) {
+    val context = LocalContext.current
+    val prefs = remember { Preferencias(context) }
+    val valoresOcultos by prefs.valoresOcultos.collectAsState(initial = false)
+    val scope = rememberCoroutineScope()
+
     var data by remember { mutableStateOf<ResumoResponse?>(null) }
     var loading by remember { mutableStateOf(true) }
     var offline by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
-    var valoresOcultos by remember { mutableStateOf(false) }
 
     LaunchedEffect(competencia) {
         loading = true
@@ -177,7 +186,9 @@ fun ResumoScreen(
                         )
                         BotaoOlho(
                             oculto = valoresOcultos,
-                            onToggle = { valoresOcultos = !valoresOcultos },
+                            onToggle = {
+                                scope.launch { prefs.setValoresOcultos(!valoresOcultos) }
+                            },
                         )
                     }
                     Text(
