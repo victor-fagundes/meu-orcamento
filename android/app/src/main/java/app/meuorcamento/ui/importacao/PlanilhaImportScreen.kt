@@ -179,70 +179,82 @@ fun PlanilhaImportScreen(
                 .padding(horizontal = 16.dp)
                 .verticalScroll(rememberScrollState()),
         ) {
-        OfflineBanner(offline, status)
-        BotaoPrimario(text = Strings.escolherArquivo, onClick = { picker.launch("*/*") })
-        status?.let { Text(it, modifier = Modifier.padding(top = 8.dp)) }
-        linhasPlano.forEach { line ->
-            Text(
-                buildString {
-                    append(line.nome.ifBlank { "Linha ${line.n}" })
-                    if (!line.ok) append(" — ${line.why ?: "rejeitada"}")
-                    else if (line.alvo != "escolher") append(" — ${line.grupo}")
+            OfflineBanner(offline, status)
+            BotaoPrimario(
+                text = Strings.escolherArquivo,
+                onClick = { picker.launch("*/*") },
+                modifier = Modifier.padding(top = 8.dp),
+            )
+            status?.let {
+                Text(
+                    it,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(top = 8.dp),
+                )
+            }
+            linhasPlano.forEach { line ->
+                Text(
+                    buildString {
+                        append(line.nome.ifBlank { "Linha ${line.n}" })
+                        if (!line.ok) append(" — ${line.why ?: "rejeitada"}")
+                        else if (line.alvo != "escolher") append(" — ${line.grupo}")
+                    },
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(top = 8.dp),
+                )
+                if (line.ok && line.alvo == "escolher") {
+                    EscolhaGrupo(
+                        escolhido = escolhas[line.n].orEmpty(),
+                        candidatos = line.candidatos,
+                        onPick = { escolhas = escolhas + (line.n to it) },
+                    )
+                }
+            }
+            preview?.preview?.forEach { row ->
+                Text(
+                    "${row.itemNome.ifBlank { row.desc }} · ${formatCentavos(row.valCents)}" +
+                        if (row.ok) "" else " — ${row.why ?: "rejeitada"}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(top = 8.dp),
+                )
+            }
+            if (parsed != null) {
+                BotaoTexto(text = Strings.cancelar, onClick = { limpar() })
+            }
+            BotaoPrimario(
+                text = Strings.confirmarImportacao,
+                enabled = parsed != null && preview != null && !faltaEscolha,
+                onClick = {
+                    val p = parsed ?: return@BotaoPrimario
+                    if (faltaEscolha) return@BotaoPrimario
+                    scope.launch {
+                        try {
+                            val payload = escolhas.filterValues { it.isNotBlank() }
+                                .map { (n, grupo) -> EscolhaDto(n, grupo) }
+                            val resultBody = api.postJson(
+                                "/api/v1/import/planilha/confirm",
+                                api.json.encodeToString(
+                                    ConfirmPlanilhaBody(
+                                        kind = p.kind,
+                                        rowsJson = p.rowsJson,
+                                        map = p.map,
+                                        escolhas = payload,
+                                    ),
+                                ),
+                            )
+                            val result = api.json.decodeFromString(ConfirmPlanilhaResult.serializer(), resultBody)
+                            limpar()
+                            status = "Importados: ${result.imported}"
+                            val destino = result.abrirCompetencia
+                            if (!destino.isNullOrBlank()) onOpenedMonth(destino)
+                        } catch (e: Exception) {
+                            status = e.message
+                            offline = e is IOException
+                        }
+                    }
                 },
                 modifier = Modifier.padding(top = 8.dp),
             )
-            if (line.ok && line.alvo == "escolher") {
-                EscolhaGrupo(
-                    escolhido = escolhas[line.n].orEmpty(),
-                    candidatos = line.candidatos,
-                    onPick = { escolhas = escolhas + (line.n to it) },
-                )
-            }
-        }
-        preview?.preview?.forEach { row ->
-            Text(
-                "${row.itemNome.ifBlank { row.desc }} · ${formatCentavos(row.valCents)}" +
-                    if (row.ok) "" else " — ${row.why ?: "rejeitada"}",
-                modifier = Modifier.padding(top = 8.dp),
-            )
-        }
-        if (parsed != null) {
-            BotaoTexto(text = Strings.cancelar, onClick = { limpar() })
-        }
-        BotaoPrimario(
-            text = Strings.confirmarImportacao,
-            enabled = parsed != null && preview != null && !faltaEscolha,
-            onClick = {
-                val p = parsed ?: return@BotaoPrimario
-                if (faltaEscolha) return@BotaoPrimario
-                scope.launch {
-                    try {
-                        val payload = escolhas.filterValues { it.isNotBlank() }
-                            .map { (n, grupo) -> EscolhaDto(n, grupo) }
-                        val resultBody = api.postJson(
-                            "/api/v1/import/planilha/confirm",
-                            api.json.encodeToString(
-                                ConfirmPlanilhaBody(
-                                    kind = p.kind,
-                                    rowsJson = p.rowsJson,
-                                    map = p.map,
-                                    escolhas = payload,
-                                ),
-                            ),
-                        )
-                        val result = api.json.decodeFromString(ConfirmPlanilhaResult.serializer(), resultBody)
-                        limpar()
-                        status = "Importados: ${result.imported}"
-                        val destino = result.abrirCompetencia
-                        if (!destino.isNullOrBlank()) onOpenedMonth(destino)
-                    } catch (e: Exception) {
-                        status = e.message
-                        offline = e is IOException
-                    }
-                }
-            },
-            modifier = Modifier.padding(top = 8.dp),
-        )
         }
     }
 }
@@ -260,7 +272,7 @@ private fun EscolhaGrupo(
             value = escolhido.ifBlank { "Escolha o grupo" },
             onValueChange = {},
             readOnly = true,
-            modifier = Modifier.menuAnchor().fillMaxWidth(),
+            modifier = Modifier.menuAnchor().fillMaxWidth().padding(vertical = 4.dp),
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(aberto) },
         )
         ExposedDropdownMenu(expanded = aberto, onDismissRequest = { aberto = false }) {
