@@ -46,6 +46,7 @@ import app.meuorcamento.ui.CompetenciaPicker
 import app.meuorcamento.ui.OfflineBanner
 import app.meuorcamento.ui.components.BotaoPrimario
 import app.meuorcamento.ui.components.BotaoTexto
+import app.meuorcamento.ui.components.FabEstendido
 import app.meuorcamento.ui.copy.Strings
 import app.meuorcamento.ui.reaisParaCentavos
 import app.meuorcamento.ui.resumo.ResumoItemDto
@@ -145,77 +146,48 @@ fun OrcamentoScreen(
     val comMovimento = grupos.filter { it.planoCentavos > 0 || it.realizadoCentavos > 0 }
     val semMovimento = grupos.filter { it.planoCentavos == 0L && it.realizadoCentavos == 0L }
 
-    Column(
-        Modifier
-            .fillMaxSize()
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null,
-            ) { armedId = null },
-    ) {
-        CompetenciaPicker(competencia, onCompetencia)
-        Column(Modifier.padding(horizontal = 16.dp)) {
-            OfflineBanner(offline || error != null, error)
-            Row(Modifier.horizontalScroll(rememberScrollState())) {
-                TIPOS.forEach { code ->
-                    FilterChip(
-                        selected = tipo == code,
-                        onClick = { onTipo(code) },
-                        label = { Text(labelChip(code)) },
-                        modifier = Modifier.padding(end = 8.dp),
-                        colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                            selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                        ),
-                    )
-                }
-            }
-        }
-        when {
-            loading && totais == null -> CircularProgressIndicator(Modifier.padding(24.dp))
-            totais == null -> Text(Strings.erroCarregarOrcamento, modifier = Modifier.padding(horizontal = 16.dp))
-            else -> {
-                val cabe = (linha?.planoCentavos ?: 0) - (linha?.realizadoCentavos ?: 0)
-                Column(Modifier.padding(horizontal = 16.dp)) {
-                    Text("${Strings.aindaCabeEm} ${labelTipo(tipo).lowercase()}", modifier = Modifier.padding(top = 12.dp))
-                    Text(
-                        formatCentavos(cabe),
-                        style = ValorDisplay,
-                        color = if (cabe < 0) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
-                    )
-                    BotaoTexto(text = Strings.novoItem, onClick = { novoAberto = true })
-                }
-                LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp)) {
-                    items(comMovimento, key = { "${it.tipo}-${it.grupo}" }) { grupo ->
-                        GrupoBloco(
-                            grupo = grupo,
-                            itens = data?.itens.orEmpty(),
-                            lancamentos = data?.lancamentos.orEmpty(),
-                            armedId = armedId,
-                            onArm = { armedId = it },
-                            onEdit = { editItem = it },
-                            onArchive = { id ->
-                                scope.launch {
-                                    try {
-                                        api.delete("/api/v1/itens?id=$id")
-                                        armedId = null
-                                        reload()
-                                    } catch (e: Exception) {
-                                        error = e.message
-                                    }
-                                }
-                            },
+    Box(Modifier.fillMaxSize()) {
+        Column(
+            Modifier
+                .fillMaxSize()
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                ) { armedId = null },
+        ) {
+            CompetenciaPicker(competencia, onCompetencia)
+            Column(Modifier.padding(horizontal = 16.dp)) {
+                OfflineBanner(offline || error != null, error)
+                Row(Modifier.horizontalScroll(rememberScrollState())) {
+                    TIPOS.forEach { code ->
+                        FilterChip(
+                            selected = tipo == code,
+                            onClick = { onTipo(code) },
+                            label = { Text(labelChip(code)) },
+                            modifier = Modifier.padding(end = 8.dp),
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            ),
                         )
                     }
-                    item {
-                        if (semMovimento.isNotEmpty()) {
-                            TextButton(onClick = { semAberto = !semAberto }) {
-                                Text(if (semAberto) "Ocultar sem movimento" else "Sem movimento neste mês")
-                            }
-                        }
+                }
+            }
+            when {
+                loading && totais == null -> CircularProgressIndicator(Modifier.padding(24.dp))
+                totais == null -> Text(Strings.erroCarregarOrcamento, modifier = Modifier.padding(horizontal = 16.dp))
+                else -> {
+                    val cabe = (linha?.planoCentavos ?: 0) - (linha?.realizadoCentavos ?: 0)
+                    Column(Modifier.padding(horizontal = 16.dp)) {
+                        Text("${Strings.aindaCabeEm} ${labelTipo(tipo).lowercase()}", modifier = Modifier.padding(top = 12.dp))
+                        Text(
+                            formatCentavos(cabe),
+                            style = ValorDisplay,
+                            color = if (cabe < 0) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
+                        )
                     }
-                    if (semAberto) {
-                        items(semMovimento, key = { "z-${it.tipo}-${it.grupo}" }) { grupo ->
+                    LazyColumn(Modifier.weight(1f).padding(horizontal = 16.dp, bottom = 96.dp)) {
+                        items(comMovimento, key = { "${it.tipo}-${it.grupo}" }) { grupo ->
                             GrupoBloco(
                                 grupo = grupo,
                                 itens = data?.itens.orEmpty(),
@@ -236,10 +208,47 @@ fun OrcamentoScreen(
                                 },
                             )
                         }
+                        item {
+                            if (semMovimento.isNotEmpty()) {
+                                TextButton(onClick = { semAberto = !semAberto }) {
+                                    Text(if (semAberto) "Ocultar sem movimento" else "Sem movimento neste mês")
+                                }
+                            }
+                        }
+                        if (semAberto) {
+                            items(semMovimento, key = { "z-${it.tipo}-${it.grupo}" }) { grupo ->
+                                GrupoBloco(
+                                    grupo = grupo,
+                                    itens = data?.itens.orEmpty(),
+                                    lancamentos = data?.lancamentos.orEmpty(),
+                                    armedId = armedId,
+                                    onArm = { armedId = it },
+                                    onEdit = { editItem = it },
+                                    onArchive = { id ->
+                                        scope.launch {
+                                            try {
+                                                api.delete("/api/v1/itens?id=$id")
+                                                armedId = null
+                                                reload()
+                                            } catch (e: Exception) {
+                                                error = e.message
+                                            }
+                                        }
+                                    },
+                                )
+                            }
+                        }
                     }
                 }
             }
         }
+        FabEstendido(
+            text = "+ ${Strings.novoItem}",
+            onClick = { novoAberto = true },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(end = 16.dp, bottom = 88.dp),
+        )
     }
 
     editItem?.let { item ->
