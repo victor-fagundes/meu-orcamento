@@ -83,18 +83,30 @@ fun ExportScreen(api: ApiClient, onUnauthorized: () -> Unit) {
     Column(Modifier.fillMaxSize()) {
         BarraTitulo("Exportar")
         Column(Modifier.padding(horizontal = 16.dp)) {
-        OfflineBanner(offline, status)
-        BotaoPrimario(
-            text = Strings.exportarCsv,
-            onClick = { share("/api/v1/export/csv", "text/csv", "meu-orcamento.csv") },
-            modifier = Modifier.padding(top = 12.dp),
-        )
-        BotaoPrimario(
-            text = Strings.exportarJson,
-            onClick = { share("/api/v1/export/json", "application/json", "meu-orcamento.json") },
-            modifier = Modifier.padding(top = 8.dp),
-        )
-        status?.let { Text(it, modifier = Modifier.padding(top = 12.dp)) }
+            OfflineBanner(offline, status)
+            Text(
+                "Baixe seus dados para backup ou análise.",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 8.dp, bottom = 16.dp),
+            )
+            BotaoPrimario(
+                text = Strings.exportarCsv,
+                onClick = { share("/api/v1/export/csv", "text/csv", "meu-orcamento.csv") },
+                modifier = Modifier.padding(top = 8.dp),
+            )
+            BotaoPrimario(
+                text = Strings.exportarJson,
+                onClick = { share("/api/v1/export/json", "application/json", "meu-orcamento.json") },
+                modifier = Modifier.padding(top = 8.dp),
+            )
+            status?.let {
+                Text(
+                    it,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(top = 16.dp),
+                )
+            }
         }
     }
 }
