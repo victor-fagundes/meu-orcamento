@@ -14,6 +14,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -121,6 +122,7 @@ fun ResumoScreen(
     var loading by remember { mutableStateOf(true) }
     var offline by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
+    var valoresOcultos by remember { mutableStateOf(false) }
 
     LaunchedEffect(competencia) {
         loading = true
@@ -143,6 +145,8 @@ fun ResumoScreen(
         }
     }
 
+    fun formatar(valor: Long): String = if (valoresOcultos) "••••" else formatCentavos(valor)
+
     val totais = data?.totais
     Column(Modifier.fillMaxSize()) {
         CompetenciaPicker(competencia, onCompetencia)
@@ -162,20 +166,28 @@ fun ResumoScreen(
                     val gasto = totais.totalGastoDespesasCentavos
                     val dias = diasRestantesNoMes(competencia)
                     val estourou = ainda < 0
+                    Row(
+                        Modifier.fillMaxWidth().padding(top = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            if (estourou) Strings.passouDoOrcado else Strings.disponivelNesteMes,
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.weight(1f),
+                        )
+                        IconButton(onClick = { valoresOcultos = !valoresOcultos }) {
+                            Text(if (valoresOcultos) "👁" else "👁‍🗨", style = MaterialTheme.typography.bodyLarge)
+                        }
+                    }
                     Text(
-                        if (estourou) Strings.passouDoOrcado else Strings.disponivelNesteMes,
-                        style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(top = 8.dp),
-                    )
-                    Text(
-                        formatCentavos(ainda),
+                        formatar(ainda),
                         style = ValorDisplay,
                         color = if (estourou) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
                     )
                     if (orcado > 0) {
                         val frase = buildString {
-                            append("${Strings.gastou} ${formatCentavos(gasto)} de ${formatCentavos(orcado)}")
+                            append("${Strings.gastou} ${formatar(gasto)} de ${formatar(orcado)}")
                             if (dias != null) append(". ${Strings.faltam} $dias ${Strings.diasNesteMes}")
                         }
                         Text(
@@ -196,7 +208,6 @@ fun ResumoScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
-                    // Grade de 4 cartões em 2 colunas (DS: MODULOS.md)
                     Column(
                         Modifier.padding(top = 18.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -210,12 +221,12 @@ fun ResumoScreen(
                                 par.forEach { tipo ->
                                     CartaoTipo(
                                         tipo = tipo,
+                                        valoresOcultos = valoresOcultos,
                                         onClick = { onOpenTipo(tipo.tipo) },
                                         modifier = Modifier.weight(1f),
                                     )
                                 }
                                 if (par.size == 1) {
-                                    // Espaço vazio para manter o grid
                                     Column(Modifier.weight(1f)) {}
                                 }
                             }
@@ -230,9 +241,11 @@ fun ResumoScreen(
 @Composable
 private fun CartaoTipo(
     tipo: TotalTipoDto,
+    valoresOcultos: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    fun formatar(v: Long) = if (valoresOcultos) "••••" else formatCentavos(v)
     Card(
         onClick = onClick,
         modifier = modifier,
@@ -249,13 +262,13 @@ private fun CartaoTipo(
                 overflow = TextOverflow.Ellipsis,
             )
             Text(
-                formatCentavos(tipo.realizadoCentavos),
+                formatar(tipo.realizadoCentavos),
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(top = 4.dp),
                 maxLines = 1,
             )
             Text(
-                "de ${formatCentavos(tipo.planoCentavos)} planejados",
+                "de ${formatar(tipo.planoCentavos)} planejados",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = 2.dp),
