@@ -29,7 +29,6 @@ import app.meuorcamento.ui.BarraTitulo
 import app.meuorcamento.ui.OfflineBanner
 import app.meuorcamento.ui.components.BotaoPerigo
 import app.meuorcamento.ui.components.BotaoPrimario
-import app.meuorcamento.ui.components.BotaoTexto
 import app.meuorcamento.ui.copy.Strings
 import app.meuorcamento.ui.lancamentos.CartaoDto
 import app.meuorcamento.ui.lancamentos.CartoesResponse
@@ -118,81 +117,85 @@ fun AjustesScreen(
                 .padding(horizontal = 16.dp)
                 .verticalScroll(rememberScrollState()),
         ) {
-        OfflineBanner(offline || error != null, error)
-        Text(email ?: "Conta", modifier = Modifier.padding(vertical = 8.dp))
-        LinhaAjuste(
-            "Esqueci a senha",
-            enabled = !resetUrl.isNullOrBlank(),
-            onClick = { resetUrl?.let { uriHandler.openUri(it) } },
-        )
-        LinhaAjuste(Strings.sair, onClick = { confirmarSaida = true })
+            OfflineBanner(offline || error != null, error)
 
-        Text(Strings.limitesAlerta, style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 16.dp))
-        OutlinedTextField(
-            value = globalPct,
-            onValueChange = { globalPct = it.filter(Char::isDigit) },
-            label = { Text(Strings.limiteGlobal) },
-            modifier = Modifier.fillMaxWidth(),
-        )
-        BotaoPrimario(
-            text = Strings.salvarLimites,
-            onClick = {
-                val pct = globalPct.toIntOrNull()
-                if (pct == null || pct !in 1..100) {
-                    error = Strings.informeInteiro1a100
-                    globalPct = salvoPct
-                    return@BotaoPrimario
-                }
-                scope.launch {
-                    try {
-                        api.putJson("/api/v1/limites", api.json.encodeToString(SaveLimitesBody(pct)))
-                        salvoPct = pct.toString()
-                        reload()
-                    } catch (e: Exception) {
-                        error = e.message
+            // Grupo: Dia a dia (DS)
+            Text("Dia a dia", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 16.dp, bottom = 8.dp))
+            Text(email ?: "Conta", modifier = Modifier.padding(vertical = 8.dp))
+            LinhaAjuste(
+                "Esqueci a senha",
+                enabled = !resetUrl.isNullOrBlank(),
+                onClick = { resetUrl?.let { uriHandler.openUri(it) } },
+            )
+            LinhaAjuste(Strings.sair, onClick = { confirmarSaida = true })
+
+            Text(Strings.limitesAlerta, style = MaterialTheme.typography.titleSmall, modifier = Modifier.padding(top = 12.dp))
+            OutlinedTextField(
+                value = globalPct,
+                onValueChange = { globalPct = it.filter(Char::isDigit) },
+                label = { Text(Strings.limiteGlobal) },
+                modifier = Modifier.fillMaxWidth(),
+            )
+            BotaoPrimario(
+                text = Strings.salvarLimites,
+                onClick = {
+                    val pct = globalPct.toIntOrNull()
+                    if (pct == null || pct !in 1..100) {
+                        error = Strings.informeInteiro1a100
+                        globalPct = salvoPct
+                        return@BotaoPrimario
                     }
-                }
-            },
-            modifier = Modifier.padding(top = 8.dp),
-        )
-
-        Text(Strings.cartoes, style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 16.dp))
-        if (cartoes.isEmpty()) Text(Strings.nenhumCartao)
-        cartoes.forEach { c ->
-            LinhaAjuste(c.apelido, Strings.desativar, onClick = { cartaoSair = c })
-        }
-        OutlinedTextField(value = apelido, onValueChange = { apelido = it }, label = { Text(Strings.novoApelido) }, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(value = diaFecha, onValueChange = { diaFecha = it }, label = { Text(Strings.diaFechamento) }, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(value = diaVenc, onValueChange = { diaVenc = it }, label = { Text(Strings.diaVencimento) }, modifier = Modifier.fillMaxWidth())
-        BotaoPrimario(
-            text = Strings.adicionarCartao,
-            onClick = {
-                if (apelido.isBlank()) {
-                    error = Strings.informeApelido
-                    return@BotaoPrimario
-                }
-                scope.launch {
-                    try {
-                        api.postJson(
-                            "/api/v1/cartoes",
-                            api.json.encodeToString(
-                                NewCartaoBody(apelido.trim(), diaFecha.toIntOrNull() ?: 10, diaVenc.toIntOrNull() ?: 17),
-                            ),
-                        )
-                        apelido = ""
-                        reload()
-                    } catch (e: Exception) {
-                        error = e.message
+                    scope.launch {
+                        try {
+                            api.putJson("/api/v1/limites", api.json.encodeToString(SaveLimitesBody(pct)))
+                            salvoPct = pct.toString()
+                            reload()
+                        } catch (e: Exception) {
+                            error = e.message
+                        }
                     }
-                }
-            },
-            modifier = Modifier.padding(top = 8.dp),
-        )
+                },
+                modifier = Modifier.padding(top = 8.dp),
+            )
 
-        Text("Dados", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 24.dp))
-        LinhaAjuste("Importar planilha", onClick = onImportPlanilha)
-        LinhaAjuste("Importar fatura", onClick = onImportPdf)
-        LinhaAjuste("Exportar", onClick = onExport)
+            Text(Strings.cartoes, style = MaterialTheme.typography.titleSmall, modifier = Modifier.padding(top = 16.dp))
+            if (cartoes.isEmpty()) Text(Strings.nenhumCartao, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            cartoes.forEach { c ->
+                LinhaAjuste(c.apelido, Strings.desativar, onClick = { cartaoSair = c })
+            }
+            OutlinedTextField(value = apelido, onValueChange = { apelido = it }, label = { Text(Strings.novoApelido) }, modifier = Modifier.fillMaxWidth().padding(top = 8.dp))
+            OutlinedTextField(value = diaFecha, onValueChange = { diaFecha = it }, label = { Text(Strings.diaFechamento) }, modifier = Modifier.fillMaxWidth())
+            OutlinedTextField(value = diaVenc, onValueChange = { diaVenc = it }, label = { Text(Strings.diaVencimento) }, modifier = Modifier.fillMaxWidth())
+            BotaoPrimario(
+                text = Strings.adicionarCartao,
+                onClick = {
+                    if (apelido.isBlank()) {
+                        error = Strings.informeApelido
+                        return@BotaoPrimario
+                    }
+                    scope.launch {
+                        try {
+                            api.postJson(
+                                "/api/v1/cartoes",
+                                api.json.encodeToString(
+                                    NewCartaoBody(apelido.trim(), diaFecha.toIntOrNull() ?: 10, diaVenc.toIntOrNull() ?: 17),
+                                ),
+                            )
+                            apelido = ""
+                            reload()
+                        } catch (e: Exception) {
+                            error = e.message
+                        }
+                    }
+                },
+                modifier = Modifier.padding(top = 8.dp),
+            )
+
+            // Grupo: Dados e arquivos (DS)
+            Text("Dados e arquivos", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 24.dp, bottom = 8.dp))
+            LinhaAjuste("Importar planilha", onClick = onImportPlanilha)
+            LinhaAjuste("Importar fatura", onClick = onImportPdf)
+            LinhaAjuste("Exportar", onClick = onExport)
         }
     }
 
