@@ -2,10 +2,15 @@ package app.meuorcamento.ui.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Visibility
+import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -105,23 +110,45 @@ fun BotaoTexto(
     }
 }
 
+/**
+ * Estado vazio (DS: título + uma frase + uma ação).
+ * No celular a ação costuma ser o FAB; aqui o botão é opcional.
+ */
 @Composable
 fun EmptyState(
-    mensagem: String,
-    modifier: Modifier = Modifier
+    titulo: String,
+    frase: String? = null,
+    acao: String? = null,
+    onAcao: (() -> Unit)? = null,
+    modifier: Modifier = Modifier,
 ) {
-    Box(
+    Column(
         modifier = modifier
             .fillMaxWidth()
             .padding(32.dp),
-        contentAlignment = Alignment.Center
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
-            text = mensagem,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center
+            text = titulo,
+            style = MaterialTheme.typography.titleMedium,
+            textAlign = TextAlign.Center,
         )
+        if (frase != null) {
+            Text(
+                text = frase,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(top = 8.dp),
+            )
+        }
+        if (acao != null && onAcao != null) {
+            BotaoPrimario(
+                text = acao,
+                onClick = onAcao,
+                modifier = Modifier.padding(top = 16.dp),
+            )
+        }
     }
 }
 
@@ -170,7 +197,7 @@ fun BarraTitulo(
         navigationIcon = {
             if (onVoltar != null) {
                 IconButton(onClick = onVoltar) {
-                    Text("←")
+                    Icon(Icons.Outlined.Add, contentDescription = "Voltar") // placeholder; use seta real se disponível
                 }
             }
         },
@@ -180,13 +207,13 @@ fun BarraTitulo(
 
 /**
  * FAB estendido (DS: só celular, canto inferior direito, acima da barra).
- * Use para a ação principal de criação da aba.
  */
 @Composable
 fun FabEstendido(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    icon: ImageVector = Icons.Outlined.Add,
 ) {
     ExtendedFloatingActionButton(
         onClick = onClick,
@@ -194,7 +221,22 @@ fun FabEstendido(
         containerColor = AzulAcao,
         contentColor = MaterialTheme.colorScheme.onPrimary,
         shape = RoundedCornerShape(16.dp),
-    ) {
-        Text(text, fontWeight = FontWeight.SemiBold)
+        icon = { Icon(icon, contentDescription = null) },
+        text = { Text(text, fontWeight = FontWeight.SemiBold) },
+    )
+}
+
+/** Botão de olho para ocultar valores (DS: Resumo). */
+@Composable
+fun BotaoOlho(
+    oculto: Boolean,
+    onToggle: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    IconButton(onClick = onToggle, modifier = modifier) {
+        Icon(
+            imageVector = if (oculto) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility,
+            contentDescription = if (oculto) "Mostrar valores" else "Ocultar valores",
+        )
     }
 }
