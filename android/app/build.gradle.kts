@@ -99,6 +99,7 @@ dependencies {
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
 
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
@@ -106,4 +107,3 @@ dependencies {
 
     debugImplementation("androidx.compose.ui:ui-tooling")
 }
-
