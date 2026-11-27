@@ -233,7 +233,10 @@ fun LancamentosScreen(
             }
 
             if (loaded && rows.isEmpty() && error == null && !showForm) {
-                EmptyState(mensagem = Strings.nenhumLancamento)
+                EmptyState(
+                    titulo = "Nenhum lançamento",
+                    frase = "Registre o primeiro gasto ou receita deste mês.",
+                )
             }
 
             LazyColumn(Modifier.weight(1f).padding(bottom = 96.dp)) {
