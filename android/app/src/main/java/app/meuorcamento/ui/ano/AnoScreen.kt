@@ -87,40 +87,42 @@ fun AnoScreen(api: ApiClient, onUnauthorized: () -> Unit) {
                 .padding(horizontal = 16.dp)
                 .verticalScroll(rememberScrollState()),
         ) {
-        OfflineBanner(offline || error != null, error)
-        when {
-            grade == null -> Text(Strings.erroCarregarAno)
-            vazio -> Text("Este ano ainda não tem valores.")
-            else -> {
-                grade.realizado.forEach { cell ->
-                    val plano = grade.planejado.find { it.id == cell.id }?.valoresCentavos.orEmpty()
-                    Column(Modifier.padding(vertical = 8.dp)) {
-                        Text(
-                            cell.nome ?: cell.grupo,
-                            style = MaterialTheme.typography.titleMedium,
-                        )
-                        Row(Modifier.horizontalScroll(rememberScrollState())) {
-                            Strings.mesesAbreviados.forEachIndexed { index, nome ->
-                                Column(Modifier.width(120.dp).padding(end = 8.dp)) {
-                                    Text(nome, style = MaterialTheme.typography.labelSmall)
-                                    Text(
-                                        formatCentavos(cell.valoresCentavos.getOrElse(index) { 0L }),
-                                        maxLines = 1,
-                                        softWrap = false,
-                                    )
-                                    Text(
-                                        "${Strings.plano} ${formatCentavos(plano.getOrElse(index) { 0L })}",
-                                        maxLines = 1,
-                                        softWrap = false,
-                                        style = MaterialTheme.typography.bodySmall,
-                                    )
+            OfflineBanner(offline || error != null, error)
+            when {
+                grade == null -> Text(Strings.erroCarregarAno, style = MaterialTheme.typography.bodyLarge)
+                vazio -> Text("Este ano ainda não tem valores.", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                else -> {
+                    grade.realizado.forEach { cell ->
+                        val plano = grade.planejado.find { it.id == cell.id }?.valoresCentavos.orEmpty()
+                        Column(Modifier.padding(vertical = 12.dp)) {
+                            Text(
+                                cell.nome ?: cell.grupo,
+                                style = MaterialTheme.typography.titleMedium,
+                            )
+                            Row(Modifier.horizontalScroll(rememberScrollState()).padding(top = 8.dp)) {
+                                Strings.mesesAbreviados.forEachIndexed { index, nome ->
+                                    Column(Modifier.width(100.dp).padding(end = 12.dp)) {
+                                        Text(nome, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        Text(
+                                            formatCentavos(cell.valoresCentavos.getOrElse(index) { 0L }),
+                                            maxLines = 1,
+                                            softWrap = false,
+                                            style = MaterialTheme.typography.bodyLarge,
+                                        )
+                                        Text(
+                                            "${Strings.plano} ${formatCentavos(plano.getOrElse(index) { 0L })}",
+                                            maxLines = 1,
+                                            softWrap = false,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
-        }
         }
     }
 }
