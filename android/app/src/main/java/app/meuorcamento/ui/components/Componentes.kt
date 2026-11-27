@@ -177,3 +177,24 @@ fun BarraTitulo(
         actions = acoes
     )
 }
+
+/**
+ * FAB estendido (DS: só celular, canto inferior direito, acima da barra).
+ * Use para a ação principal de criação da aba.
+ */
+@Composable
+fun FabEstendido(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    ExtendedFloatingActionButton(
+        onClick = onClick,
+        modifier = modifier,
+        containerColor = AzulAcao,
+        contentColor = MaterialTheme.colorScheme.onPrimary,
+        shape = RoundedCornerShape(16.dp),
+    ) {
+        Text(text, fontWeight = FontWeight.SemiBold)
+    }
+}
