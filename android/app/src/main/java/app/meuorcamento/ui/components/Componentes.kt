@@ -9,10 +9,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import app.meuorcamento.ui.theme.TemaKt
+import app.meuorcamento.ui.theme.AzulAcao
 
 /**
- * Design system mínimo do Meu Orçamento.
+ * Design system do Meu Orçamento.
  * Use SEMPRE estes componentes. Nunca invente botão ou estilo novo.
  */
 
@@ -29,14 +29,14 @@ fun BotaoPrimario(
         modifier = modifier
             .fillMaxWidth()
             .height(48.dp),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(14.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = TemaKt.getAzulAcao()
+            containerColor = AzulAcao
         )
     ) {
         Text(
             text = text,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.SemiBold
         )
     }
 }
@@ -54,7 +54,7 @@ fun BotaoSecundario(
         modifier = modifier
             .fillMaxWidth()
             .height(48.dp),
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(14.dp)
     ) {
         Text(text = text)
     }
@@ -73,7 +73,7 @@ fun BotaoPerigo(
         modifier = modifier
             .fillMaxWidth()
             .height(48.dp),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(14.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.error,
             contentColor = MaterialTheme.colorScheme.onError
@@ -81,7 +81,7 @@ fun BotaoPerigo(
     ) {
         Text(
             text = text,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.SemiBold
         )
     }
 }
@@ -99,7 +99,7 @@ fun BotaoTexto(
     ) {
         Text(
             text = text,
-            color = if (perigoso) MaterialTheme.colorScheme.error else TemaKt.getAzulAcao(),
+            color = if (perigoso) MaterialTheme.colorScheme.error else AzulAcao,
             fontWeight = FontWeight.Medium
         )
     }
@@ -146,7 +146,7 @@ fun DialogConfirmacao(
                 }
             } else {
                 TextButton(onClick = onConfirmar) {
-                    Text(textoConfirmar, color = TemaKt.getAzulAcao())
+                    Text(textoConfirmar, color = AzulAcao)
                 }
             }
         },
