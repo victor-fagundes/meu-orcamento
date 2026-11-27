@@ -24,6 +24,7 @@ import app.meuorcamento.data.ApiException
 import app.meuorcamento.domain.formatCentavos
 import app.meuorcamento.ui.BarraTitulo
 import app.meuorcamento.ui.OfflineBanner
+import app.meuorcamento.ui.components.EmptyState
 import app.meuorcamento.ui.copy.Strings
 import kotlinx.serialization.Serializable
 import java.io.IOException
@@ -90,7 +91,10 @@ fun AnoScreen(api: ApiClient, onUnauthorized: () -> Unit) {
             OfflineBanner(offline || error != null, error)
             when {
                 grade == null -> Text(Strings.erroCarregarAno, style = MaterialTheme.typography.bodyLarge)
-                vazio -> Text("Este ano ainda não tem valores.", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                vazio -> EmptyState(
+                    titulo = "Este ano ainda não tem valores",
+                    frase = "Quando houver planejamento ou lançamentos, eles aparecem aqui.",
+                )
                 else -> {
                     grade.realizado.forEach { cell ->
                         val plano = grade.planejado.find { it.id == cell.id }?.valoresCentavos.orEmpty()
