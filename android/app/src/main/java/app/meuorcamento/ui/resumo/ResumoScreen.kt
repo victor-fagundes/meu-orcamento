@@ -1,6 +1,7 @@
 package app.meuorcamento.ui.resumo
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,6 +11,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -95,7 +98,6 @@ data class ResumoLancDto(
     val itemGrupo: String = "",
 )
 
-/** Dias civis que restam no mês corrente, incluindo hoje. Fora do mês corrente, null. */
 fun diasRestantesNoMes(competencia: String, hoje: Calendar = Calendar.getInstance()): Int? {
     val parts = competencia.split("-")
     if (parts.size != 2) return null
@@ -194,9 +196,29 @@ fun ResumoScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
-                    Column(Modifier.padding(top = 18.dp)) {
-                        totais.porTipo.forEach { tipo ->
-                            LinhaTipo(tipo, onClick = { onOpenTipo(tipo.tipo) })
+                    // Grade de 4 cartões em 2 colunas (DS: MODULOS.md)
+                    Column(
+                        Modifier.padding(top = 18.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        val tipos = totais.porTipo
+                        tipos.chunked(2).forEach { par ->
+                            Row(
+                                Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            ) {
+                                par.forEach { tipo ->
+                                    CartaoTipo(
+                                        tipo = tipo,
+                                        onClick = { onOpenTipo(tipo.tipo) },
+                                        modifier = Modifier.weight(1f),
+                                    )
+                                }
+                                if (par.size == 1) {
+                                    // Espaço vazio para manter o grid
+                                    Column(Modifier.weight(1f)) {}
+                                }
+                            }
                         }
                     }
                 }
@@ -206,33 +228,41 @@ fun ResumoScreen(
 }
 
 @Composable
-private fun LinhaTipo(tipo: TotalTipoDto, onClick: () -> Unit) {
-    Column(
-        Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(vertical = 12.dp),
+private fun CartaoTipo(
+    tipo: TotalTipoDto,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        onClick = onClick,
+        modifier = modifier,
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Column(Modifier.padding(16.dp)) {
             Text(
                 labelTipo(tipo.tipo),
-                modifier = Modifier.weight(1f),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.bodyLarge,
             )
             Text(
                 formatCentavos(tipo.realizadoCentavos),
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(top = 4.dp),
                 maxLines = 1,
-                softWrap = false,
-                style = MaterialTheme.typography.bodyLarge,
+            )
+            Text(
+                "de ${formatCentavos(tipo.planoCentavos)} planejados",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 2.dp),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
         }
-        Text(
-            "${Strings.plano} ${formatCentavos(tipo.planoCentavos)}",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
     }
 }
 
