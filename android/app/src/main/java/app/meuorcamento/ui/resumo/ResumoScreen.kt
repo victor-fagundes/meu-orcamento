@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.LinearProgressIndicator
@@ -21,15 +22,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import app.meuorcamento.ui.theme.ValorDisplay
+import app.meuorcamento.ui.theme.corMedidor
 import app.meuorcamento.data.ApiClient
 import app.meuorcamento.data.ApiException
 import app.meuorcamento.domain.formatCentavos
 import app.meuorcamento.ui.CompetenciaPicker
 import app.meuorcamento.ui.OfflineBanner
 import app.meuorcamento.ui.copy.Strings
+import androidx.compose.foundation.isSystemInDarkTheme
 import kotlinx.serialization.Serializable
 import java.io.IOException
 import java.util.Calendar
@@ -156,7 +160,12 @@ fun ResumoScreen(
                     val gasto = totais.totalGastoDespesasCentavos
                     val dias = diasRestantesNoMes(competencia)
                     val estourou = ainda < 0
-                    Text(if (estourou) Strings.passouDoOrcado else Strings.aindaPodeGastar)
+                    Text(
+                        if (estourou) Strings.passouDoOrcado else Strings.disponivelNesteMes,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(top = 8.dp),
+                    )
                     Text(
                         formatCentavos(ainda),
                         style = ValorDisplay,
@@ -175,8 +184,8 @@ fun ResumoScreen(
                         val frac = (gasto.toFloat() / orcado.toFloat()).coerceIn(0f, 1f)
                         LinearProgressIndicator(
                             progress = { frac },
-                            modifier = Modifier.fillMaxWidth().height(4.dp),
-                            color = if (estourou) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(99.dp)),
+                            color = corMedidor(orcado, gasto, isSystemInDarkTheme()),
                             trackColor = MaterialTheme.colorScheme.surfaceVariant,
                         )
                     } else if (dias != null) {
@@ -185,8 +194,10 @@ fun ResumoScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
-                    totais.porTipo.forEach { tipo ->
-                        LinhaTipo(tipo, onClick = { onOpenTipo(tipo.tipo) })
+                    Column(Modifier.padding(top = 18.dp)) {
+                        totais.porTipo.forEach { tipo ->
+                            LinhaTipo(tipo, onClick = { onOpenTipo(tipo.tipo) })
+                        }
                     }
                 }
             }
@@ -208,8 +219,14 @@ private fun LinhaTipo(tipo: TotalTipoDto, onClick: () -> Unit) {
                 modifier = Modifier.weight(1f),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.bodyLarge,
             )
-            Text(formatCentavos(tipo.realizadoCentavos), maxLines = 1, softWrap = false)
+            Text(
+                formatCentavos(tipo.realizadoCentavos),
+                maxLines = 1,
+                softWrap = false,
+                style = MaterialTheme.typography.bodyLarge,
+            )
         }
         Text(
             "${Strings.plano} ${formatCentavos(tipo.planoCentavos)}",
