@@ -1,5 +1,6 @@
 package app.meuorcamento.ui.lancamentos
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -41,6 +42,7 @@ import app.meuorcamento.ui.components.BotaoPerigo
 import app.meuorcamento.ui.components.BotaoPrimario
 import app.meuorcamento.ui.components.BotaoTexto
 import app.meuorcamento.ui.components.EmptyState
+import app.meuorcamento.ui.components.FabEstendido
 import app.meuorcamento.ui.copy.Strings
 import app.meuorcamento.ui.reaisParaCentavos
 import kotlinx.coroutines.launch
@@ -162,121 +164,118 @@ fun LancamentosScreen(
 
     LaunchedEffect(competencia) { reload() }
 
-    Column(Modifier.fillMaxSize()) {
-        CompetenciaPicker(competencia, onCompetencia)
-        Column(Modifier.padding(horizontal = 16.dp)) {
-            OfflineBanner(offline || error != null, error)
-            if (loaded && rows.isNotEmpty()) {
-                BotaoPrimario(
-                    text = Strings.registrar,
-                    onClick = {
-                        editing = null
-                        showForm = true
+    Box(Modifier.fillMaxSize()) {
+        Column(Modifier.fillMaxSize()) {
+            CompetenciaPicker(competencia, onCompetencia)
+            Column(Modifier.padding(horizontal = 16.dp)) {
+                OfflineBanner(offline || error != null, error)
+            }
+
+            if (showForm) {
+                Column(Modifier.padding(horizontal = 16.dp)) {
+                LancamentoForm(
+                    itens = itens,
+                    cartoes = cartoes,
+                    editing = editing,
+                    competencia = competencia,
+                    onCancel = { showForm = false; editing = null },
+                    onSave = { item, valorTexto, dataISO, descricao, pagamento, parcelas, editScope ->
+                        val cents = reaisParaCentavos(valorTexto)
+                        if (cents == null) {
+                            error = Strings.informeValorMaiorZero
+                            return@LancamentoForm
+                        }
+                        scope.launch {
+                            try {
+                                val atual = editing
+                                if (atual == null) {
+                                    api.postJson(
+                                        "/api/v1/lancamentos",
+                                        api.json.encodeToString(
+                                            CreateLancBody(
+                                                itemId = item.id,
+                                                descricao = descricao.ifBlank { null },
+                                                valorCentavos = cents,
+                                                dataISO = dataISO,
+                                                pagamento = pagamento,
+                                                parcelas = parcelas,
+                                            ),
+                                        ),
+                                    )
+                                } else {
+                                    api.patchJson(
+                                        "/api/v1/lancamentos/${atual.id}",
+                                        api.json.encodeToString(
+                                            PatchLancBody(
+                                                itemId = item.id,
+                                                descricao = descricao.ifBlank { null },
+                                                valorCentavos = cents,
+                                                dataISO = dataISO,
+                                                pagamento = pagamento,
+                                                scope = editScope,
+                                            ),
+                                        ),
+                                    )
+                                }
+                                showForm = false
+                                editing = null
+                                reload()
+                            } catch (e: ApiException) {
+                                if (e.status == 401) onUnauthorized() else error = e.message
+                            } catch (e: Exception) {
+                                error = e.message
+                                offline = e is IOException
+                            }
+                        }
                     },
                 )
-            }
-        }
-
-        if (showForm) {
-            Column(Modifier.padding(horizontal = 16.dp)) {
-            LancamentoForm(
-                itens = itens,
-                cartoes = cartoes,
-                editing = editing,
-                competencia = competencia,
-                onCancel = { showForm = false; editing = null },
-                onSave = { item, valorTexto, dataISO, descricao, pagamento, parcelas, editScope ->
-                    val cents = reaisParaCentavos(valorTexto)
-                    if (cents == null) {
-                        error = Strings.informeValorMaiorZero
-                        return@LancamentoForm
-                    }
-                    scope.launch {
-                        try {
-                            val atual = editing
-                            if (atual == null) {
-                                api.postJson(
-                                    "/api/v1/lancamentos",
-                                    api.json.encodeToString(
-                                        CreateLancBody(
-                                            itemId = item.id,
-                                            descricao = descricao.ifBlank { null },
-                                            valorCentavos = cents,
-                                            dataISO = dataISO,
-                                            pagamento = pagamento,
-                                            parcelas = parcelas,
-                                        ),
-                                    ),
-                                )
-                            } else {
-                                api.patchJson(
-                                    "/api/v1/lancamentos/${atual.id}",
-                                    api.json.encodeToString(
-                                        PatchLancBody(
-                                            itemId = item.id,
-                                            descricao = descricao.ifBlank { null },
-                                            valorCentavos = cents,
-                                            dataISO = dataISO,
-                                            pagamento = pagamento,
-                                            scope = editScope,
-                                        ),
-                                    ),
-                                )
-                            }
-                            showForm = false
-                            editing = null
-                            reload()
-                        } catch (e: ApiException) {
-                            if (e.status == 401) onUnauthorized() else error = e.message
-                        } catch (e: Exception) {
-                            error = e.message
-                            offline = e is IOException
-                        }
-                    }
-                },
-            )
-            }
-        }
-
-        if (loaded && rows.isEmpty() && error == null && !showForm) {
-            EmptyState(mensagem = Strings.nenhumLancamento)
-            BotaoPrimario(
-                text = Strings.registrar,
-                onClick = { editing = null; showForm = true },
-                modifier = Modifier.padding(horizontal = 16.dp),
-            )
-        }
-
-        LazyColumn(Modifier.weight(1f)) {
-            items(rows, key = { it.id }) { row ->
-                val titulo = row.descricao?.takeIf { it.isNotBlank() } ?: (row.itemNome ?: "Lançamento")
-                Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            titulo,
-                            modifier = Modifier.weight(1f),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                        Text(formatCentavos(row.valorCentavos), maxLines = 1, softWrap = false)
-                    }
-                    Text(
-                        "${dataVisivel(row.dataTransacao)} · ${row.itemNome ?: Strings.item} · ${rotuloMeio(row)}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    RowActions(
-                        onEdit = {
-                            editing = row
-                            showForm = true
-                        },
-                        onDelete = {
-                            pendingDelete = row
-                            scopeChoice = "one"
-                        },
-                    )
                 }
             }
+
+            if (loaded && rows.isEmpty() && error == null && !showForm) {
+                EmptyState(mensagem = Strings.nenhumLancamento)
+            }
+
+            LazyColumn(Modifier.weight(1f).padding(bottom = 96.dp)) {
+                items(rows, key = { it.id }) { row ->
+                    val titulo = row.descricao?.takeIf { it.isNotBlank() } ?: (row.itemNome ?: "Lançamento")
+                    Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                titulo,
+                                modifier = Modifier.weight(1f),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                            Text(formatCentavos(row.valorCentavos), maxLines = 1, softWrap = false)
+                        }
+                        Text(
+                            "${dataVisivel(row.dataTransacao)} · ${row.itemNome ?: Strings.item} · ${rotuloMeio(row)}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        RowActions(
+                            onEdit = {
+                                editing = row
+                                showForm = true
+                            },
+                            onDelete = {
+                                pendingDelete = row
+                                scopeChoice = "one"
+                            },
+                        )
+                    }
+                }
+            }
+        }
+        if (!showForm) {
+            FabEstendido(
+                text = "+ ${Strings.registrar}",
+                onClick = { editing = null; showForm = true },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(end = 16.dp, bottom = 88.dp),
+            )
         }
     }
 
@@ -467,9 +466,11 @@ private fun LancamentoForm(
                         )
                     }
                     showDate = false
-                }) { Text("Ok") }
+                }) { Text(Strings.confirmar) }
             },
             dismissButton = { TextButton(onClick = { showDate = false }) { Text(Strings.cancelar) } },
-        ) { DatePicker(state = dateState) }
+        ) {
+            DatePicker(state = dateState)
+        }
     }
 }
