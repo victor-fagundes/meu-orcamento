@@ -81,6 +81,8 @@ fun AjustesScreen(
     var apelido by remember { mutableStateOf("") }
     var diaFecha by remember { mutableStateOf("10") }
     var diaVenc by remember { mutableStateOf("17") }
+    var passoExcluir by remember { mutableStateOf(0) } // 0 = fechado, 1 = aviso, 2 = digitar EXCLUIR
+    var textoExcluir by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
     val uriHandler = LocalUriHandler.current
 
@@ -119,7 +121,6 @@ fun AjustesScreen(
         ) {
             OfflineBanner(offline || error != null, error)
 
-            // Grupo: Dia a dia (DS)
             Text("Dia a dia", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 16.dp, bottom = 8.dp))
             Text(email ?: "Conta", modifier = Modifier.padding(vertical = 8.dp))
             LinhaAjuste(
@@ -191,11 +192,19 @@ fun AjustesScreen(
                 modifier = Modifier.padding(top = 8.dp),
             )
 
-            // Grupo: Dados e arquivos (DS)
             Text("Dados e arquivos", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 24.dp, bottom = 8.dp))
             LinhaAjuste("Importar planilha", onClick = onImportPlanilha)
             LinhaAjuste("Importar fatura", onClick = onImportPdf)
             LinhaAjuste("Exportar", onClick = onExport)
+
+            // Excluir conta isolado no fim, em vermelho (DS)
+            Text(
+                Strings.queroExcluirMinhaConta,
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier
+                    .padding(top = 32.dp, bottom = 16.dp)
+                    .clickable { passoExcluir = 1 },
+            )
         }
     }
 
@@ -217,6 +226,61 @@ fun AjustesScreen(
                 )
             },
             dismissButton = { TextButton(onClick = { confirmarSaida = false }) { Text(Strings.cancelar) } },
+        )
+    }
+
+    // Passo 1: aviso
+    if (passoExcluir == 1) {
+        AlertDialog(
+            onDismissRequest = { passoExcluir = 0 },
+            title = { Text(Strings.excluirConta) },
+            text = { Text(Strings.removePermanentemente) },
+            confirmButton = {
+                BotaoPerigo(
+                    text = "Continuar",
+                    onClick = { passoExcluir = 2 },
+                )
+            },
+            dismissButton = { TextButton(onClick = { passoExcluir = 0 }) { Text(Strings.cancelar) } },
+        )
+    }
+
+    // Passo 2: digitar EXCLUIR
+    if (passoExcluir == 2) {
+        AlertDialog(
+            onDismissRequest = { passoExcluir = 0; textoExcluir = "" },
+            title = { Text(Strings.digiteExcluir) },
+            text = {
+                Column {
+                    Text(Strings.removePermanentemente, modifier = Modifier.padding(bottom = 8.dp))
+                    OutlinedTextField(
+                        value = textoExcluir,
+                        onValueChange = { textoExcluir = it },
+                        label = { Text("EXCLUIR") },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+            },
+            confirmButton = {
+                BotaoPerigo(
+                    text = Strings.excluirDefinitivamente,
+                    enabled = textoExcluir == "EXCLUIR",
+                    onClick = {
+                        passoExcluir = 0
+                        textoExcluir = ""
+                        scope.launch {
+                            try {
+                                api.delete("/api/v1/conta")
+                                auth.signOut()
+                                onSignedOut()
+                            } catch (e: Exception) {
+                                error = e.message
+                            }
+                        }
+                    },
+                )
+            },
+            dismissButton = { TextButton(onClick = { passoExcluir = 0; textoExcluir = "" }) { Text(Strings.cancelar) } },
         )
     }
 
